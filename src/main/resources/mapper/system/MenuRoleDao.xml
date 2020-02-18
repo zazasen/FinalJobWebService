@@ -67,4 +67,8 @@
         delete from final_job.menu_role where id = #{id}
     </delete>
 
+    <select id="getRoleIdsByMenuId" resultType="int">
+        select role_id from menu_role where menu_id = #{menuId};
+    </select>
+
 </mapper>

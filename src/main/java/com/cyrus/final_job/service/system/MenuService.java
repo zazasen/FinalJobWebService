@@ -60,4 +60,11 @@ public interface MenuService {
      * @return 菜单信息
      */
     Result getMenusByUserId();
+
+    /**
+     * 获取所有的菜单，带角色
+     *
+     * @return 所有的菜单
+     */
+    List<Menu> getAllMenuWithRole();
 }

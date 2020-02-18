@@ -3,12 +3,9 @@ package com.cyrus.final_job.service.impl.system;
 import com.cyrus.final_job.dao.system.MenuDao;
 import com.cyrus.final_job.dao.system.MenuRoleDao;
 import com.cyrus.final_job.dao.system.RoleDao;
-import com.cyrus.final_job.dao.system.UserRoleDao;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.system.Menu;
-import com.cyrus.final_job.entity.system.MenuRole;
 import com.cyrus.final_job.entity.system.Role;
-import com.cyrus.final_job.entity.system.UserRole;
 import com.cyrus.final_job.service.system.MenuService;
 import com.cyrus.final_job.utils.Results;
 import com.cyrus.final_job.utils.UserUtils;
@@ -32,8 +29,6 @@ public class MenuServiceImpl implements MenuService {
     @Autowired
     private MenuRoleDao menuRoleDao;
 
-    @Autowired
-    private UserRoleDao userRoleDao;
 
     @Autowired
     private RoleDao roleDao;
@@ -101,5 +96,20 @@ public class MenuServiceImpl implements MenuService {
         int userId = UserUtils.getCurrentUserId();
         List<Menu> menus = menuDao.getMenusByUserId(userId);
         return Results.createOk(menus);
+    }
+
+    @Override
+    public List<Menu> getAllMenuWithRole() {
+        List<Menu> menus = menuDao.queryAll(new Menu());
+        for (Menu menu : menus) {
+            List<Role> roles = new ArrayList<>();
+            List<Integer> roleIds = menuRoleDao.getRoleIdsByMenuId(menu.getId());
+            for (Integer roleId : roleIds) {
+                Role role = roleDao.queryById(roleId);
+                roles.add(role);
+            }
+            menu.setRoles(roles);
+        }
+        return menus;
     }
 }

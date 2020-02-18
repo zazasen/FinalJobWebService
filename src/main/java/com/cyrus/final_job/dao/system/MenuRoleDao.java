@@ -63,4 +63,5 @@ public interface MenuRoleDao {
      */
     int deleteById(Integer id);
 
+    List<Integer> getRoleIdsByMenuId(Integer menuId);
 }
