@@ -14,6 +14,9 @@ public abstract class Results {
     public static Result createOk(String msg) {
         return new Result(200, msg);
     }
+    public static Result createOk(Object data) {
+        return new Result(200, null,data);
+    }
 
     public static Result createOk(String msg, Object data) {
         return new Result(200, msg, data);

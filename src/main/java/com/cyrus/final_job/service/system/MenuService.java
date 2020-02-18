@@ -1,5 +1,6 @@
 package com.cyrus.final_job.service.system;
 
+import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.system.Menu;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface MenuService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<Menu> queryAllByLimit(int offset, int limit);
@@ -53,4 +54,10 @@ public interface MenuService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 获取当前登录用户可以访问的菜单
+     *
+     * @return 菜单信息
+     */
+    Result getMenusByUserId();
 }

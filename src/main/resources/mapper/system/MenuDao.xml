@@ -34,7 +34,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="MenuMap">
         select
-          id, url, path, component, name, icon, keep_alive, require_auth, parent_id, enabled
+        id, url, path, component, name, icon, keep_alive, require_auth, parent_id, enabled
         from final_job.menu
         <where>
             <if test="id != null">
@@ -115,5 +115,36 @@
     <delete id="deleteById">
         delete from final_job.menu where id = #{id}
     </delete>
+
+    <resultMap id="MenusMap" type="com.cyrus.final_job.entity.system.Menu" extends="MenuMap">
+        <collection property="children" ofType="com.cyrus.final_job.entity.system.Menu">
+            <result property="id" column="id2" jdbcType="INTEGER"/>
+            <result property="path" column="path2" jdbcType="VARCHAR"/>
+            <result property="component" column="component2" jdbcType="VARCHAR"/>
+            <result property="name" column="name2" jdbcType="VARCHAR"/>
+            <result property="icon" column="icon2" jdbcType="VARCHAR"/>
+            <result property="keepAlive" column="keepAlive2" jdbcType="INTEGER"/>
+            <result property="requireAuth" column="requireAuth2" jdbcType="INTEGER"/>
+            <result property="parentId" column="parentId2" jdbcType="INTEGER"/>
+            <result property="enabled" column="enabled2" jdbcType="INTEGER"/>
+        </collection>
+    </resultMap>
+    <select id="getMenusByUserId" resultMap="MenusMap">
+        select m2.*,
+               m1.`id`           as id2,
+               m1.`component`    as component2,
+               m1.`enabled`      as enabled2,
+               m1.`icon`         as icon2,
+               m1.`keep_alive`   as keepAlive2,
+               m1.`name`         as name2,
+               m1.`parent_id`    as parentId2,
+               m1.`require_auth` as requireAuth2,
+               m1.`path`         as path2
+        from (select *
+              from menu
+              where id in (select menu_id from menu_role where role_id in (select role_id from user_role where user_id = #{userId}))
+                and enabled = true) m1
+                 left join menu m2 on m1.parent_id = m2.id
+    </select>
 
 </mapper>

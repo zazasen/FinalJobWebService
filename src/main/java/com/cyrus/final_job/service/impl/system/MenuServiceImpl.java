@@ -1,11 +1,21 @@
 package com.cyrus.final_job.service.impl.system;
 
 import com.cyrus.final_job.dao.system.MenuDao;
+import com.cyrus.final_job.dao.system.MenuRoleDao;
+import com.cyrus.final_job.dao.system.RoleDao;
+import com.cyrus.final_job.dao.system.UserRoleDao;
+import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.system.Menu;
+import com.cyrus.final_job.entity.system.MenuRole;
+import com.cyrus.final_job.entity.system.Role;
+import com.cyrus.final_job.entity.system.UserRole;
 import com.cyrus.final_job.service.system.MenuService;
+import com.cyrus.final_job.utils.Results;
+import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +28,15 @@ import java.util.List;
 public class MenuServiceImpl implements MenuService {
     @Autowired
     private MenuDao menuDao;
+
+    @Autowired
+    private MenuRoleDao menuRoleDao;
+
+    @Autowired
+    private UserRoleDao userRoleDao;
+
+    @Autowired
+    private RoleDao roleDao;
 
     /**
      * 通过ID查询单条数据
@@ -34,7 +53,7 @@ public class MenuServiceImpl implements MenuService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     @Override
@@ -75,5 +94,12 @@ public class MenuServiceImpl implements MenuService {
     @Override
     public boolean deleteById(Integer id) {
         return this.menuDao.deleteById(id) > 0;
+    }
+
+    @Override
+    public Result getMenusByUserId() {
+        int userId = UserUtils.getCurrentUserId();
+        List<Menu> menus = menuDao.getMenusByUserId(userId);
+        return Results.createOk(menus);
     }
 }

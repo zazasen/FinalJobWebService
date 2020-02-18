@@ -23,10 +23,13 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -35,6 +38,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private DataSource dataSource;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -61,6 +67,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .failureHandler(failureHandler)
                 .permitAll()
                 .and()
+                .rememberMe()
+                .tokenRepository(persistentTokenRepository())
+                .tokenValiditySeconds(3600)
+                .userDetailsService(userService)
+                .and()
                 .logout()
                 .logoutSuccessHandler(logoutSuccessHandler)
                 .permitAll()
@@ -68,6 +79,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // AuthenticationEntryPoint 用來解決匿名用戶访问无权限资源异常
                 // 在这里是为了处理没有登录的时候访问资源时不要重定向，解决跨域问题
                 .exceptionHandling().authenticationEntryPoint(authenticationEntryPoint);
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepositoryImpl = new JdbcTokenRepositoryImpl();
+        tokenRepositoryImpl.setDataSource(dataSource);
+        // 启动时自动创建表   如果数据库有该表，再设置为true，启动会报错
+//        tokenRepositoryImpl.setCreateTableOnStartup(true);
+        return tokenRepositoryImpl;
     }
 
     // 登录成功返回消息

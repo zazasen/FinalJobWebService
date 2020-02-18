@@ -3,6 +3,7 @@ package com.cyrus.final_job.entity.system;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 菜单管理表(Menu)实体类
@@ -51,5 +52,9 @@ public class Menu implements Serializable {
      * 菜单项是否启用
      */
     private Integer enabled;
+
+    private List<Menu> children;
+
+    private List<Role> roles;
 
 }
