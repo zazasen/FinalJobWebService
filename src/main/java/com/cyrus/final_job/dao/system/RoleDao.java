@@ -1,6 +1,7 @@
 package com.cyrus.final_job.dao.system;
 
 import com.cyrus.final_job.entity.system.Role;
+import com.cyrus.final_job.entity.system.condition.RoleCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -25,12 +26,14 @@ public interface RoleDao {
      * 查询指定行数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<Role> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
 
+    List<Role> query(@Param("roleCondition") RoleCondition roleCondition);
 
+    Long queryCount(@Param("roleCondition") RoleCondition roleCondition);
     /**
      * 通过实体作为筛选条件查询
      *
@@ -38,6 +41,8 @@ public interface RoleDao {
      * @return 对象列表
      */
     List<Role> queryAll(Role role);
+
+    Long queryAllCount();
 
     /**
      * 新增数据
@@ -64,4 +69,6 @@ public interface RoleDao {
     int deleteById(Integer id);
 
     List<Role> getRolesByIds(@Param("roleIds") List<Integer> roleIds);
+
+    void delMulByIds(@Param("ids") List<Integer> ids);
 }

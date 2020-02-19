@@ -1,8 +1,11 @@
 package com.cyrus.final_job.service.impl.system;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.system.MenuRoleDao;
+import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.system.MenuRole;
 import com.cyrus.final_job.service.system.MenuRoleService;
+import com.cyrus.final_job.utils.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +37,7 @@ public class MenuRoleServiceImpl implements MenuRoleService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     @Override
@@ -75,5 +78,13 @@ public class MenuRoleServiceImpl implements MenuRoleService {
     @Override
     public boolean deleteById(Integer id) {
         return this.menuRoleDao.deleteById(id) > 0;
+    }
+
+    @Override
+    public Result getMenuIdsByRoleId(JSONObject params) {
+        Integer roleId = params.getInteger("roleId");
+        if(roleId == null) return Results.error("roleId 不能为空");
+        List<Integer> menuIds = menuRoleDao.getMenuIdsByRoleId(roleId);
+        return Results.createOk(menuIds);
     }
 }

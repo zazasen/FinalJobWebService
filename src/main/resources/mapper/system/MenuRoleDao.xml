@@ -71,4 +71,19 @@
         select role_id from menu_role where menu_id = #{menuId};
     </select>
 
+    <select id="getMenuIdsByRoleId" resultType="int">
+        select menu_id from menu_role where role_id = #{roleId}
+    </select>
+
+    <delete id="delByRoleId">
+        delete from final_job.menu_role where role_id = #{roleId}
+    </delete>
+
+    <delete id="delMulByRoleIds">
+        delete from final_job.menu_role where role_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

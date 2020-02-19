@@ -70,4 +70,6 @@ public interface MenuDao {
      * @return 可以访问的菜单列表
      */
     List<Menu> getMenusByUserId(int userId);
+
+    List<Menu> getAllMenuWithChildren();
 }

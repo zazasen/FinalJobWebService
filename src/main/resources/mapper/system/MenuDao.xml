@@ -15,6 +15,27 @@
         <result property="enabled" column="enabled" jdbcType="INTEGER"/>
     </resultMap>
 
+    <resultMap id="MenuWithChildrenMap" type="com.cyrus.final_job.entity.system.Menu" extends="MenuMap">
+        <collection property="children" ofType="com.cyrus.final_job.entity.system.Menu">
+            <result property="id" column="id1" jdbcType="INTEGER"/>
+            <result property="name" column="name1" jdbcType="VARCHAR"/>
+            <result property="enabled" column="enabled1" jdbcType="INTEGER"/>
+            <collection property="children" ofType="com.cyrus.final_job.entity.system.Menu">
+                <result property="id" column="id2" jdbcType="INTEGER"/>
+                <result property="name" column="name2" jdbcType="VARCHAR"/>
+                <result property="enabled" column="enabled" jdbcType="INTEGER"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="getAllMenuWithChildren" resultMap="MenuWithChildrenMap">
+        select m1.id as id,m1.name as name,m1.enabled as enabled,
+               m2.id as id1,m2.name as name1,m2.enabled as enabled1,
+               m3.id as id2,m3.name as name2,m3.enabled as enabled2
+        from menu m1,menu m2,menu m3
+        where m1.id = m2.parent_id and m2.id = m3.parent_id and m3.enabled=true
+    </select>
+
     <!--查询单个-->
     <select id="queryById" resultMap="MenuMap">
         select

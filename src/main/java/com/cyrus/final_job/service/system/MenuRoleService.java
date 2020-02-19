@@ -1,5 +1,7 @@
 package com.cyrus.final_job.service.system;
 
+import com.alibaba.fastjson.JSONObject;
+import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.system.MenuRole;
 
 import java.util.List;
@@ -24,7 +26,7 @@ public interface MenuRoleService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<MenuRole> queryAllByLimit(int offset, int limit);
@@ -53,4 +55,11 @@ public interface MenuRoleService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 获取某个角色可以访问的所有资源
+     *
+     * @param params params
+     * @return res
+     */
+    Result getMenuIdsByRoleId(JSONObject params);
 }

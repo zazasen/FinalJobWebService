@@ -112,4 +112,9 @@ public class MenuServiceImpl implements MenuService {
         }
         return menus;
     }
+
+    public Result getAllMenuWithChildren() {
+        List<Menu> menus = menuDao.getAllMenuWithChildren();
+        return Results.createOk(menus);
+    }
 }

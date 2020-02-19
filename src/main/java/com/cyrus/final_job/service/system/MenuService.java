@@ -67,4 +67,6 @@ public interface MenuService {
      * @return 所有的菜单
      */
     List<Menu> getAllMenuWithRole();
+
+    Result getAllMenuWithChildren();
 }

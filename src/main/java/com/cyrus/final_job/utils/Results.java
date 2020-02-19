@@ -1,6 +1,9 @@
 package com.cyrus.final_job.utils;
 
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
+
+import java.util.List;
 
 public abstract class Results {
 
@@ -14,8 +17,9 @@ public abstract class Results {
     public static Result createOk(String msg) {
         return new Result(200, msg);
     }
+
     public static Result createOk(Object data) {
-        return new Result(200, null,data);
+        return new Result(200, null, data);
     }
 
     public static Result createOk(String msg, Object data) {
@@ -28,6 +32,11 @@ public abstract class Results {
 
     public static Result error(String msg, Object obj) {
         return new Result(500, msg, obj);
+    }
+
+
+    public static ResultPage createOk(Long total, List<?> data) {
+        return new ResultPage(200, total, data);
     }
 
     // 参数非法

@@ -6,6 +6,7 @@
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="roleName" column="role_name" jdbcType="VARCHAR"/>
         <result property="roleZh" column="role_zh" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
@@ -13,7 +14,7 @@
     <!--查询单个-->
     <select id="queryById" resultMap="RoleMap">
         select
-          id, role_name, role_zh, create_time, update_time
+          id, role_name, role_zh, remark, create_time, update_time
         from final_job.role
         where id = #{id}
     </select>
@@ -21,15 +22,46 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="RoleMap">
         select
-          id, role_name, role_zh, create_time, update_time
+          id, role_name, role_zh, remark, create_time, update_time
         from final_job.role
         limit #{offset}, #{limit}
+    </select>
+
+    <select id="query" resultMap="RoleMap">
+        <bind name="roleName" value="'%' + roleCondition.roleName + '%'"/>
+        <bind name="roleZh" value="'%' + roleCondition.roleZh + '%'"/>
+        select
+        id, role_name, role_zh, remark, create_time, update_time
+        from final_job.role
+        <where>
+            <if test="roleCondition.roleName != null and roleCondition.roleName != ''">
+                and role_name like #{roleName}
+            </if>
+            <if test="roleCondition.roleZh != null and roleCondition.roleZh != ''">
+                and role_zh like #{roleZh}
+            </if>
+        </where>
+        limit #{roleCondition.offset}, #{roleCondition.pageSize}
+    </select>
+
+    <select id="queryCount" resultType="long">
+        <bind name="roleName" value="'%' + roleCondition.roleName + '%'"/>
+        <bind name="roleZh" value="'%' + roleCondition.roleZh + '%'"/>
+        select count(*) from final_job.role
+        <where>
+            <if test="roleCondition.roleName != null and roleCondition.roleName != ''">
+                and role_name like #{roleName}
+            </if>
+            <if test="roleCondition.roleZh != null and roleCondition.roleZh != ''">
+                and role_zh like #{roleZh}
+            </if>
+        </where>
     </select>
 
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="RoleMap">
         select
-        id, role_name, role_zh, create_time, update_time
+        id, role_name, role_zh, remark, create_time, update_time
         from final_job.role
         <where>
             <if test="id != null">
@@ -50,10 +82,14 @@
         </where>
     </select>
 
+    <select id="queryAllCount" resultType="long">
+        select count(*) from final_job.role
+    </select>
+
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.role(role_name, role_zh, create_time, update_time)
-        values (#{roleName}, #{roleZh}, #{createTime}, #{updateTime})
+        insert into final_job.role(role_name, role_zh, remark, create_time, update_time)
+        values (#{roleName}, #{roleZh},#{remark}, #{createTime},#{updateTime})
     </insert>
 
     <!--通过主键修改数据-->
@@ -65,6 +101,9 @@
             </if>
             <if test="roleZh != null and roleZh != ''">
                 role_zh = #{roleZh},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime},
@@ -82,11 +121,18 @@
     </delete>
 
     <select id="getRolesByIds" resultMap="RoleMap">
-        select id, role_name, role_zh, create_time, update_time from final_job.role
+        select id, role_name, role_zh, remark, create_time, update_time from final_job.role
         where id in
         <foreach collection="roleIds" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </select>
+
+    <delete id="delMulByIds">
+        delete from final_job.role where id in 
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 
 </mapper>
