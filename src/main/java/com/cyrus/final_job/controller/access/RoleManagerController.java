@@ -1,4 +1,4 @@
-package com.cyrus.final_job.controller.system.access;
+package com.cyrus.final_job.controller.access;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;

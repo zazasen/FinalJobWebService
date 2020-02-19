@@ -1,17 +1,17 @@
-package com.cyrus.final_job.dao.system;
+package com.cyrus.final_job.dao;
 
-import com.cyrus.final_job.entity.system.User;
+import com.cyrus.final_job.entity.Department;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 /**
- * 用户表(User)表数据库访问层
+ * 部门表(Department)表数据库访问层
  *
  * @author cyrus
- * @since 2020-02-16 14:53:32
+ * @since 2020-02-19 13:34:25
  */
-public interface UserDao {
+public interface DepartmentDao {
 
     /**
      * 通过ID查询单条数据
@@ -19,41 +19,43 @@ public interface UserDao {
      * @param id 主键
      * @return 实例对象
      */
-    User queryById(Integer id);
+    Department queryById(Integer id);
+
+    List<Department> getDepartmentByParentId(Integer parentId);
 
     /**
      * 查询指定行数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
-    List<User> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
+    List<Department> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
 
 
     /**
      * 通过实体作为筛选条件查询
      *
-     * @param user 实例对象
+     * @param department 实例对象
      * @return 对象列表
      */
-    List<User> queryAll(User user);
+    List<Department> queryAll(Department department);
 
     /**
      * 新增数据
      *
-     * @param user 实例对象
+     * @param department 实例对象
      * @return 影响行数
      */
-    int insert(User user);
+    int insert(Department department);
 
     /**
      * 修改数据
      *
-     * @param user 实例对象
+     * @param department 实例对象
      * @return 影响行数
      */
-    int update(User user);
+    int update(Department department);
 
     /**
      * 通过主键删除数据
@@ -63,7 +65,4 @@ public interface UserDao {
      */
     int deleteById(Integer id);
 
-    User loadUserByUsername(String username);
-
-    User queryByDepartmentId(Integer depId);
 }

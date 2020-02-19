@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyrus.final_job.dao.DepartmentDao">
+
+    <resultMap type="com.cyrus.final_job.entity.Department" id="DepartmentMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="parentId" column="parent_id" jdbcType="INTEGER"/>
+        <result property="parentName" column="parent_name" jdbcType="VARCHAR"/>
+        <result property="enabled" column="enabled" jdbcType="INTEGER"/>
+        <result property="isParent" column="is_parent" jdbcType="INTEGER"/>
+        <result property="sonCount" column="son_count" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="DepartmentVoMap" type="com.cyrus.final_job.entity.Department" extends="DepartmentMap">
+        <collection property="children" ofType="com.cyrus.final_job.entity.Department"
+                    select="com.cyrus.final_job.dao.DepartmentDao.getDepartmentByParentId" column="id"></collection>
+    </resultMap>
+
+    <select id="getDepartmentByParentId" resultMap="DepartmentVoMap">
+        select
+          id, name, parent_id, enabled, is_parent,parent_name
+          from final_job.department where parent_id = #{parentId}
+    </select>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="DepartmentMap">
+        select
+          id, name, parent_id, enabled, is_parent,son_count
+        from final_job.department
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="DepartmentMap">
+        select
+          id, name, parent_id, enabled, is_parent,son_count
+        from final_job.department
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="DepartmentMap">
+        select
+        id, name, parent_id, enabled, is_parent,son_count
+        from final_job.department
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="parentId != null">
+                and parent_id = #{parentId}
+            </if>
+            <if test="enabled != null">
+                and enabled = #{enabled}
+            </if>
+            <if test="isParent != null">
+                and is_parent = #{isParent}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into final_job.department(name, parent_id, enabled, is_parent,parent_name)
+        values (#{name}, #{parentId}, #{enabled}, #{isParent},#{parentName})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update final_job.department
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId},
+            </if>
+            <if test="enabled != null">
+                enabled = #{enabled},
+            </if>
+            <if test="isParent != null">
+                is_parent = #{isParent},
+            </if>
+            <if test="parentName != null">
+                parent_name = #{parentName},
+            </if>
+            <if test="sonCount != null">
+                son_count = #{sonCount},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from final_job.department where id = #{id}
+    </delete>
+
+</mapper>

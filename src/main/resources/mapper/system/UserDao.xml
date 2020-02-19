@@ -52,6 +52,13 @@
         where username = #{username}
     </select>
 
+    <select id="queryByDepartmentId" resultMap="UserMap">
+        select
+          id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, engage_form, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
+        from final_job.user
+        where department_id = #{depId}
+    </select>
+
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="UserMap">
         select
