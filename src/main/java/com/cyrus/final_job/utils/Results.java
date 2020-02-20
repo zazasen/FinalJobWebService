@@ -40,7 +40,7 @@ public abstract class Results {
     }
 
     // 参数非法
-    public static Result createInvalidParam(String param) {
+    public static Result createInvalidParam() {
         return new Result(500, "抱歉,网络开小差了,请稍后重试");
     }
 }

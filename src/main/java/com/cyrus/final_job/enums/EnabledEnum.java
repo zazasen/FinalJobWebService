@@ -1,10 +1,12 @@
 package com.cyrus.final_job.enums;
 
-import lombok.Data;
+
+import java.util.Objects;
 
 
 public enum EnabledEnum {
-    UNENABLED(0, "禁用"),
+    UNKNOWN(-1, "未知"),
+    DISABLE(0, "禁用"),
     ENABLED(1, "启用");
 
     Integer code;
@@ -29,5 +31,14 @@ public enum EnabledEnum {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public static EnabledEnum getEnumByCode(Integer code) {
+        for (EnabledEnum value : EnabledEnum.values()) {
+            if (Objects.equals(value.getCode(), code)) {
+                return value;
+            }
+        }
+        return UNKNOWN;
     }
 }
