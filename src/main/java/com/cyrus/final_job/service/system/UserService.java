@@ -1,5 +1,8 @@
 package com.cyrus.final_job.service.system;
 
+import com.alibaba.fastjson.JSONObject;
+import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.system.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -54,4 +57,26 @@ public interface UserService extends UserDetailsService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 员工查询
+     *
+     * @param params params
+     * @return 分页数据
+     */
+    ResultPage getStaff(JSONObject params);
+
+
+    /**
+     * 添加用户
+     *
+     * @param params params
+     * @return res
+     */
+    Result addStaff(JSONObject params);
+
+    Result updateStaff(JSONObject params);
+
+    Result delStaff(JSONObject params);
+
+    Result delStaffs(JSONObject params);
 }

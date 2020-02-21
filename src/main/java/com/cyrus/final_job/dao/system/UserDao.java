@@ -1,6 +1,8 @@
 package com.cyrus.final_job.dao.system;
 
+import com.cyrus.final_job.entity.condition.UserCondition;
 import com.cyrus.final_job.entity.system.User;
+import com.cyrus.final_job.entity.vo.UserDetailVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -30,6 +32,9 @@ public interface UserDao {
      */
     List<User> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
 
+    List<UserDetailVo> queryStaffByCondition(UserCondition userCondition);
+
+    Long queryStaffCountByCondition(UserCondition userCondition);
 
     /**
      * 通过实体作为筛选条件查询
@@ -66,4 +71,6 @@ public interface UserDao {
     User loadUserByUsername(String username);
 
     User queryByDepartmentId(Integer depId);
+
+    Long getMaxWorkId();
 }

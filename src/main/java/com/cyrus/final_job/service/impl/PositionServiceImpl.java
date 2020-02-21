@@ -32,6 +32,8 @@ public class PositionServiceImpl implements PositionService {
     @Resource
     private PositionDao positionDao;
 
+
+
     /**
      * 通过ID查询单条数据
      *
@@ -148,4 +150,16 @@ public class PositionServiceImpl implements PositionService {
         positionDao.delByIds(ids);
         return Results.createOk("删除成功");
     }
+
+    @Override
+    public Result getPositions() {
+        List<Position> positions = positionDao.queryAll(new Position());
+        for (Position position : positions) {
+            // 初级 资深java工程师样式
+            position.setPositionName(PositionLevelEnum.getEnumByCode(position.getPositionLevel()).getDesc()
+                    + "-" + position.getPositionName());
+        }
+        return Results.createOk(positions);
+    }
+
 }

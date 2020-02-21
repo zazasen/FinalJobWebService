@@ -102,4 +102,12 @@ public interface PositionService {
      * @return res
      */
     Result delPositionsByIds(JSONObject params);
+
+    /**
+     * 获取职位下拉框
+     *
+     * @return res
+     */
+    Result getPositions();
+
 }

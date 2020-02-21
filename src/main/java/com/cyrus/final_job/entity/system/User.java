@@ -1,16 +1,22 @@
 package com.cyrus.final_job.entity.system;
 
+import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.enums.EnabledEnum;
+import com.cyrus.final_job.utils.CommonUtils;
+import com.cyrus.final_job.utils.DateUtils;
+import com.cyrus.final_job.utils.Results;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 用户表(User)实体类
@@ -45,10 +51,7 @@ public class User implements Serializable, UserDetails {
      * 性别,1 男 0 女
      */
     private Integer gender;
-    /**
-     * 出生日期
-     */
-    private Timestamp birthday;
+
     /**
      * 身份证号
      */
@@ -90,10 +93,6 @@ public class User implements Serializable, UserDetails {
      */
     private Integer positionId;
     /**
-     * 聘用形式
-     */
-    private String engageForm;
-    /**
      * 最高学历,0 其他 1 小学 2 初中 3 高中 4 大专 5 本科 6 硕士 7 博士
      */
     private Integer topDegree;
@@ -112,7 +111,7 @@ public class User implements Serializable, UserDetails {
     /**
      * 工号
      */
-    private String workId;
+    private Long workId;
     /**
      * 合同期限
      */
@@ -120,7 +119,11 @@ public class User implements Serializable, UserDetails {
     /**
      * 工龄
      */
-    private Integer workAge;
+    private Double workAge;
+    /**
+     * 出生日期
+     */
+    private Timestamp birthday;
     /**
      * 创建时间、入职时间
      */
@@ -152,6 +155,77 @@ public class User implements Serializable, UserDetails {
 
 
     private List<Role> roles;
+
+    public Result checkBaseParams() {
+        if (StringUtils.isEmpty(this.username)) {
+            return Results.error("登录账号不能为空");
+        }
+        if (StringUtils.isEmpty(this.realName)) {
+            return Results.error("用户名不能为空");
+        }
+        if (Objects.isNull(gender)) {
+            return Results.error("用户性别不能为空");
+        }
+        if (StringUtils.isEmpty(this.idCard)) {
+            return Results.error("身份证号不能为空");
+        }
+        if (Objects.isNull(wedlock)) {
+            return Results.error("婚姻状况不能为空");
+        }
+        if (Objects.isNull(nationId)) {
+            return Results.error("所属民族不能为空");
+        }
+        if (StringUtils.isEmpty(nativePlace)) {
+            return Results.error("所属籍贯不能为空");
+        }
+        if (Objects.isNull(politicsId)) {
+            return Results.error("政治面貌不能为空");
+        }
+        if (StringUtils.isEmpty(email)) {
+            return Results.error("邮箱不能为空");
+        }
+        if (StringUtils.isEmpty(phone)) {
+            return Results.error("手机号码不能为空");
+        }
+        if (StringUtils.isEmpty(address)) {
+            return Results.error("联系地址不能为空");
+        }
+        if (Objects.isNull(departmentId)) {
+            return Results.error("所属部门不能为空");
+        }
+        if (Objects.isNull(positionId)) {
+            return Results.error("所属职位不能为空");
+        }
+        if (Objects.isNull(topDegree)) {
+            return Results.error("学历不能为空");
+        }
+        if (StringUtils.isEmpty(specialty)) {
+            return Results.error("所属专业不能为空");
+        }
+        if (StringUtils.isEmpty(school)) {
+            return Results.error("毕业学校不能为空");
+        }
+        if (Objects.isNull(workAge)) {
+            return Results.error("工龄不能为空");
+        }
+        if (birthday == null) {
+            return Results.error("出生日期不能为空");
+        }
+        return null;
+    }
+
+
+    public Result checkParams() {
+        Result result = this.checkBaseParams();
+        if (result != null) return result;
+        this.password = CommonUtils.getPassword(username);
+        this.userFace = "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3684533571,3875739943&fm=26&gp=0.jpg";
+        this.createTime = DateUtils.getNowTime();
+        this.updateTime = DateUtils.getNowTime();
+        this.enabled = true;
+        return null;
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -312,14 +386,6 @@ public class User implements Serializable, UserDetails {
         this.positionId = positionId;
     }
 
-    public String getEngageForm() {
-        return engageForm;
-    }
-
-    public void setEngageForm(String engageForm) {
-        this.engageForm = engageForm;
-    }
-
     public Integer getTopDegree() {
         return topDegree;
     }
@@ -352,11 +418,11 @@ public class User implements Serializable, UserDetails {
         this.workState = workState;
     }
 
-    public String getWorkId() {
+    public Long getWorkId() {
         return workId;
     }
 
-    public void setWorkId(String workId) {
+    public void setWorkId(Long workId) {
         this.workId = workId;
     }
 
@@ -368,11 +434,11 @@ public class User implements Serializable, UserDetails {
         this.contractTerm = contractTerm;
     }
 
-    public Integer getWorkAge() {
+    public Double getWorkAge() {
         return workAge;
     }
 
-    public void setWorkAge(Integer workAge) {
+    public void setWorkAge(Double workAge) {
         this.workAge = workAge;
     }
 
