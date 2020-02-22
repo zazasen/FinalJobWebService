@@ -60,4 +60,8 @@
         delete from final_job.nation where id = #{id}
     </delete>
 
+    <select id="getNationIdByName" resultType="int">
+        select id from final_job.nation where name = #{name}
+    </select>
+
 </mapper>

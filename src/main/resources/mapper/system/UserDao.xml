@@ -101,6 +101,13 @@
         select max(work_id) from final_job.user;
     </select>
 
+    <select id="export" resultMap="UserVoMap">
+        select
+          id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
+        from final_job.user
+        order by create_time
+    </select>
+
     <select id="queryStaffByCondition" resultMap="UserVoMap">
         <bind name="realName" value="'%' + realName + '%'"/>
         select
@@ -150,6 +157,7 @@
                 and real_name like #{realName}
             </if>
         </where>
+        order by create_time
         limit #{offset}, #{pageSize}
     </select>
 

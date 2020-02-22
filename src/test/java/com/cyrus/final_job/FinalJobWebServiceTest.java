@@ -8,13 +8,16 @@ import com.cyrus.final_job.dao.system.MenuDao;
 import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.service.DepartmentService;
 import com.cyrus.final_job.service.system.MenuService;
+import com.cyrus.final_job.utils.CommonUtils;
 import com.cyrus.final_job.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @SpringBootTest
 public class FinalJobWebServiceTest {
@@ -68,6 +71,9 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void test() {
+        System.out.println(CommonUtils.doubleToLong(1.0));
     }
+
+
 
 }

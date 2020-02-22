@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.system.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -79,4 +81,8 @@ public interface UserService extends UserDetailsService {
     Result delStaff(JSONObject params);
 
     Result delStaffs(JSONObject params);
+
+    ResponseEntity<byte[]> exportStaff();
+
+    Result importStaff(MultipartFile file);
 }

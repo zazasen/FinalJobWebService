@@ -39,4 +39,13 @@ public enum WorkStateEnum {
         }
         return UNKNOWN;
     }
+
+    public static WorkStateEnum getEnumByDesc(String desc) {
+        for (WorkStateEnum value : WorkStateEnum.values()) {
+            if (Objects.equals(value.getDesc(), desc)) {
+                return value;
+            }
+        }
+        return UNKNOWN;
+    }
 }

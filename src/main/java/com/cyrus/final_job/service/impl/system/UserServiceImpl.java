@@ -19,16 +19,26 @@ import com.cyrus.final_job.entity.system.UserRole;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.system.UserService;
+import com.cyrus.final_job.utils.CommonUtils;
 import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
 import com.cyrus.final_job.utils.UserUtils;
+import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -91,6 +101,315 @@ public class UserServiceImpl implements UserService {
         userCondition.buildLimit();
         if (userCondition.getRealName() == null) userCondition.setRealName("");
         List<UserDetailVo> userDetailVoList = userDao.queryStaffByCondition(userCondition);
+        buildUserDetailVo(userDetailVoList);
+        Long total = userDao.queryStaffCountByCondition(userCondition);
+        return Results.createOk(total, userDetailVoList);
+    }
+
+    @Override
+    public Result importStaff(MultipartFile file) {
+        List<User> importData = new ArrayList<>();
+        User user = null;
+        // 导入数据构造
+        try {
+            HSSFWorkbook workbook = new HSSFWorkbook(file.getInputStream());
+            // 获取 sheet 个数，这里一般只有一个
+            int numberOfSheets = workbook.getNumberOfSheets();
+            for (int i = 0; i < numberOfSheets; i++) {
+                HSSFSheet sheet = workbook.getSheetAt(i);
+                // sheet 内的行数
+                int rows = sheet.getPhysicalNumberOfRows();
+                for (int j = 1; j < rows; j++) {
+                    HSSFRow row = sheet.getRow(j);
+                    // 列数
+                    int cells = row.getPhysicalNumberOfCells();
+                    user = new User();
+                    for (int k = 0; k < cells; k++) {
+                        // 获取单元格
+                        HSSFCell cell = row.getCell(k);
+                        // 对每个单元格进行判断
+                        judgeCellValueType(cell, user, k);
+                    }
+                    user.setUpdateTime(DateUtils.getNowTime());
+                    user.setUsername(CommonUtils.convertHanzi2Pinyin(user.getRealName(), true));
+                    user.setPassword(CommonUtils.getPassword(CommonUtils.convertHanzi2Pinyin(user.getRealName(), true)));
+                    user.setUserFace("https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3684533571,3875739943&fm=26&gp=0.jpg");
+                    importData.add(user);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Results.error("导入失败，请检查导入数据是否正确");
+        }
+        int successCount = 0;
+        List<Integer> errIndex = new ArrayList<>();
+        for (int i = 0; i < importData.size(); i++) {
+            if (userDao.insert(importData.get(i)) > 0) {
+                successCount++;
+            } else {
+                errIndex.add(i + 1);
+            }
+        }
+        if (successCount == importData.size()) {
+            return Results.createOk("全部导入成功");
+        }
+        return Results.createOk("部分导入成功,成功 [" + successCount + "] 条;以下记录添加失败:[" + errIndex.toString() + "],请检查这些数据是否正确");
+    }
+
+
+    private void judgeCellValueType(HSSFCell cell, User user, int k) {
+        switch (cell.getCellType()) {
+            case STRING:
+                String cellValue = cell.getStringCellValue();
+                // 判断是哪个单元格
+                switch (k) {
+                    case 1:
+                        user.setRealName(cellValue);
+                        break;
+                    case 2:
+                        user.setWorkId(Long.parseLong(cellValue));
+                        break;
+                    case 3:
+                        user.setGender(GenderEnum.getEnumByDesc(cellValue).getCode());
+                        break;
+                    case 5:
+                        user.setIdCard(cellValue);
+                        break;
+                    case 6:
+                        user.setWedlock(WedlockEnum.getEnumByDesc(cellValue).getCode());
+                        break;
+                    case 7:
+                        user.setNationId(nationDao.getNationIdByName(cellValue));
+                        break;
+                    case 8:
+                        user.setNativePlace(cellValue);
+                        break;
+                    case 9:
+                        user.setPoliticsId(politicsStatusDao.getIdByName(cellValue));
+                        break;
+                    case 10:
+                        user.setPhone(cellValue);
+                        break;
+                    case 11:
+                        user.setAddress(cellValue);
+                        break;
+                    case 14:
+                        cellValue = cellValue.substring(0, cellValue.length() - 1);
+                        user.setWorkAge(Double.parseDouble(cellValue));
+                        break;
+                    case 18:
+                        user.setTopDegree(DegreeEnum.getEnumByDesc(cellValue).getCode());
+                        break;
+                    case 19:
+                        user.setSpecialty(cellValue);
+                        break;
+                    case 20:
+                        user.setSchool(cellValue);
+                        break;
+                    case 22:
+                        user.setWorkState(WorkStateEnum.getEnumByDesc(cellValue).getCode());
+                        break;
+                    case 23:
+                        user.setEmail(cellValue);
+                        break;
+                    case 28:
+                        user.setEnabled(EnableBooleanEnum.getEnumByDesc(cellValue).getCode());
+                        break;
+                }
+                break;
+            default: {
+                switch (k) {
+                    case 2:
+                        user.setWorkId(CommonUtils.doubleToLong(cell.getNumericCellValue()));
+                        break;
+                    case 4:
+                        if (cell.getDateCellValue() == null) {
+                            break;
+                        }
+                        user.setBirthday(new Timestamp(cell.getDateCellValue().getTime()));
+                        break;
+                    case 12:
+                        user.setDepartmentId(CommonUtils.doubleToInt(cell.getNumericCellValue()));
+                        break;
+                    case 15:
+                        user.setPositionId(CommonUtils.doubleToInt(cell.getNumericCellValue()));
+                        break;
+                    case 21:
+                        if (cell.getDateCellValue() == null) {
+                            break;
+                        }
+                        user.setCreateTime(new Timestamp(cell.getDateCellValue().getTime()));
+                        break;
+                    case 24:
+                        if (cell.getDateCellValue() == null) {
+                            break;
+                        }
+                        user.setBeginContractTime(new Timestamp(cell.getDateCellValue().getTime()));
+                        break;
+                    case 25:
+                        if (cell.getDateCellValue() == null) {
+                            break;
+                        }
+                        user.setEndContractTime(new Timestamp(cell.getDateCellValue().getTime()));
+                        break;
+                    case 26:
+                        if (cell.getDateCellValue() == null) {
+                            break;
+                        }
+                        user.setConversionTime(new Timestamp(cell.getDateCellValue().getTime()));
+                        break;
+                    case 27:
+                        if (cell.getDateCellValue() == null) {
+                            break;
+                        }
+                        user.setDepartureTime(new Timestamp(cell.getDateCellValue().getTime()));
+                        break;
+                }
+            }
+            break;
+        }
+    }
+
+    @Override
+    public ResponseEntity<byte[]> exportStaff() {
+        List<UserDetailVo> exportData = userDao.export();
+        buildUserDetailVo(exportData);
+        // 导出数据构造
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        // 样式
+        HSSFCellStyle dateCellStyle = workbook.createCellStyle();
+        dateCellStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("m/d/yy"));
+        // 创建表单
+        HSSFSheet sheet = workbook.createSheet();
+        // 标题行
+        buildTitle(sheet);
+        // 构建内容行
+        buildContent(sheet, exportData, dateCellStyle);
+        HttpHeaders headers = new HttpHeaders();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        try {
+            headers.setContentDispositionFormData("attachment",
+                    new String("员工基础信息.xls".getBytes("utf-8"), "ISO-8859-1"));
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            workbook.write(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<byte[]>(stream.toByteArray(), headers, HttpStatus.CREATED);
+    }
+
+    private void buildContent(HSSFSheet sheet, List<UserDetailVo> exportData, HSSFCellStyle dateCellStyle) {
+        for (int i = 0; i < exportData.size(); i++) {
+            UserDetailVo item = exportData.get(i);
+            HSSFRow row = sheet.createRow(i + 1);
+            row.createCell(0).setCellValue(item.getId());
+            row.createCell(1).setCellValue(item.getRealName());
+            row.createCell(2).setCellValue(item.getWorkId());
+            row.createCell(3).setCellValue(item.getGenderStr());
+            HSSFCell cell4 = row.createCell(4);
+            cell4.setCellStyle(dateCellStyle);
+            cell4.setCellValue(item.getBirthday());
+            row.createCell(5).setCellValue(item.getIdCard());
+            row.createCell(6).setCellValue(item.getWedlockStr());
+            row.createCell(7).setCellValue(item.getNationName());
+            row.createCell(8).setCellValue(item.getNativePlace());
+            row.createCell(9).setCellValue(item.getPoliticsStr());
+            row.createCell(10).setCellValue(item.getPhone());
+            row.createCell(11).setCellValue(item.getAddress());
+            row.createCell(12).setCellValue(item.getDepartmentId());
+            row.createCell(13).setCellValue(item.getDepartmentName());
+            row.createCell(14).setCellValue(item.getWorkAgeStr());
+            row.createCell(15).setCellValue(item.getPositionId());
+            row.createCell(16).setCellValue(item.getPositionName());
+            row.createCell(17).setCellValue(item.getPositionLevelName());
+            row.createCell(18).setCellValue(item.getTopDegreeStr());
+            row.createCell(19).setCellValue(item.getSpecialty());
+            row.createCell(20).setCellValue(item.getSchool());
+            HSSFCell cell19 = row.createCell(21);
+            cell19.setCellStyle(dateCellStyle);
+            cell19.setCellValue(item.getCreateTime());
+            row.createCell(22).setCellValue(item.getWorkStateStr());
+            row.createCell(23).setCellValue(item.getEmail());
+            HSSFCell cell24 = row.createCell(24);
+            cell24.setCellStyle(dateCellStyle);
+            cell24.setCellValue(item.getBeginContractTime());
+            HSSFCell cell25 = row.createCell(25);
+            cell25.setCellStyle(dateCellStyle);
+            cell25.setCellValue(item.getEndContractTime());
+            HSSFCell cell26 = row.createCell(26);
+            cell26.setCellStyle(dateCellStyle);
+            cell26.setCellValue(item.getConversionTime());
+            HSSFCell cell27 = row.createCell(27);
+            cell27.setCellStyle(dateCellStyle);
+            cell27.setCellValue(item.getDepartureTime());
+            row.createCell(28).setCellValue(item.getEnabledStr());
+        }
+    }
+
+
+    public void buildTitle(HSSFSheet sheet) {
+        HSSFRow row0 = sheet.createRow(0);
+        HSSFCell c0 = row0.createCell(0);
+        c0.setCellValue("编号");
+        HSSFCell c1 = row0.createCell(1);
+        c1.setCellValue("姓名");
+        HSSFCell c2 = row0.createCell(2);
+        c2.setCellValue("工号");
+        HSSFCell c3 = row0.createCell(3);
+        c3.setCellValue("性别");
+        HSSFCell c4 = row0.createCell(4);
+        c4.setCellValue("出生日期");
+        HSSFCell c5 = row0.createCell(5);
+        c5.setCellValue("身份证号码");
+        HSSFCell c6 = row0.createCell(6);
+        c6.setCellValue("婚姻状况");
+        HSSFCell c7 = row0.createCell(7);
+        c7.setCellValue("民族");
+        HSSFCell c8 = row0.createCell(8);
+        c8.setCellValue("籍贯");
+        HSSFCell c9 = row0.createCell(9);
+        c9.setCellValue("政治面貌");
+        HSSFCell c10 = row0.createCell(10);
+        c10.setCellValue("电话号码");
+        HSSFCell c11 = row0.createCell(11);
+        c11.setCellValue("联系地址");
+        HSSFCell c12 = row0.createCell(12);
+        c12.setCellValue("所属部门id");
+        HSSFCell c13 = row0.createCell(13);
+        c13.setCellValue("所属部门");
+        HSSFCell c14 = row0.createCell(14);
+        c14.setCellValue("工龄");
+        HSSFCell c15 = row0.createCell(15);
+        c15.setCellValue("职位id");
+        HSSFCell c16 = row0.createCell(16);
+        c16.setCellValue("职位");
+        HSSFCell c17 = row0.createCell(17);
+        c17.setCellValue("职位级别");
+        HSSFCell c18 = row0.createCell(18);
+        c18.setCellValue("最高学历");
+        HSSFCell c19 = row0.createCell(19);
+        c19.setCellValue("专业");
+        HSSFCell c20 = row0.createCell(20);
+        c20.setCellValue("毕业院校");
+        HSSFCell c21 = row0.createCell(21);
+        c21.setCellValue("入职日期");
+        HSSFCell c22 = row0.createCell(22);
+        c22.setCellValue("在职状态");
+        HSSFCell c23 = row0.createCell(23);
+        c23.setCellValue("邮箱");
+        HSSFCell c24 = row0.createCell(24);
+        c24.setCellValue("合同起始日期");
+        HSSFCell c25 = row0.createCell(25);
+        c25.setCellValue("合同终止日期");
+        HSSFCell c26 = row0.createCell(26);
+        c26.setCellValue("转正日期");
+        HSSFCell c27 = row0.createCell(27);
+        c27.setCellValue("离职日期");
+        HSSFCell c28 = row0.createCell(28);
+        c28.setCellValue("账号是否可用");
+    }
+
+    private void buildUserDetailVo(List<UserDetailVo> userDetailVoList) {
         for (UserDetailVo item : userDetailVoList) {
             item.setGenderStr(GenderEnum.getEnumByCode(item.getGender()).getDesc());
             item.setWedlockStr(WedlockEnum.getEnumByCode(item.getWedlock()).getDesc());
@@ -110,8 +429,6 @@ public class UserServiceImpl implements UserService {
                 item.setContractTermStr(item.getContractTerm() + "天");
             }
         }
-        Long total = userDao.queryStaffCountByCondition(userCondition);
-        return Results.createOk(total, userDetailVoList);
     }
 
     /**

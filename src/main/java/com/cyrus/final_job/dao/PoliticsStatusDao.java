@@ -63,4 +63,5 @@ public interface PoliticsStatusDao {
      */
     int deleteById(Integer id);
 
+    int getIdByName(String name);
 }

@@ -40,4 +40,13 @@ public enum GenderEnum {
         }
         return UNKNOWN;
     }
+
+    public static GenderEnum getEnumByDesc(String desc) {
+        for (GenderEnum value : GenderEnum.values()) {
+            if (Objects.equals(value.getDesc(), desc)) {
+                return value;
+            }
+        }
+        return UNKNOWN;
+    }
 }

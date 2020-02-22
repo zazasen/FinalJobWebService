@@ -60,4 +60,8 @@
         delete from final_job.politics_status where id = #{id}
     </delete>
 
+    <select id="getIdByName" resultType="int">
+        select id from final_job.politics_status where name = #{name}
+    </select>
+
 </mapper>

@@ -63,4 +63,6 @@ public interface NationDao {
      */
     int deleteById(Integer id);
 
+    int getNationIdByName(String name);
+
 }

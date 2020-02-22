@@ -34,6 +34,8 @@ public interface UserDao {
 
     List<UserDetailVo> queryStaffByCondition(UserCondition userCondition);
 
+    List<UserDetailVo> export();
+
     Long queryStaffCountByCondition(UserCondition userCondition);
 
     /**

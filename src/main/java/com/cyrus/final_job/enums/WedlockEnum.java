@@ -41,4 +41,13 @@ public enum WedlockEnum {
         }
         return UNKNOWN;
     }
+
+    public static WedlockEnum getEnumByDesc(String desc) {
+        for (WedlockEnum value : WedlockEnum.values()) {
+            if (Objects.equals(value.getDesc(), desc)) {
+                return value;
+            }
+        }
+        return UNKNOWN;
+    }
 }

@@ -46,4 +46,13 @@ public enum DegreeEnum {
         }
         return UNKNOWN;
     }
+
+    public static DegreeEnum getEnumByDesc(String desc) {
+        for (DegreeEnum value : DegreeEnum.values()) {
+            if (Objects.equals(value.getDesc(), desc)) {
+                return value;
+            }
+        }
+        return UNKNOWN;
+    }
 }

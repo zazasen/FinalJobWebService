@@ -9,7 +9,9 @@ import com.cyrus.final_job.service.PoliticsStatusService;
 import com.cyrus.final_job.service.PositionService;
 import com.cyrus.final_job.service.system.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 员工管理 controller
@@ -69,6 +71,16 @@ public class StaffManagerController {
     @PostMapping("/delStaffs")
     public Result delStaffs(@RequestBody JSONObject params){
         return userService.delStaffs(params);
+    }
+
+    @GetMapping("/exportStaff")
+    public ResponseEntity<byte[]> exportStaff(){
+        return userService.exportStaff();
+    }
+
+    @PostMapping("/importStaff")
+    public Result importStaff(MultipartFile file){
+        return userService.importStaff(file);
     }
 
 }
