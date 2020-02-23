@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 @Data
 public class UserCondition extends BasePageQuery {
 
+    private String username;
+
     /**
      * 员工姓名
      */

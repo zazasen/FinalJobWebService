@@ -1,7 +1,9 @@
 package com.cyrus.final_job.dao.system;
 
+import com.cyrus.final_job.entity.condition.UserAccountQueryCondition;
 import com.cyrus.final_job.entity.condition.UserCondition;
 import com.cyrus.final_job.entity.system.User;
+import com.cyrus.final_job.entity.vo.UserAccountVo;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -75,4 +77,7 @@ public interface UserDao {
     User queryByDepartmentId(Integer depId);
 
     Long getMaxWorkId();
+
+    List<UserAccountVo> queryUserAccountByCondition(UserAccountQueryCondition condition);
+    Long queryUserAccountCountByCondition(UserAccountQueryCondition condition);
 }

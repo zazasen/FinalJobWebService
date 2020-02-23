@@ -3,18 +3,22 @@ package com.cyrus.final_job.service.impl.system;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.system.MenuRoleDao;
 import com.cyrus.final_job.dao.system.RoleDao;
+import com.cyrus.final_job.dao.system.UserRoleDao;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.system.MenuRole;
 import com.cyrus.final_job.entity.system.Role;
+import com.cyrus.final_job.entity.system.UserRole;
 import com.cyrus.final_job.entity.system.condition.RoleCondition;
 import com.cyrus.final_job.service.system.RoleService;
 import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
+import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 角色表(Role)表服务实现类
@@ -29,6 +33,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private MenuRoleDao menuRoleDao;
+
+    @Autowired
+    private UserRoleDao userRoleDao;
 
     /**
      * 通过ID查询单条数据
@@ -88,6 +95,7 @@ public class RoleServiceImpl implements RoleService {
         Integer id = params.getInteger("id");
         if (id == null) return Results.error("参数不能为空");
         menuRoleDao.delByRoleId(id);
+        userRoleDao.delByRoleId(id);
         roleDao.deleteById(id);
         return Results.createOk("删除成功");
     }
@@ -153,8 +161,34 @@ public class RoleServiceImpl implements RoleService {
     public Result delMulByIds(JSONObject params) {
         String s = JSONObject.toJSONString(params.getJSONArray("ids"));
         List<Integer> ids = JSONObject.parseArray(s, Integer.class);
-        roleDao.delMulByIds(ids);
         menuRoleDao.delMulByRoleIds(ids);
+        for (Integer id : ids) {
+            userRoleDao.delByRoleId(id);
+        }
+        roleDao.delMulByIds(ids);
         return Results.createOk("删除成功");
+    }
+
+    @Override
+    public Result getAllRolesWithoutCondition() {
+        List<Role> roles = roleDao.queryAll(null);
+        return Results.createOk(roles);
+    }
+
+    /**
+     * 判断该账号下是否已经具备某一角色
+     *
+     * @return
+     */
+    private boolean isRoleExit(int roleId) {
+        UserRole userRole = new UserRole();
+        userRole.setUserId(UserUtils.getCurrentUserId());
+        List<UserRole> userRoles = userRoleDao.queryAll(userRole);
+        for (UserRole role : userRoles) {
+            if (Objects.equals(role.getRoleId(), roleId)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

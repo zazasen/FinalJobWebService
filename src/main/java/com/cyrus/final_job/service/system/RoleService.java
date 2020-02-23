@@ -82,4 +82,6 @@ public interface RoleService {
     Result updateRole(JSONObject params);
 
     ResultPage query(JSONObject params);
+
+    Result getAllRolesWithoutCondition();
 }

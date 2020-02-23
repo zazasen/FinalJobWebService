@@ -12,10 +12,13 @@ import com.cyrus.final_job.dao.system.UserRoleDao;
 import com.cyrus.final_job.entity.Position;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.UserAccountCondition;
+import com.cyrus.final_job.entity.condition.UserAccountQueryCondition;
 import com.cyrus.final_job.entity.condition.UserCondition;
 import com.cyrus.final_job.entity.system.Role;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.system.UserRole;
+import com.cyrus.final_job.entity.vo.UserAccountVo;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.system.UserService;
@@ -38,7 +41,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -99,11 +101,31 @@ public class UserServiceImpl implements UserService {
     public ResultPage getStaff(JSONObject params) {
         UserCondition userCondition = params.toJavaObject(UserCondition.class);
         userCondition.buildLimit();
-        if (userCondition.getRealName() == null) userCondition.setRealName("");
         List<UserDetailVo> userDetailVoList = userDao.queryStaffByCondition(userCondition);
         buildUserDetailVo(userDetailVoList);
         Long total = userDao.queryStaffCountByCondition(userCondition);
         return Results.createOk(total, userDetailVoList);
+    }
+
+    @Override
+    public ResultPage getUsers(JSONObject params) {
+        UserAccountQueryCondition condition = params.toJavaObject(UserAccountQueryCondition.class);
+        condition.buildLimit();
+        List<UserAccountVo> userAccountVos = userDao.queryUserAccountByCondition(condition);
+        Long total = userDao.queryUserAccountCountByCondition(condition);
+        for (UserAccountVo userAccountVo : userAccountVos) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(userAccountVo.getId());
+            List<UserRole> userRoles = userRoleDao.queryAll(userRole);
+            List<Role> list = new ArrayList<>();
+            for (UserRole role : userRoles) {
+                Role r = roleDao.queryById(role.getRoleId());
+                list.add(r);
+            }
+            userAccountVo.setEnabledStr(EnableBooleanEnum.getEnumByCode(userAccountVo.getEnabled()).getDesc());
+            userAccountVo.setRoles(list);
+        }
+        return Results.createOk(total, userAccountVos);
     }
 
     @Override
@@ -460,6 +482,9 @@ public class UserServiceImpl implements UserService {
         User user = params.toJavaObject(User.class);
         Result result = user.checkBaseParams();
         if (result != null) return result;
+        if (Objects.equals(user.getId(), 1) && !Objects.equals(UserUtils.getCurrentUserId(), 1)) {
+            return Results.error("只有 admin 账户能更新 admin 用户");
+        }
         user.setUpdateTime(DateUtils.getNowTime());
         userDao.update(user);
         return Results.createOk("更新成功");
@@ -510,11 +535,15 @@ public class UserServiceImpl implements UserService {
         if (Objects.isNull(id)) {
             return Results.error("id 不能为空");
         }
+        if (Objects.equals(id, 1)) {
+            return Results.error("admin 账号不能删除");
+        }
         int userId = UserUtils.getCurrentUserId();
         if (Objects.equals(id, userId)) {
             return Results.error("您不能删除自己");
         }
         userDao.deleteById(id);
+        userRoleDao.deleteByUserId(id);
         return Results.createOk("删除成功");
     }
 
@@ -525,13 +554,46 @@ public class UserServiceImpl implements UserService {
         if (array == null || array.isEmpty()) return Results.error("ids 参数不能为空");
         List<Integer> ids = JSONArray.parseArray(JSONObject.toJSONString(array), Integer.class);
         for (Integer id : ids) {
+            if (Objects.equals(id, 1)) {
+                return Results.error("admin 账号不能删除");
+            }
             if (Objects.equals(id, UserUtils.getCurrentUserId())) {
                 return Results.error("您不能删除自己");
             }
         }
         for (Integer id : ids) {
             userDao.deleteById(id);
+            userRoleDao.deleteByUserId(id);
         }
         return Results.createOk("删除成功");
+    }
+
+    @Override
+    public Result updateUserAccount(UserAccountCondition condition) {
+        if (condition == null || condition.getId() == null) return Results.createInvalidParam();
+        if (Objects.equals(condition.getId(), 1) && !Objects.equals(UserUtils.getCurrentUserId(), 1)) {
+            return Results.error("非admin账号不能操作admin账号");
+        }
+        Integer[] roleIds = condition.getRoleIds();
+        if (roleIds != null && roleIds.length > 0) {
+            userRoleDao.deleteByUserId(condition.getId());
+            for (Integer roleId : roleIds) {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(condition.getId());
+                userRole.setRoleId(roleId);
+                userRoleDao.insert(userRole);
+            }
+        }
+        User user = new User();
+        if (condition.getPassword() != null) {
+            String password = CommonUtils.getPassword(condition.getPassword());
+            user.setPassword(password);
+        }
+        user.setId(condition.getId());
+        if (condition.getEnabled() != null) {
+            user.setEnabled(condition.getEnabled());
+        }
+        userDao.update(user);
+        return Results.createOk("账号更新成功");
     }
 }

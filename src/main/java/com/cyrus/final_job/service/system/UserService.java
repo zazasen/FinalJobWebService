@@ -3,6 +3,7 @@ package com.cyrus.final_job.service.system;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.UserAccountCondition;
 import com.cyrus.final_job.entity.system.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -85,4 +86,8 @@ public interface UserService extends UserDetailsService {
     ResponseEntity<byte[]> exportStaff();
 
     Result importStaff(MultipartFile file);
+
+    Result updateUserAccount(UserAccountCondition condition);
+
+    ResultPage getUsers(JSONObject params);
 }

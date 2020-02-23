@@ -67,6 +67,13 @@
         <result property="enabled" column="enabled" jdbcType="BOOLEAN"/>
     </resultMap>
 
+    <resultMap id="UserAccountVoMap" type="com.cyrus.final_job.entity.vo.UserAccountVo">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="username" column="username" jdbcType="VARCHAR"/>
+        <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+        <result property="workId" column="work_id" jdbcType="BIGINT"/>
+    </resultMap>
+
     <!--查询单个-->
     <select id="queryById" resultMap="UserMap">
         select
@@ -109,7 +116,6 @@
     </select>
 
     <select id="queryStaffByCondition" resultMap="UserVoMap">
-        <bind name="realName" value="'%' + realName + '%'"/>
         select
           id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
         from final_job.user
@@ -154,11 +160,54 @@
                 and departure_time between #{createTimeStart} and #{createTimeEnd}
             </if>
             <if test="realName != null and realName != ''">
+                <bind name="realName" value="'%' + realName + '%'"/>
                 and real_name like #{realName}
             </if>
+            <if test="username != null and username != ''">
+                <bind name="username" value="'%' + username + '%'"/>
+                and username like #{username}
+            </if>
         </where>
-        order by create_time
+        order by create_time desc
         limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryUserAccountByCondition" resultMap="UserAccountVoMap">
+        select id,username,real_name,enabled,work_id
+        from final_job.user
+        <where>
+            <if test="workId != null">
+                and work_id = #{workId}
+            </if>
+            <if test="realName != null and realName != ''">
+                <bind name="realName" value="'%' + realName + '%'"/>
+                and real_name like #{realName}
+            </if>
+            <if test="username != null and username != ''">
+                <bind name="username" value="'%' + username + '%'"/>
+                and username like #{username}
+            </if>
+        </where>
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryUserAccountCountByCondition" resultType="long">
+        select count(*)
+        from final_job.user
+        <where>
+            <if test="workId != null and workId != ''">
+                and work_id = #{workId}
+            </if>
+            <if test="realName != null and realName != ''">
+                <bind name="realName" value="'%' + realName + '%'"/>
+                and real_name like #{realName}
+            </if>
+            <if test="username != null and username != ''">
+                <bind name="username" value="'%' + username + '%'"/>
+                and username like #{username}
+            </if>
+        </where>
     </select>
 
     <select id="queryStaffCountByCondition" resultType="long">

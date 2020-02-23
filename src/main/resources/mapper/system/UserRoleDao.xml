@@ -67,4 +67,12 @@
         delete from final_job.user_role where id = #{id}
     </delete>
 
+    <delete id="deleteByUserId">
+        delete from final_job.user_role where user_id = #{userId}
+    </delete>
+
+    <delete id="delByRoleId">
+        delete from final_job.user_role where role_id = #{userId}
+    </delete>
+
 </mapper>

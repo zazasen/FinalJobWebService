@@ -63,4 +63,7 @@ public interface UserRoleDao {
      */
     int deleteById(Integer id);
 
+    int deleteByUserId(Integer userId);
+
+    int delByRoleId(Integer id);
 }

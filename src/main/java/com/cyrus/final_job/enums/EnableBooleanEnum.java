@@ -31,6 +31,16 @@ public enum EnableBooleanEnum {
         this.desc = desc;
     }
 
+
+    public static EnableBooleanEnum getEnumByCode(Boolean code) {
+        for (EnableBooleanEnum value : EnableBooleanEnum.values()) {
+            if (Objects.equals(value.getCode(), code)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
     public static EnableBooleanEnum getEnumByDesc(String desc) {
         for (EnableBooleanEnum value : EnableBooleanEnum.values()) {
             if (Objects.equals(value.getDesc(), desc)) {
