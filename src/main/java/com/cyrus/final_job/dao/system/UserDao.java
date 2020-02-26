@@ -74,7 +74,7 @@ public interface UserDao {
 
     User loadUserByUsername(String username);
 
-    User queryByDepartmentId(Integer depId);
+    List<User> queryByDepartmentId(Integer depId);
 
     Long getMaxWorkId();
 

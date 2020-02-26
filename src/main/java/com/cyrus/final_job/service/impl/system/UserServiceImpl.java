@@ -437,7 +437,9 @@ public class UserServiceImpl implements UserService {
             item.setWedlockStr(WedlockEnum.getEnumByCode(item.getWedlock()).getDesc());
             item.setNationName(nationDao.queryById(item.getNationId()).getName());
             item.setPoliticsStr(politicsStatusDao.queryById(item.getPoliticsId()).getName());
-            item.setDepartmentName(departmentDao.queryById(item.getDepartmentId()).getName());
+            if(departmentDao.queryById(item.getDepartmentId()) != null){
+                item.setDepartmentName(departmentDao.queryById(item.getDepartmentId()).getName());
+            }
             Position position = positionDao.queryById(item.getPositionId());
             item.setPositionName(position.getPositionName());
             item.setTopDegreeStr(DegreeEnum.getEnumByCode(item.getTopDegree()).getDesc());

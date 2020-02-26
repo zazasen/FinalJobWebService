@@ -10,6 +10,8 @@
         <result property="enabled" column="enabled" jdbcType="INTEGER"/>
         <result property="isParent" column="is_parent" jdbcType="INTEGER"/>
         <result property="sonCount" column="son_count" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="userRealName" column="user_real_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap id="DepartmentVoMap" type="com.cyrus.final_job.entity.Department" extends="DepartmentMap">
@@ -19,14 +21,14 @@
 
     <select id="getDepartmentByParentId" resultMap="DepartmentVoMap">
         select
-          id, name, parent_id, enabled, is_parent,parent_name
+          id, name, parent_id, enabled, is_parent,parent_name,user_id,user_real_name
           from final_job.department where parent_id = #{parentId}
     </select>
 
     <!--查询单个-->
     <select id="queryById" resultMap="DepartmentMap">
         select
-          id, name, parent_id, enabled, is_parent,son_count
+          id, name, parent_id, enabled, is_parent,son_count,user_id,user_real_name
         from final_job.department
         where id = #{id}
     </select>
@@ -34,7 +36,7 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="DepartmentMap">
         select
-          id, name, parent_id, enabled, is_parent,son_count
+          id, name, parent_id, enabled, is_parent,son_count,user_id,user_real_name
         from final_job.department
         limit #{offset}, #{limit}
     </select>
@@ -42,7 +44,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="DepartmentMap">
         select
-        id, name, parent_id, enabled, is_parent,son_count
+        id, name, parent_id, enabled, is_parent,son_count,user_id,user_real_name
         from final_job.department
         <where>
             <if test="id != null">
@@ -60,13 +62,19 @@
             <if test="isParent != null">
                 and is_parent = #{isParent}
             </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="userRealName != null">
+                and user_real_name = #{userRealName}
+            </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.department(name, parent_id, enabled, is_parent,parent_name)
-        values (#{name}, #{parentId}, #{enabled}, #{isParent},#{parentName})
+        insert into final_job.department(name, parent_id, enabled, is_parent,parent_name,user_id,user_real_name)
+        values (#{name}, #{parentId}, #{enabled}, #{isParent},#{parentName},#{userId},#{userRealName})
     </insert>
 
     <!--通过主键修改数据-->
@@ -90,6 +98,12 @@
             </if>
             <if test="sonCount != null">
                 son_count = #{sonCount},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="userRealName != null">
+                user_real_name = #{userRealName},
             </if>
         </set>
         where id = #{id}

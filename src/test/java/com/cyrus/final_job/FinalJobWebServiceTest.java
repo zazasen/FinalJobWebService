@@ -9,7 +9,6 @@ import com.cyrus.final_job.dao.system.MenuDao;
 import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.service.DepartmentService;
 import com.cyrus.final_job.service.system.MenuService;
-import com.cyrus.final_job.utils.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -69,7 +68,7 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void test() {
-        System.out.println(DateUtils.getNowHour());
+
     }
 
 

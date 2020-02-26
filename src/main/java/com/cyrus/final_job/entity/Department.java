@@ -1,6 +1,7 @@
 package com.cyrus.final_job.entity;
 
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.vo.ApprovalFlowVo;
 import com.cyrus.final_job.utils.Results;
 import lombok.Data;
 
@@ -28,6 +29,9 @@ public class Department implements Serializable {
      */
     private Integer parentId;
 
+    private Integer userId;
+    private String userRealName;
+
     private Integer enabled;
 
     private Integer isParent;
@@ -35,6 +39,8 @@ public class Department implements Serializable {
     private String parentName;
 
     private Integer sonCount;
+
+    private ApprovalFlowVo approvalFlowVo;
 
     private List<Department> children = new ArrayList<>();
 
@@ -47,6 +53,9 @@ public class Department implements Serializable {
         }
         if (parentName == null) {
             return Results.error("上级部门名不能为空");
+        }
+        if (userId == null) {
+            return Results.error("部门主管不能为空");
         }
         this.enabled = 1;
         this.isParent = 0;

@@ -67,4 +67,26 @@ public interface DepartmentService {
      * @return res
      */
     Result getAllDepartment();
+
+    /**
+     * bp 获取部门，获取自己兄弟部门，以及父部门
+     *
+     * @return
+     */
+    Result getDepByBp();
+
+    /**
+     * 获取指定部门底下的员工
+     *
+     * @param params
+     * @return
+     */
+    Result getDepStaff(JSONObject params);
+
+    /**
+     * bp 自己兄弟部门以及父部门的所有员工
+     *
+     * @return
+     */
+    Result getBrotherAndFatherDepStaff(JSONObject params);
 }
