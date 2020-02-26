@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 菜单管理表(Menu)表服务实现类
@@ -95,7 +97,8 @@ public class MenuServiceImpl implements MenuService {
     public Result getMenusByUserId() {
         int userId = UserUtils.getCurrentUserId();
         List<Menu> menus = menuDao.getMenusByUserId(userId);
-        return Results.createOk(menus);
+        List<Menu> res = menus.stream().sorted(Comparator.comparing(Menu::getId)).collect(Collectors.toList());
+        return Results.createOk(res);
     }
 
     @Override

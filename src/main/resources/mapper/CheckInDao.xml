@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyrus.final_job.dao.CheckInDao">
+
+    <resultMap type="com.cyrus.final_job.entity.CheckIn" id="CheckInMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="startPlace" column="start_place" jdbcType="VARCHAR"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="startType" column="start_type" jdbcType="INTEGER"/>
+        <result property="endPlace" column="end_place" jdbcType="VARCHAR"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="endType" column="end_type" jdbcType="INTEGER"/>
+        <result property="signType" column="sign_type" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="VARCHAR"/>
+        <result property="workHours" column="work_hours" jdbcType="DOUBLE"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="CheckInMap">
+        select
+          id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
+        from final_job.check_in
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="CheckInMap">
+        select
+          id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
+        from final_job.check_in
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="queryAllByCondition" resultMap="CheckInMap">
+        select
+        id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time,
+        work_hours
+        from final_job.check_in
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="startTime != null and endTime != null">
+                and create_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryAllByConditionCount" resultType="long">
+        select count(*)
+        from final_job.check_in
+        <where>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="startTime != null and endTime != null">
+                and create_time between #{startTime} and #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryByIdAndCreateTime" resultMap="CheckInMap">
+        select
+          id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
+        from final_job.check_in
+        where user_id = #{userId} and create_time = #{createTime}
+    </select>
+
+    <select id="queryByCreateTime" resultMap="CheckInMap">
+        select
+          id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
+        from final_job.check_in
+        where create_time = #{createTime}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="CheckInMap">
+        select
+        id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time,
+        work_hours
+        from final_job.check_in
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="startPlace != null and startPlace != ''">
+                and start_place = #{startPlace}
+            </if>
+            <if test="startTime != null">
+                and start_time = #{startTime}
+            </if>
+            <if test="startType != null">
+                and start_type = #{startType}
+            </if>
+            <if test="endPlace != null and endPlace != ''">
+                and end_place = #{endPlace}
+            </if>
+            <if test="endTime != null">
+                and end_time = #{endTime}
+            </if>
+            <if test="endType != null">
+                and end_type = #{endType}
+            </if>
+            <if test="signType != null">
+                and sign_type = #{signType}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                and create_time = #{createTime}
+            </if>
+            <if test="workHours != null">
+                and work_hours = #{workHours}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into final_job.check_in(user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours)
+        values (#{userId}, #{startPlace}, #{startTime}, #{startType}, #{endPlace}, #{endTime}, #{endType}, #{signType}, #{createTime}, #{workHours})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update final_job.check_in
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="startPlace != null and startPlace != ''">
+                start_place = #{startPlace},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="startType != null">
+                start_type = #{startType},
+            </if>
+            <if test="endPlace != null and endPlace != ''">
+                end_place = #{endPlace},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="endType != null">
+                end_type = #{endType},
+            </if>
+            <if test="signType != null">
+                sign_type = #{signType},
+            </if>
+            <if test="createTime != null and createTime != ''">
+                create_time = #{createTime},
+            </if>
+            <if test="workHours != null">
+                work_hours = #{workHours},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from final_job.check_in where id = #{id}
+    </delete>
+
+</mapper>
