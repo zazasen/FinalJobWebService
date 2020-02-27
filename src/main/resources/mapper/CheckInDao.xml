@@ -14,6 +14,7 @@
         <result property="signType" column="sign_type" jdbcType="INTEGER"/>
         <result property="createTime" column="create_time" jdbcType="VARCHAR"/>
         <result property="workHours" column="work_hours" jdbcType="DOUBLE"/>
+        <result property="enabled" column="enabled" jdbcType="BOOLEAN"/>
     </resultMap>
 
     <!--查询单个-->
@@ -37,14 +38,13 @@
         id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time,
         work_hours
         from final_job.check_in
-        <where>
-            <if test="userId != null">
-                and user_id = #{userId}
-            </if>
-            <if test="startTime != null and endTime != null">
-                and create_time between #{startTime} and #{endTime}
-            </if>
-        </where>
+        where enabled = true
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="startTime != null and endTime != null">
+            and create_time between #{startTime} and #{endTime}
+        </if>
         order by create_time desc
         limit #{offset}, #{pageSize}
     </select>
@@ -52,28 +52,34 @@
     <select id="queryAllByConditionCount" resultType="long">
         select count(*)
         from final_job.check_in
-        <where>
-            <if test="userId != null">
-                and user_id = #{userId}
-            </if>
-            <if test="startTime != null and endTime != null">
-                and create_time between #{startTime} and #{endTime}
-            </if>
-        </where>
+        where enabled = true
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="startTime != null and endTime != null">
+            and create_time between #{startTime} and #{endTime}
+        </if>
     </select>
 
     <select id="queryByIdAndCreateTime" resultMap="CheckInMap">
         select
           id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
         from final_job.check_in
-        where user_id = #{userId} and create_time = #{createTime}
+        where user_id = #{userId} and create_time = #{createTime} and enabled = true
     </select>
 
     <select id="queryByCreateTime" resultMap="CheckInMap">
         select
           id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
         from final_job.check_in
-        where create_time = #{createTime}
+        where create_time = #{createTime} and user_id = #{userId} and enabled = true
+    </select>
+
+    <select id="queryApplyRecordByCreateTime" resultMap="CheckInMap">
+        select
+          id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
+        from final_job.check_in
+        where create_time = #{createTime} and user_id = #{userId} and enabled = false
     </select>
 
     <!--通过实体作为筛选条件查询-->
@@ -121,8 +127,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.check_in(user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours)
-        values (#{userId}, #{startPlace}, #{startTime}, #{startType}, #{endPlace}, #{endTime}, #{endType}, #{signType}, #{createTime}, #{workHours})
+        insert into final_job.check_in(user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours,enabled)
+        values (#{userId}, #{startPlace}, #{startTime}, #{startType}, #{endPlace}, #{endTime}, #{endType}, #{signType}, #{createTime}, #{workHours},#{enabled})
     </insert>
 
     <!--通过主键修改数据-->

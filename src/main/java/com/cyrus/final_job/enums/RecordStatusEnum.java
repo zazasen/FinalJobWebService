@@ -2,17 +2,15 @@ package com.cyrus.final_job.enums;
 
 import java.util.Objects;
 
-public enum SignTypeEnum {
-    UNKNOWN(-1, "未知"),
-    HALF(0, "半天班"),
-    FULL(1, "一天班"),
-    FREE(2, "请假"),
-    NONE(3, "未签到");
+public enum RecordStatusEnum {
 
+    UNKNOWN(-1, "未知"),
+    READY_PASS(0, "待审批"),
+    PASSED(1, "已审批");
     private Integer code;
     private String desc;
 
-    SignTypeEnum(Integer code, String desc) {
+    RecordStatusEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -29,12 +27,8 @@ public enum SignTypeEnum {
         return desc;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public static SignTypeEnum getEnumByCode(Integer code) {
-        for (SignTypeEnum value : SignTypeEnum.values()) {
+    public static RecordStatusEnum getEnumByCode(Integer code) {
+        for (RecordStatusEnum value : RecordStatusEnum.values()) {
             if (Objects.equals(value.getCode(), code)) {
                 return value;
             }

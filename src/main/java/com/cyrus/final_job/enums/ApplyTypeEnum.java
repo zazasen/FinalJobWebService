@@ -2,17 +2,16 @@ package com.cyrus.final_job.enums;
 
 import java.util.Objects;
 
-public enum SignTypeEnum {
+public enum ApplyTypeEnum {
+
     UNKNOWN(-1, "未知"),
-    HALF(0, "半天班"),
-    FULL(1, "一天班"),
-    FREE(2, "请假"),
-    NONE(3, "未签到");
+    START_SIGN_APPlY(0, "签到补卡"),
+    END_SIGN_APPLY(1, "签退补卡");
 
     private Integer code;
     private String desc;
 
-    SignTypeEnum(Integer code, String desc) {
+    ApplyTypeEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -33,8 +32,8 @@ public enum SignTypeEnum {
         this.desc = desc;
     }
 
-    public static SignTypeEnum getEnumByCode(Integer code) {
-        for (SignTypeEnum value : SignTypeEnum.values()) {
+    public static ApplyTypeEnum getEnumByCode(Integer code) {
+        for (ApplyTypeEnum value : ApplyTypeEnum.values()) {
             if (Objects.equals(value.getCode(), code)) {
                 return value;
             }

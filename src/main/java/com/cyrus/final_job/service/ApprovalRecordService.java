@@ -1,19 +1,19 @@
 package com.cyrus.final_job.service;
 
 import com.alibaba.fastjson.JSONObject;
-import com.cyrus.final_job.entity.CheckIn;
+import com.cyrus.final_job.entity.ApprovalRecord;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 
 import java.util.List;
 
 /**
- * 签到表(CheckIn)表服务接口
+ * 审批人员表(ApprovalRecord)表服务接口
  *
  * @author cyrus
- * @since 2020-02-25 13:06:41
+ * @since 2020-02-27 11:35:59
  */
-public interface CheckInService {
+public interface ApprovalRecordService {
 
     /**
      * 通过ID查询单条数据
@@ -21,7 +21,7 @@ public interface CheckInService {
      * @param id 主键
      * @return 实例对象
      */
-    CheckIn queryById(Integer id);
+    ApprovalRecord queryById(Integer id);
 
     /**
      * 查询多条数据
@@ -30,23 +30,23 @@ public interface CheckInService {
      * @param limit  查询条数
      * @return 对象列表
      */
-    List<CheckIn> queryAllByLimit(int offset, int limit);
+    List<ApprovalRecord> queryAllByLimit(int offset, int limit);
 
     /**
      * 新增数据
      *
-     * @param checkIn 实例对象
+     * @param approvalRecord 实例对象
      * @return 实例对象
      */
-    CheckIn insert(CheckIn checkIn);
+    ApprovalRecord insert(ApprovalRecord approvalRecord);
 
     /**
      * 修改数据
      *
-     * @param checkIn 实例对象
+     * @param approvalRecord 实例对象
      * @return 实例对象
      */
-    CheckIn update(CheckIn checkIn);
+    ApprovalRecord update(ApprovalRecord approvalRecord);
 
     /**
      * 通过主键删除数据
@@ -57,50 +57,25 @@ public interface CheckInService {
     boolean deleteById(Integer id);
 
     /**
-     * 签到
+     * 获取当前登录用户的所有审批记录
      *
      * @return
      */
-    Result signIn();
-
-
-    /**
-     * 签出
-     *
-     * @return
-     */
-    Result signOut();
+    ResultPage getAllMyApproval(JSONObject params);
 
     /**
-     * 当前的签到类型
-     *
-     * @return
-     */
-    Result signType();
-
-    Result calendarShow();
-
-    /**
-     * 获取考个人勤记录
+     * 获取具体某一条记录的详情
      *
      * @param params
      * @return
      */
-    ResultPage getAttendanceRecord(JSONObject params);
+    Result getApprovalDetail(JSONObject params);
 
     /**
-     * 获取所有员工考勤记录
+     * 审批通过处理
      *
      * @param params
      * @return
      */
-    ResultPage getAllAttendanceRecord(JSONObject params);
-
-    /**
-     * 补签
-     *
-     * @param params
-     * @return
-     */
-    Result remedySign(JSONObject params);
+    Result approvalPass(JSONObject params);
 }

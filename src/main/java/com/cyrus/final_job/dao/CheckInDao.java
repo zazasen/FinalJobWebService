@@ -26,7 +26,7 @@ public interface CheckInDao {
      * 查询指定行数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<CheckIn> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
@@ -70,5 +70,7 @@ public interface CheckInDao {
 
     CheckIn queryByIdAndCreateTime(CheckIn checkIn);
 
-    CheckIn queryByCreateTime(String createTime);
+    CheckIn queryByCreateTime(@Param("createTime") String createTime, @Param("userId") Integer userId);
+
+    CheckIn queryApplyRecordByCreateTime(@Param("createTime") String createTime, @Param("userId") Integer userId);
 }

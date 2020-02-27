@@ -65,6 +65,8 @@ public class CheckIn implements Serializable {
      */
     private Double workHours;
 
+    private Boolean enabled;
+
     /**
      * 上班签到
      *
@@ -106,5 +108,4 @@ public class CheckIn implements Serializable {
             return checkIn;
         }
     }
-
 }

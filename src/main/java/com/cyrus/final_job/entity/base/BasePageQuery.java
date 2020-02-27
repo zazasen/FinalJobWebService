@@ -13,7 +13,7 @@ public class BasePageQuery {
             pageIndex = 1;
         }
         if (this.pageSize == null || this.pageSize <= 0) {
-            pageSize = 5;
+            pageSize = 10;
         }
         this.offset = (pageIndex - 1) * pageSize;
     }
