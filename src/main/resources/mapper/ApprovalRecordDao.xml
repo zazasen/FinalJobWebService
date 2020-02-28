@@ -9,6 +9,7 @@
         <result property="approvalUserId" column="approval_user_id" jdbcType="INTEGER"/>
         <result property="recordStatus" column="record_status" jdbcType="INTEGER"/>
         <result property="approvalId" column="approval_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!--查询单个-->
@@ -29,7 +30,7 @@
 
     <select id="queryAllPage" resultMap="ApprovalRecordMap">
         select
-        id, produce_user_id, approval_type, approval_user_id, record_status, approval_id
+        id, produce_user_id, approval_type, approval_user_id, record_status, approval_id,create_time
         from final_job.approval_record
         <where>
             <if test="id != null">
@@ -49,6 +50,9 @@
             </if>
             <if test="approvalId != null">
                 and approval_id = #{approvalId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
             </if>
         </where>
         order by record_status
@@ -76,6 +80,9 @@
             </if>
             <if test="approvalId != null">
                 and approval_id = #{approvalId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
             </if>
         </where>
     </select>
@@ -110,8 +117,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.approval_record(produce_user_id, approval_type, approval_user_id, record_status, approval_id)
-        values (#{produceUserId}, #{approvalType}, #{approvalUserId}, #{recordStatus}, #{approvalId})
+        insert into final_job.approval_record(produce_user_id, approval_type, approval_user_id, record_status, approval_id,create_time)
+        values (#{produceUserId}, #{approvalType}, #{approvalUserId}, #{recordStatus}, #{approvalId},#{createTime})
     </insert>
 
     <!--通过主键修改数据-->
@@ -140,6 +147,10 @@
     <!--通过主键删除-->
     <delete id="deleteById">
         delete from final_job.approval_record where id = #{id}
+    </delete>
+
+    <delete id="delByApprovalTypeAndApprovalId">
+        delete from final_job.approval_record where approval_type = #{code} and approval_id = #{id}
     </delete>
 
 </mapper>

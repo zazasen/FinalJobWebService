@@ -67,4 +67,5 @@ public interface ApprovalRecordDao {
      */
     int deleteById(Integer id);
 
+    void delByApprovalTypeAndApprovalId(@Param("code") Integer code, @Param("id") Integer id);
 }

@@ -158,7 +158,8 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
 
         ApprovalRecord approvalRecord = approvalRecordDao.queryById(id);
 
-        if (Objects.equals(RecordStatusEnum.getEnumByCode(approvalRecord.getRecordStatus()), RecordStatusEnum.PASSED)) {
+        if (Objects.equals(RecordStatusEnum.getEnumByCode(approvalRecord.getRecordStatus()), RecordStatusEnum.PASSED)
+                || Objects.equals(RecordStatusEnum.getEnumByCode(approvalRecord.getRecordStatus()), RecordStatusEnum.NOT_PASSED)) {
             return Results.createOk("该申请已经处理过，无需再次处理");
         }
 
@@ -178,52 +179,63 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
     }
 
     private void startRemedySign(ApprovalRecord approvalRecord) {
+
         // 申请人申请的记录
-        CheckIn applyRecord = checkInDao.queryById(approvalRecord.getApprovalId());
-        // 申请人补卡前的记录
-        CheckIn oldRecord = checkInDao.queryByCreateTime(applyRecord.getCreateTime(), approvalRecord.getProduceUserId());
-        oldRecord.setStartTime(applyRecord.getStartTime());
-        oldRecord.setStartType(applyRecord.getStartType());
-        // 如果是定时任务生成的当天缺卡记录
-        if (Objects.equals(oldRecord.getSignType(), SignTypeEnum.NONE.getCode())) {
-            oldRecord.setSignType(SignTypeEnum.HALF.getCode());
-        }
-        // 如果 endTime 为空，说明此之前没有下班打卡，工作时长设置为4.0
-        if (oldRecord.getEndTime() == null) {
-            oldRecord.setWorkHours(4.0);
-            oldRecord.setSignType(SignTypeEnum.HALF.getCode());
+        CheckIn newRecord = checkInDao.queryById(approvalRecord.getApprovalId());
+
+        // 获取待被更新的记录
+        CheckIn checkIn = checkInDao.queryByCreateTime(newRecord.getCreateTime(), approvalRecord.getProduceUserId());
+
+        checkIn.setStartTime(newRecord.getStartTime());
+        checkIn.setStartType(newRecord.getStartType());
+        if (checkIn.getEndTime() != null) {
+            double workHours = DateUtils.getGapTime(checkIn.getStartTime().toLocalDateTime(), checkIn.getEndTime().toLocalDateTime());
+            checkIn.setWorkHours(workHours);
+            checkIn.setSignType(SignTypeEnum.FULL.getCode());
         } else {
-            // 否则说明之前有下班打卡，更新时长
-            oldRecord.setWorkHours(DateUtils.getGapTime(applyRecord.getStartTime().toLocalDateTime(), oldRecord.getEndTime().toLocalDateTime()));
-            oldRecord.setSignType(SignTypeEnum.FULL.getCode());
+            checkIn.setWorkHours(4.0);
+            checkIn.setSignType(SignTypeEnum.HALF.getCode());
         }
-        checkInDao.update(oldRecord);
+        checkInDao.update(checkIn);
         approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
         approvalRecordDao.update(approvalRecord);
     }
 
     private void endRemedySign(ApprovalRecord approvalRecord) {
+
         // 申请人申请的记录
-        CheckIn applyRecord = checkInDao.queryById(approvalRecord.getApprovalId());
-        // 申请人补卡前的记录
-        CheckIn oldRecord = checkInDao.queryByCreateTime(applyRecord.getCreateTime(), approvalRecord.getProduceUserId());
-        oldRecord.setEndTime(applyRecord.getEndTime());
-        oldRecord.setEndType(applyRecord.getEndType());
-        // 如果是定时任务生成的当天缺卡记录
-        if (Objects.equals(oldRecord.getSignType(), SignTypeEnum.NONE.getCode())) {
-            oldRecord.setSignType(SignTypeEnum.HALF.getCode());
-        }
-        // 如果 startTime 为空，说明此之前没有上班班打卡，工作时长设置为4.0
-        if (oldRecord.getStartTime() == null) {
-            oldRecord.setWorkHours(4.0);
-            oldRecord.setSignType(SignTypeEnum.HALF.getCode());
+        CheckIn newRecord = checkInDao.queryById(approvalRecord.getApprovalId());
+
+        // 获取待被更新的记录
+        CheckIn checkIn = checkInDao.queryByCreateTime(newRecord.getCreateTime(), approvalRecord.getProduceUserId());
+
+        checkIn.setEndTime(newRecord.getEndTime());
+        checkIn.setEndType(newRecord.getEndType());
+        checkIn.setSignType(newRecord.getSignType());
+        if (checkIn.getStartTime() != null) {
+            double workHours = DateUtils.getGapTime(checkIn.getStartTime().toLocalDateTime(), checkIn.getEndTime().toLocalDateTime());
+            checkIn.setWorkHours(workHours);
+            checkIn.setSignType(SignTypeEnum.FULL.getCode());
         } else {
-            // 否则说明之前有上班打卡，更新时长
-            oldRecord.setWorkHours(DateUtils.getGapTime(oldRecord.getStartTime().toLocalDateTime(), applyRecord.getEndTime().toLocalDateTime()));
-            oldRecord.setSignType(SignTypeEnum.FULL.getCode());
+            checkIn.setWorkHours(4.0);
+            checkIn.setSignType(SignTypeEnum.HALF.getCode());
         }
-        checkInDao.update(oldRecord);
+        checkInDao.update(checkIn);
         approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
         approvalRecordDao.update(approvalRecord);
+    }
+
+    @Override
+    public Result notPass(JSONObject params) {
+        Integer id = params.getInteger("id");
+        if (id == null) return Results.error("审批记录 id 不能为空");
+        ApprovalRecord approvalRecord = approvalRecordDao.queryById(id);
+        if (Objects.equals(RecordStatusEnum.getEnumByCode(approvalRecord.getRecordStatus()), RecordStatusEnum.PASSED)
+                || Objects.equals(RecordStatusEnum.getEnumByCode(approvalRecord.getRecordStatus()), RecordStatusEnum.NOT_PASSED)) {
+            return Results.createOk("该申请已经处理过，无需再次处理");
+        }
+        approvalRecord.setRecordStatus(RecordStatusEnum.NOT_PASSED.getCode());
+        approvalRecordDao.update(approvalRecord);
+        return Results.createOk("驳回成功");
     }
 }

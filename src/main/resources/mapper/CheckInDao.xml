@@ -43,7 +43,7 @@
             and user_id = #{userId}
         </if>
         <if test="startTime != null and endTime != null">
-            and create_time between #{startTime} and #{endTime}
+            and create_time between #{beginTime} and #{tailTime}
         </if>
         order by create_time desc
         limit #{offset}, #{pageSize}
@@ -57,7 +57,7 @@
             and user_id = #{userId}
         </if>
         <if test="startTime != null and endTime != null">
-            and create_time between #{startTime} and #{endTime}
+            and create_time between #{beginTime} and #{beginTime}
         </if>
     </select>
 

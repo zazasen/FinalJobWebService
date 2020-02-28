@@ -203,7 +203,9 @@ public class CheckInServiceImpl implements CheckInService {
     public ResultPage getAttendanceRecord(JSONObject params) {
         CheckInCondition condition = params.toJavaObject(CheckInCondition.class);
         condition.buildLimit();
+        condition.buildTime();
         condition.setUserId(UserUtils.getCurrentUserId());
+
         List<CheckInRecordVo> vos = buildAttendanceRecord(condition);
         Long total = checkInDao.queryAllByConditionCount(condition);
         return Results.createOk(total, vos);
@@ -213,6 +215,7 @@ public class CheckInServiceImpl implements CheckInService {
     public ResultPage getAllAttendanceRecord(JSONObject params) {
         CheckInCondition condition = params.toJavaObject(CheckInCondition.class);
         condition.buildLimit();
+        condition.buildTime();
         List<CheckInRecordVo> vos = buildAttendanceRecord(condition);
         Long total = checkInDao.queryAllByConditionCount(condition);
         return Results.createOk(total, vos);
@@ -250,11 +253,9 @@ public class CheckInServiceImpl implements CheckInService {
         switch (applyTypeEnum) {
             // 签到补卡
             case START_SIGN_APPlY:
-                startApplySign(condition);
-                return Results.createOk("已发起申请");
+                return startApplySign(condition);
             case END_SIGN_APPLY:
-                endApplySign(condition);
-                return Results.createOk("已发起申请");
+                return endApplySign(condition);
             default:
                 break;
         }
@@ -267,40 +268,35 @@ public class CheckInServiceImpl implements CheckInService {
      *
      * @param condition
      */
-    private void endApplySign(RemedySignCondition condition) {
-        ApprovalRecord approvalRecord = new ApprovalRecord();
+    private Result endApplySign(RemedySignCondition condition) {
         User user = userDao.queryById(condition.getUserId());
-        // 要审批的人，这里补卡都是只要直接主管审批即可
+        ApprovalRecord approvalRecord = new ApprovalRecord();
         Integer managerId = departmentDao.queryById(user.getDepartmentId()).getUserId();
-        // 申请人
         approvalRecord.setProduceUserId(user.getId());
         approvalRecord.setApprovalType(ApprovalTypeEnum.END_REMEDY_SIGN.getCode());
         approvalRecord.setApprovalUserId(managerId);
         approvalRecord.setRecordStatus(RecordStatusEnum.READY_PASS.getCode());
+        approvalRecord.setCreateTime(DateUtils.getNowTime());
         LocalDate createTime = condition.getEndTime().toLocalDateTime().toLocalDate();
-        // 根据要补卡的日期和申请人查询是否已经有记录，有记录则更新该条记录，没记录就创建记录
-        CheckIn applyRecord = checkInDao.queryApplyRecordByCreateTime(createTime.toString(), condition.getUserId());
-        if (applyRecord == null) {
-            CheckIn checkIn = new CheckIn();
-            checkIn.setUserId(condition.getUserId());
-            checkIn.setEndTime(condition.getEndTime());
-            checkIn.setEndType(SignInTypeEnum.REMEDY_SIGN.getCode());
-            checkIn.setCreateTime(createTime.toString());
-            checkIn.setEnabled(EnableBooleanEnum.DISABLE.getCode());
+
+        // 要被更新的记录
+        CheckIn checkIn = checkInDao.queryByCreateTime(createTime.toString(), user.getId());
+        checkIn.setId(null);
+        checkIn.setEndTime(condition.getEndTime());
+        checkIn.setEndType(SignInTypeEnum.REMEDY_SIGN.getCode());
+        checkIn.setEnabled(EnableBooleanEnum.DISABLE.getCode());
+        if (checkIn.getStartTime() != null) {
+            checkIn.setSignType(SignTypeEnum.FULL.getCode());
+            double workHours = DateUtils.getGapTime(checkIn.getStartTime().toLocalDateTime(), condition.getEndTime().toLocalDateTime());
+            checkIn.setWorkHours(workHours);
+        } else {
             checkIn.setSignType(SignTypeEnum.HALF.getCode());
             checkIn.setWorkHours(4.0);
-            checkInDao.insert(checkIn);
-            approvalRecord.setApprovalId(checkIn.getId());
-        } else {
-            applyRecord.setEndTime(condition.getEndTime());
-            applyRecord.setEndType(SignInTypeEnum.REMEDY_SIGN.getCode());
-            applyRecord.setSignType(SignTypeEnum.FULL.getCode());
-            double workHours = DateUtils.getGapTime(applyRecord.getStartTime().toLocalDateTime(), condition.getEndTime().toLocalDateTime());
-            applyRecord.setWorkHours(workHours);
-            checkInDao.update(applyRecord);
-            approvalRecord.setApprovalId(applyRecord.getId());
         }
+        checkInDao.insert(checkIn);
+        approvalRecord.setApprovalId(checkIn.getId());
         approvalRecordDao.insert(approvalRecord);
+        return Results.createOk("已发起申请");
     }
 
     /**
@@ -308,37 +304,35 @@ public class CheckInServiceImpl implements CheckInService {
      *
      * @param condition
      */
-    private void startApplySign(RemedySignCondition condition) {
-        ApprovalRecord approvalRecord = new ApprovalRecord();
+    private Result startApplySign(RemedySignCondition condition) {
+
         User user = userDao.queryById(condition.getUserId());
+        ApprovalRecord approvalRecord = new ApprovalRecord();
         Integer managerId = departmentDao.queryById(user.getDepartmentId()).getUserId();
         approvalRecord.setProduceUserId(user.getId());
         approvalRecord.setApprovalType(ApprovalTypeEnum.START_REMEDY_SIGN.getCode());
         approvalRecord.setApprovalUserId(managerId);
         approvalRecord.setRecordStatus(RecordStatusEnum.READY_PASS.getCode());
+        approvalRecord.setCreateTime(DateUtils.getNowTime());
         LocalDate createTime = condition.getStartTime().toLocalDateTime().toLocalDate();
-        // 根据要补卡的日期和申请人查询是否已经有记录，有记录则更新该条记录，没记录就创建记录
-        CheckIn applyRecord = checkInDao.queryApplyRecordByCreateTime(createTime.toString(), condition.getUserId());
-        if (applyRecord == null) {
-            CheckIn checkIn = new CheckIn();
-            checkIn.setUserId(condition.getUserId());
-            checkIn.setStartTime(condition.getStartTime());
-            checkIn.setStartType(SignInTypeEnum.REMEDY_SIGN.getCode());
-            checkIn.setCreateTime(createTime.toString());
-            checkIn.setEnabled(EnableBooleanEnum.DISABLE.getCode());
+
+        // 要被更新的记录
+        CheckIn checkIn = checkInDao.queryByCreateTime(createTime.toString(), user.getId());
+        checkIn.setId(null);
+        checkIn.setStartTime(condition.getStartTime());
+        checkIn.setStartType(SignInTypeEnum.REMEDY_SIGN.getCode());
+        checkIn.setEnabled(EnableBooleanEnum.DISABLE.getCode());
+        if (checkIn.getEndTime() != null) {
+            checkIn.setSignType(SignTypeEnum.FULL.getCode());
+            double workHours = DateUtils.getGapTime(condition.getStartTime().toLocalDateTime(), checkIn.getEndTime().toLocalDateTime());
+            checkIn.setWorkHours(workHours);
+        } else {
             checkIn.setSignType(SignTypeEnum.HALF.getCode());
             checkIn.setWorkHours(4.0);
-            checkInDao.insert(checkIn);
-            approvalRecord.setApprovalId(checkIn.getId());
-        } else {
-            applyRecord.setStartTime(condition.getStartTime());
-            applyRecord.setStartType(SignInTypeEnum.REMEDY_SIGN.getCode());
-            applyRecord.setSignType(SignTypeEnum.FULL.getCode());
-            double workHours = DateUtils.getGapTime(condition.getStartTime().toLocalDateTime(), applyRecord.getEndTime().toLocalDateTime());
-            applyRecord.setWorkHours(workHours);
-            checkInDao.update(applyRecord);
-            approvalRecord.setApprovalId(applyRecord.getId());
         }
+        checkInDao.insert(checkIn);
+        approvalRecord.setApprovalId(checkIn.getId());
         approvalRecordDao.insert(approvalRecord);
+        return Results.createOk("已发起申请");
     }
 }

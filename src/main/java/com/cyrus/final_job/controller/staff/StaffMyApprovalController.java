@@ -43,4 +43,9 @@ public class StaffMyApprovalController {
         return approvalRecordService.approvalPass(params);
     }
 
+    @PostMapping("/notPass")
+    public Result notPass(@RequestBody JSONObject params){
+        return approvalRecordService.notPass(params);
+    }
+
 }

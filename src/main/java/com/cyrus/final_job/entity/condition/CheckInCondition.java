@@ -10,4 +10,14 @@ public class CheckInCondition extends BasePageQuery {
     private Timestamp startTime;
     private Timestamp endTime;
     private Integer userId;
+
+    private String beginTime;
+    private String tailTime;
+
+    public void buildTime() {
+        if (this.getStartTime() != null && this.getEndTime() != null) {
+            this.setBeginTime(this.getStartTime().toLocalDateTime().toLocalDate().toString());
+            this.setTailTime(this.getEndTime().toLocalDateTime().toLocalDate().toString());
+        }
+    }
 }

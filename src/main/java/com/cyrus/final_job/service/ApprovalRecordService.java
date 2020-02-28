@@ -78,4 +78,12 @@ public interface ApprovalRecordService {
      * @return
      */
     Result approvalPass(JSONObject params);
+
+    /**
+     * 审批驳回
+     *
+     * @param params
+     * @return
+     */
+    Result notPass(JSONObject params);
 }

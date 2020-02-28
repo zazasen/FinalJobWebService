@@ -3,6 +3,8 @@ package com.cyrus.final_job.entity;
 import com.cyrus.final_job.entity.base.BasePageQuery;
 import lombok.Data;
 
+import java.sql.Timestamp;
+
 /**
  * 审批人员表(ApprovalRecord)实体类
  *
@@ -36,6 +38,6 @@ public class ApprovalRecord extends BasePageQuery {
     */
     private Integer approvalId;
 
-
+    private Timestamp createTime;
 
 }

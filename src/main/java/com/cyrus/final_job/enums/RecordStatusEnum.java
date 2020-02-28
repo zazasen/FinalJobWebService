@@ -6,7 +6,8 @@ public enum RecordStatusEnum {
 
     UNKNOWN(-1, "未知"),
     READY_PASS(0, "待审批"),
-    PASSED(1, "已审批");
+    PASSED(1, "已审批"),
+    NOT_PASSED(2, "审批驳回");
     private Integer code;
     private String desc;
 
