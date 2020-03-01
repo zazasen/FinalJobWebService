@@ -55,7 +55,7 @@
                 and create_time = #{createTime}
             </if>
         </where>
-        order by record_status
+        order by record_status,create_time
         limit #{offset}, #{pageSize}
     </select>
 

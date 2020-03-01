@@ -109,7 +109,15 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
         approvalRecord.buildLimit();
 
         int userId = UserUtils.getCurrentUserId();
-        approvalRecord.setApprovalUserId(userId);
+        // type 等于 1 表示当前要查找的是审批别人的记录
+        if (params.getInteger("type") == 1) {
+            approvalRecord.setApprovalUserId(userId);
+        }
+        // type 等于 0 表示当前要查找的是自己被别人审批的记录
+        if (params.getInteger("type") == 0) {
+            approvalRecord.setProduceUserId(userId);
+        }
+
         List<ApprovalRecord> approvalRecords = approvalRecordDao.queryAllPage(approvalRecord);
         Long total = approvalRecordDao.queryAllPageCount(approvalRecord);
 
