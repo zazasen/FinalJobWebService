@@ -40,6 +40,11 @@ public class StaffMyApprovalController {
         return approvalRecordService.getApprovalDetail(params);
     }
 
+    /**
+     * 审批处理
+     * @param params
+     * @return
+     */
     @PostMapping("/approvalPass")
     public Result approvalPass(@RequestBody JSONObject params) {
         return approvalRecordService.approvalPass(params);

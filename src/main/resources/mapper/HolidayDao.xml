@@ -93,6 +93,12 @@
             <if test="holidayTime != null">
                 holiday_time = #{holidayTime},
             </if>
+            <if test="remaining != null">
+                remaining = #{remaining},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
         </set>
         where id = #{id}
     </update>

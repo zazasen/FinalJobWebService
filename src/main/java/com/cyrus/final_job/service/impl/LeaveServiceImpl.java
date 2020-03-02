@@ -2,10 +2,12 @@ package com.cyrus.final_job.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.*;
+import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.entity.*;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.enums.ApprovalTypeEnum;
+import com.cyrus.final_job.enums.EnableBooleanEnum;
 import com.cyrus.final_job.enums.RecordStatusEnum;
 import com.cyrus.final_job.service.LeaveService;
 import com.cyrus.final_job.utils.DateUtils;
@@ -40,6 +42,9 @@ public class LeaveServiceImpl implements LeaveService {
 
     @Autowired
     private DepartmentDao departmentDao;
+
+    @Autowired
+    private UserDao userDao;
 
     /**
      * 通过ID查询单条数据
@@ -120,22 +125,31 @@ public class LeaveServiceImpl implements LeaveService {
             return Results.error("请假时间不得早于现在");
         }
 
+
+
         leaveDao.insert(leave);
 
         User currentUser = UserUtils.getCurrentUser();
         Integer departmentId = currentUser.getDepartmentId();
         ApprovalFlow flow = approvalFlowDao.queryByDepId(departmentId);
+
+        ApprovalRecord approvalRecord = new ApprovalRecord();
+        approvalRecord.setProduceUserId(currentUser.getId());
+        approvalRecord.setApprovalType(ApprovalTypeEnum.LEAVE.getCode());
+
         Integer firstApprovalMan = null;
         if (flow == null) {
             Department department = departmentDao.queryById(departmentId);
             firstApprovalMan = department.getUserId();
         } else {
-            firstApprovalMan = flow.getFirstApprovalMan();
+            if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(flow.getFirstApprovalMan()).isEnabled())) {
+                Department department = departmentDao.queryById(departmentId);
+                firstApprovalMan = department.getUserId();
+            } else {
+                firstApprovalMan = flow.getFirstApprovalMan();
+            }
         }
 
-        ApprovalRecord approvalRecord = new ApprovalRecord();
-        approvalRecord.setProduceUserId(currentUser.getId());
-        approvalRecord.setApprovalType(ApprovalTypeEnum.LEAVE.getCode());
         approvalRecord.setApprovalUserId(firstApprovalMan);
         approvalRecord.setRecordStatus(RecordStatusEnum.READY_PASS.getCode());
         approvalRecord.setApprovalId(leave.getId());

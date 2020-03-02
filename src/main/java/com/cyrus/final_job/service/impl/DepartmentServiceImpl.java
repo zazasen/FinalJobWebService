@@ -181,9 +181,15 @@ public class DepartmentServiceImpl implements DepartmentService {
             ApprovalFlow flow = approvalFlowDao.queryByDepId(department.getId());
             if (flow != null) {
                 ApprovalFlowVo approvalFlowVo = ApprovalFlowVo.buildApprovalFlowVo(flow);
-                approvalFlowVo.setFirstApprovalManName(userDao.queryById(approvalFlowVo.getFirstApprovalMan()).getRealName());
-                approvalFlowVo.setSecondApprovalManName(userDao.queryById(approvalFlowVo.getSecondApprovalMan()).getRealName());
-                approvalFlowVo.setThirdApprovalManName(userDao.queryById(approvalFlowVo.getThirdApprovalMan()).getRealName());
+                if (approvalFlowVo.getFirstApprovalMan() != null) {
+                    approvalFlowVo.setFirstApprovalManName(userDao.queryById(approvalFlowVo.getFirstApprovalMan()).getRealName());
+                }
+                if (approvalFlowVo.getSecondApprovalMan() != null) {
+                    approvalFlowVo.setSecondApprovalManName(userDao.queryById(approvalFlowVo.getSecondApprovalMan()).getRealName());
+                }
+                if (approvalFlowVo.getThirdApprovalMan() != null) {
+                    approvalFlowVo.setThirdApprovalManName(userDao.queryById(approvalFlowVo.getThirdApprovalMan()).getRealName());
+                }
                 department.setApprovalFlowVo(approvalFlowVo);
             } else {
                 ApprovalFlowVo approvalFlowVo = new ApprovalFlowVo();
@@ -202,7 +208,12 @@ public class DepartmentServiceImpl implements DepartmentService {
      */
     private List<Department> getDepByDepartmentId(Integer departmentId) {
         Department department = departmentDao.queryById(departmentId);
-        Integer parentId = department.getParentId();
+        Integer parentId = null;
+        if (department == null) {
+            parentId = departmentId;
+        } else {
+            parentId = department.getParentId();
+        }
         List<Department> tree = new ArrayList<>();
         Department parentDepartment = departmentDao.queryById(parentId);
         List<Department> departmentTree = departmentDao.getDepartmentByParentId(parentId);

@@ -2,17 +2,14 @@ package com.cyrus.final_job.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.cyrus.final_job.dao.ApprovalRecordDao;
-import com.cyrus.final_job.dao.CheckInDao;
+import com.cyrus.final_job.dao.*;
 import com.cyrus.final_job.dao.system.UserDao;
-import com.cyrus.final_job.entity.ApprovalRecord;
-import com.cyrus.final_job.entity.CheckIn;
+import com.cyrus.final_job.entity.*;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.ApprovalRecordVo;
-import com.cyrus.final_job.enums.ApprovalTypeEnum;
-import com.cyrus.final_job.enums.RecordStatusEnum;
-import com.cyrus.final_job.enums.SignTypeEnum;
+import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.ApprovalRecordService;
 import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
@@ -21,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -43,6 +41,18 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
 
     @Autowired
     private CheckInDao checkInDao;
+
+    @Autowired
+    private LeaveDao leaveDao;
+
+    @Autowired
+    private ApprovalFlowDao approvalFlowDao;
+
+    @Autowired
+    private HolidayDao holidayDao;
+
+    @Autowired
+    private DepartmentDao departmentDao;
 
     /**
      * 通过ID查询单条数据
@@ -147,12 +157,36 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
                 CheckIn startCheckIn = checkInDao.queryById(approvalRecord.getApprovalId());
                 Map<String, String> startMap = new LinkedHashMap<>();
                 startMap.put("上班打卡时间", startCheckIn.getStartTime().toLocalDateTime().format(formatter));
+                // 如果当前状态是待审批，显示要审批的人
+                if (RecordStatusEnum.READY_PASS.getCode().equals(approvalRecord.getRecordStatus())) {
+                    startMap.put("目前审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                } else {
+                    startMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                }
                 return Results.createOk(startMap);
             case END_REMEDY_SIGN:
                 CheckIn endCheckIn = checkInDao.queryById(approvalRecord.getApprovalId());
                 Map<String, String> endMap = new LinkedHashMap<>();
                 endMap.put("下班打卡时间", endCheckIn.getEndTime().toLocalDateTime().format(formatter));
+                if (RecordStatusEnum.READY_PASS.getCode().equals(approvalRecord.getRecordStatus())) {
+                    endMap.put("目前审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                } else {
+                    endMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                }
                 return Results.createOk(endMap);
+            case LEAVE:
+                Leave leave = leaveDao.queryById(approvalRecord.getApprovalId());
+                Map<String, String> leaveMap = new LinkedHashMap<>();
+                leaveMap.put("假期类型", HolidayTypeEnum.getEnumByCode(leave.getHolidayType()).getDesc());
+                leaveMap.put("假期开始时间", leave.getBeginTime().toLocalDateTime().toLocalDate().toString());
+                leaveMap.put("假期结束时间", leave.getEndTime().toLocalDateTime().toLocalDate().toString());
+                leaveMap.put("请假原因", leave.getReason());
+                if (RecordStatusEnum.READY_PASS.getCode().equals(approvalRecord.getRecordStatus())) {
+                    leaveMap.put("目前审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                } else {
+                    leaveMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                }
+                return Results.createOk(leaveMap);
             default:
                 break;
         }
@@ -180,10 +214,120 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
             case END_REMEDY_SIGN:
                 endRemedySign(approvalRecord);
                 return Results.createOk("审批成功");
+            case LEAVE:
+                leave(approvalRecord);
+                return Results.createOk("审批成功");
             default:
                 break;
         }
         return Results.error("审批失败");
+    }
+
+    private void leave(ApprovalRecord approvalRecord) {
+        // 申请人申请的记录
+        Leave oldRecord = leaveDao.queryById(approvalRecord.getApprovalId());
+        Integer produceUserId = approvalRecord.getProduceUserId();
+        User user = userDao.queryById(produceUserId);
+        Integer departmentId = user.getDepartmentId();
+        // 申请人所在部门的审批流
+        ApprovalFlow flow = approvalFlowDao.queryByDepId(departmentId);
+        // 没有审批流，直接部门主管通过即可
+        if (flow == null) {
+            // 构造审批通过的新纪录
+            leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+        } else {
+            int userId = UserUtils.getCurrentUserId();
+            Integer first = flow.getFirstApprovalMan();
+            Integer second = flow.getSecondApprovalMan();
+            Integer third = flow.getThirdApprovalMan();
+            // 有第一审批人、无第二第三审批人 说明当前用户是第一审批人，直接通过即可
+            if (first != null && second == null && third == null) {
+                leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+            }
+            // 有第一第二审批人，且无第三审批 这种情况不存在
+
+            // 有第一第三审批人，无第二审批人
+            if (first != null && third != null && second == null) {
+                // 如果当前是第一审批人，构造第三审批人数据
+                if (userId == first) {
+                    // 如果第三审批人账号不可用，直接审批通过
+                    if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(third).isEnabled())) {
+                        leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+                    } else {
+                        leaveApplyNext(approvalRecord, third);
+                    }
+                } else {
+                    // 不然就是第三审批人，直接通过
+                    leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+                }
+            }
+            // 有第一第二第三审批人
+            if (first != null && second != null && third != null) {
+                if (userId == first) {
+                    // 如果第二审批人账号不可用，指派给第三审批人
+                    if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(second).isEnabled())) {
+                        // 如果第三审批人账号不可用，直接审批通过
+                        if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(third).isEnabled())) {
+                            leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+                        } else {
+                            leaveApplyNext(approvalRecord, third);
+                        }
+                    } else {
+                        leaveApplyNext(approvalRecord, second);
+                    }
+                } else if (userId == second) {
+                    // 如果第三审批人账号不可用，直接审批通过
+                    if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(third).isEnabled())) {
+                        leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+                    } else {
+                        leaveApplyNext(approvalRecord, third);
+                    }
+                } else {
+                    leaveApplyPass(oldRecord, produceUserId, approvalRecord);
+                }
+            }
+        }
+    }
+
+    /**
+     * 请假审批通过
+     *
+     * @param oldRecord
+     * @param produceUserId
+     * @param approvalRecord
+     */
+    private void leaveApplyPass(Leave oldRecord, Integer produceUserId, ApprovalRecord approvalRecord) {
+        Leave newRecord = JSONObject.parseObject(JSONObject.toJSONString(oldRecord), Leave.class);
+        newRecord.setId(null);
+        newRecord.setEnabled(EnableBooleanEnum.ENABLED.getCode());
+        newRecord.setCreateTime(DateUtils.getNowTime());
+        leaveDao.insert(newRecord);
+        // 减少总假期
+        Holiday holiday = new Holiday();
+        holiday.setUserId(produceUserId);
+        holiday.setHolidayType(oldRecord.getHolidayType());
+        holiday.setCreateTime(String.valueOf(LocalDate.now().getYear()));
+        holiday = holidayDao.queryByUserIdAndTypeInCurrentYear(holiday);
+        holiday.setRemaining(holiday.getRemaining() - DateUtils
+                .getGapDays(oldRecord.getBeginTime().toLocalDateTime().toLocalDate(), oldRecord.getEndTime().toLocalDateTime().toLocalDate()));
+        holidayDao.update(holiday);
+        approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
+        approvalRecordDao.update(approvalRecord);
+    }
+
+    /**
+     * 构建下一个审批人记录
+     */
+    private void leaveApplyNext(ApprovalRecord approvalRecord, Integer approvalMan) {
+        // 将第二审批人的记录更改为审批完成
+        approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
+        approvalRecordDao.update(approvalRecord);
+        // 为第三审批人新增审批记录
+        approvalRecord.setId(null);
+        approvalRecord.setApprovalUserId(approvalMan);
+        approvalRecord.setRecordStatus(RecordStatusEnum.READY_PASS.getCode());
+        approvalRecord.setCreateTime(DateUtils.getNowTime());
+        approvalRecordDao.insert(approvalRecord);
     }
 
     private void startRemedySign(ApprovalRecord approvalRecord) {

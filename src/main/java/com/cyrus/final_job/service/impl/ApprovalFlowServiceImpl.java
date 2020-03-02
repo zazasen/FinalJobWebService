@@ -86,6 +86,33 @@ public class ApprovalFlowServiceImpl implements ApprovalFlowService {
         if (approvalFlow.getDepartmentId() == null) {
             return Results.error("部门id不能为空");
         }
+        Integer first = approvalFlow.getFirstApprovalMan();
+        Integer second = approvalFlow.getSecondApprovalMan();
+        Integer third = approvalFlow.getThirdApprovalMan();
+
+        if (first == null && (second != null || third != null)) {
+            return Results.error("不能在未指派第一审批人的情况下指派第二第三审批人");
+        }
+        if (second != null && third == null) {
+            return Results.error("拥有第一第二审批人的情况下必须拥有第三审批人");
+        }
+
+        if (first != null && second != null) {
+            if (first == second) {
+                return Results.error("审批人不能相同");
+            }
+        }
+        if (first != null && third != null) {
+            if (first == third) {
+                return Results.error("审批人不能相同");
+            }
+        }
+        if (second != null && third != null) {
+            if (second == third) {
+                return Results.error("审批人不能相同");
+            }
+        }
+
         ApprovalFlow flow = approvalFlowDao.queryByDepId(approvalFlow.getDepartmentId());
         if (flow == null) {
             approvalFlowDao.insert(approvalFlow);
