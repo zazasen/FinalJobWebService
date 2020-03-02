@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -34,6 +35,11 @@ public class DateUtils {
         DecimalFormat df = new DecimalFormat("#.0");
         String str = df.format(res);
         return Double.parseDouble(str);
+    }
+
+    public static Integer getGapDays(LocalDate start, LocalDate end) {
+        Period between = Period.between(start, end);
+        return between.getDays();
     }
 
     /**
