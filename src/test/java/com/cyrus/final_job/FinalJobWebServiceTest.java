@@ -13,9 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
-
 @SpringBootTest
 public class FinalJobWebServiceTest {
 
@@ -68,13 +65,5 @@ public class FinalJobWebServiceTest {
 
     @Autowired
     private CheckInDao checkInDao;
-
-    @Test
-    public void test() {
-        Timestamp timestamp = new Timestamp(1582675200000L);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        System.out.println(timestamp.toLocalDateTime().format(formatter));
-    }
-
 
 }

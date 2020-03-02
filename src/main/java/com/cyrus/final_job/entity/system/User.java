@@ -1,7 +1,6 @@
 package com.cyrus.final_job.entity.system;
 
 import com.cyrus.final_job.entity.base.Result;
-import com.cyrus.final_job.enums.EnabledEnum;
 import com.cyrus.final_job.utils.CommonUtils;
 import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
