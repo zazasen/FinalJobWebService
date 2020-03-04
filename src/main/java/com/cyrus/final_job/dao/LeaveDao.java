@@ -1,6 +1,7 @@
 package com.cyrus.final_job.dao;
 
 import com.cyrus.final_job.entity.Leave;
+import com.cyrus.final_job.entity.condition.LeaveCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public interface LeaveDao {
      * 查询指定行数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<Leave> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
@@ -63,4 +64,13 @@ public interface LeaveDao {
      */
     int deleteById(Integer id);
 
+    /**
+     * 查询当前登录用户的已审批通过的假期
+     *
+     * @param leaveCondition
+     * @return
+     */
+    List<Leave> queryAllByCondition(LeaveCondition leaveCondition);
+
+    Long queryAllByConditionCount(LeaveCondition leaveCondition);
 }

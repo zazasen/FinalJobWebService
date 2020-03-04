@@ -29,6 +29,33 @@
         limit #{offset}, #{limit}
     </select>
 
+    <select id="queryAllByCondition" resultMap="LeaveMap">
+        select
+          id, user_id, holiday_type, begin_time, end_time, reason, enabled, create_time
+        from final_job.leave
+        where enabled = true
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="holidayType != null">
+            and holiday_type = #{holidayType}
+        </if>
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryAllByConditionCount" resultType="long">
+        select count(*)
+        from final_job.leave
+        where enabled = true
+        <if test="userId != null">
+            and user_id = #{userId}
+        </if>
+        <if test="holidayType != null">
+            and holiday_type = #{holidayType}
+        </if>
+    </select>
+
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="LeaveMap">
         select

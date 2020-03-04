@@ -3,6 +3,7 @@ package com.cyrus.final_job.service;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.Leave;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
 
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface LeaveService {
      * 查询多条数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<Leave> queryAllByLimit(int offset, int limit);
@@ -57,8 +58,16 @@ public interface LeaveService {
 
     /**
      * 请假申请
+     *
      * @param params
      * @return
      */
     Result leaveApply(JSONObject params);
+
+    /**
+     * 获取目前已经申请的假期
+     *
+     * @return
+     */
+    ResultPage getMyAppliedHolidays(JSONObject params);
 }

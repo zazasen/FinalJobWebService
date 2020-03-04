@@ -1,13 +1,18 @@
 package com.cyrus.final_job.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.*;
 import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.entity.*;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.LeaveCondition;
 import com.cyrus.final_job.entity.system.User;
+import com.cyrus.final_job.entity.vo.LeaveVo;
 import com.cyrus.final_job.enums.ApprovalTypeEnum;
 import com.cyrus.final_job.enums.EnableBooleanEnum;
+import com.cyrus.final_job.enums.HolidayTypeEnum;
 import com.cyrus.final_job.enums.RecordStatusEnum;
 import com.cyrus.final_job.service.LeaveService;
 import com.cyrus.final_job.utils.DateUtils;
@@ -126,7 +131,6 @@ public class LeaveServiceImpl implements LeaveService {
         }
 
 
-
         leaveDao.insert(leave);
 
         User currentUser = UserUtils.getCurrentUser();
@@ -156,5 +160,21 @@ public class LeaveServiceImpl implements LeaveService {
         approvalRecord.setCreateTime(DateUtils.getNowTime());
         approvalRecordDao.insert(approvalRecord);
         return Results.createOk("申请成功");
+    }
+
+    @Override
+    public ResultPage getMyAppliedHolidays(JSONObject params) {
+        int userId = UserUtils.getCurrentUserId();
+        LeaveCondition leaveCondition = params.toJavaObject(LeaveCondition.class);
+        leaveCondition.buildLimit();
+        leaveCondition.setUserId(userId);
+        List<Leave> leaves = leaveDao.queryAllByCondition(leaveCondition);
+        Long total = leaveDao.queryAllByConditionCount(leaveCondition);
+        List<LeaveVo> leaveVos = JSONArray.parseArray(JSONArray.toJSONString(leaves), LeaveVo.class);
+        for (LeaveVo leaveVo : leaveVos) {
+            leaveVo.setRealName(userDao.queryById(leaveVo.getUserId()).getRealName());
+            leaveVo.setHolidayTypeStr(HolidayTypeEnum.getEnumByCode(leaveVo.getHolidayType()).getDesc());
+        }
+        return Results.createOk(total, leaveVos);
     }
 }

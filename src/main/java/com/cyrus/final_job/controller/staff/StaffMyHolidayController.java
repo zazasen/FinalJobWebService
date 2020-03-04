@@ -2,6 +2,7 @@ package com.cyrus.final_job.controller.staff;
 
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.service.HolidayService;
 import com.cyrus.final_job.service.LeaveService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +28,13 @@ public class StaffMyHolidayController {
 
 
     @PostMapping("/leaveApply")
-    public Result leaveApply(@RequestBody JSONObject params){
+    public Result leaveApply(@RequestBody JSONObject params) {
         return leaveService.leaveApply(params);
+    }
+
+    @PostMapping("/getMyAppliedHolidays")
+    public ResultPage getMyAppliedHolidays(@RequestBody JSONObject params) {
+        return leaveService.getMyAppliedHolidays(params);
     }
 
 }
