@@ -39,7 +39,7 @@ public class DateUtils {
 
     public static Integer getGapDays(LocalDate start, LocalDate end) {
         Period between = Period.between(start, end);
-        return between.getDays();
+        return between.getDays() + 1;
     }
 
     /**

@@ -39,7 +39,7 @@ public class Overtime{
     /**
     * 当前记录状态:0 不可用 1 可用
     */
-    private Integer enabled;
+    private Boolean enabled;
     /**
     * 记录创建时间
     */

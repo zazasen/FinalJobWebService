@@ -27,11 +27,6 @@ public class StaffMyHolidayController {
     }
 
 
-    @PostMapping("/leaveApply")
-    public Result leaveApply(@RequestBody JSONObject params) {
-        return leaveService.leaveApply(params);
-    }
-
     @PostMapping("/getMyAppliedHolidays")
     public ResultPage getMyAppliedHolidays(@RequestBody JSONObject params) {
         return leaveService.getMyAppliedHolidays(params);

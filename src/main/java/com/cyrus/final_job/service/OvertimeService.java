@@ -1,6 +1,8 @@
 package com.cyrus.final_job.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.Overtime;
+import com.cyrus.final_job.entity.base.Result;
 
 import java.util.List;
 
@@ -53,4 +55,10 @@ public interface OvertimeService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 加班申请
+     * @param params
+     * @return
+     */
+    Result overtimeApply(JSONObject params);
 }

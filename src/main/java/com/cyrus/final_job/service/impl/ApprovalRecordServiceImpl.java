@@ -54,6 +54,9 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
     @Autowired
     private DepartmentDao departmentDao;
 
+    @Autowired
+    private OvertimeDao overtimeDao;
+
     /**
      * 通过ID查询单条数据
      *
@@ -187,6 +190,19 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
                     leaveMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
                 }
                 return Results.createOk(leaveMap);
+            case OVERTIME:
+                Overtime overtime = overtimeDao.queryById(approvalRecord.getApprovalId());
+                Map<String, String> overtimeMap = new LinkedHashMap<>();
+                overtimeMap.put("加班开始时间", overtime.getStartTime().toLocalDateTime().toLocalDate().toString());
+                overtimeMap.put("加班结束时间", overtime.getEndTime().toLocalDateTime().toLocalDate().toString());
+                overtimeMap.put("加班持续天数", overtime.getContinueDay() + "天");
+                overtimeMap.put("加班原因", overtime.getReason());
+                if (RecordStatusEnum.READY_PASS.getCode().equals(approvalRecord.getRecordStatus())) {
+                    overtimeMap.put("目前审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                } else {
+                    overtimeMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                }
+                return Results.createOk(overtimeMap);
             default:
                 break;
         }
@@ -217,10 +233,41 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
             case LEAVE:
                 leave(approvalRecord);
                 return Results.createOk("审批成功");
+            case OVERTIME:
+                overtime(approvalRecord);
+                return Results.createOk("审批成功");
             default:
                 break;
         }
         return Results.error("审批失败");
+    }
+
+    private void overtime(ApprovalRecord approvalRecord) {
+        // 申请人申请的记录
+        Overtime overtime = overtimeDao.queryById(approvalRecord.getApprovalId());
+        Integer produceUserId = approvalRecord.getProduceUserId();
+        User user = userDao.queryById(produceUserId);
+        Integer departmentId = user.getDepartmentId();
+        // 申请人所在部门的审批流
+        ApprovalFlow flow = approvalFlowDao.queryByDepId(departmentId);
+
+        // 加班表记录添加
+        Overtime newRecord = JSONObject.parseObject(JSONObject.toJSONString(overtime), Overtime.class);
+        newRecord.setId(null);
+        newRecord.setEnabled(EnableBooleanEnum.ENABLED.getCode());
+        newRecord.setCreateTime(DateUtils.getNowTime());
+        overtimeDao.insert(newRecord);
+        // 假期表，补休添加
+        Holiday holiday = new Holiday();
+        holiday.setUserId(produceUserId);
+        holiday.setHolidayType(HolidayTypeEnum.EXCHANGE.getCode());
+        holiday.setCreateTime(String.valueOf(LocalDate.now().getYear()));
+        holiday = holidayDao.queryByUserIdAndTypeInCurrentYear(holiday);
+        holiday.setHolidayTime(holiday.getHolidayTime() + newRecord.getContinueDay());
+        holiday.setRemaining(holiday.getRemaining() + newRecord.getContinueDay());
+        holidayDao.update(holiday);
+        approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
+        approvalRecordDao.update(approvalRecord);
     }
 
     private void leave(ApprovalRecord approvalRecord) {
