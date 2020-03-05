@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyrus.final_job.dao.AccountSetDao">
+
+    <resultMap type="com.cyrus.final_job.entity.AccountSet" id="AccountSetMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="accountName" column="account_name" jdbcType="VARCHAR"/>
+        <result property="basicSalary" column="basic_salary" jdbcType="NUMERIC"/>
+        <result property="trafficAllowance" column="traffic_allowance" jdbcType="NUMERIC"/>
+        <result property="phoneAllowance" column="phone_allowance" jdbcType="NUMERIC"/>
+        <result property="foodAllowance" column="food_allowance" jdbcType="NUMERIC"/>
+        <result property="pensionBasic" column="pension_basic" jdbcType="NUMERIC"/>
+        <result property="pensionRatio" column="pension_ratio" jdbcType="NUMERIC"/>
+        <result property="medicareBenefitsBasic" column="medicare_benefits_basic" jdbcType="NUMERIC"/>
+        <result property="medicareBenefitsRatio" column="medicare_benefits_ratio" jdbcType="NUMERIC"/>
+        <result property="businessInsuranceBasic" column="business_insurance_basic" jdbcType="NUMERIC"/>
+        <result property="businessInsuranceRatio" column="business_insurance_ratio" jdbcType="NUMERIC"/>
+        <result property="industrialInsuranceBasic" column="industrial_insurance_basic" jdbcType="NUMERIC"/>
+        <result property="industrialInsuranceRatio" column="industrial_insurance_ratio" jdbcType="NUMERIC"/>
+        <result property="birthInsuranceBasic" column="birth_insurance_basic" jdbcType="NUMERIC"/>
+        <result property="birthInsuranceRatio" column="birth_insurance_ratio" jdbcType="NUMERIC"/>
+        <result property="housingFundBasic" column="housing_fund_basic" jdbcType="NUMERIC"/>
+        <result property="housingFundRatio" column="housing_fund_ratio" jdbcType="NUMERIC"/>
+        <result property="taxes" column="taxes" jdbcType="NUMERIC"/>
+        <result property="finalSalary" column="final_salary" jdbcType="NUMERIC"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="AccountSetMap">
+        select
+          id, account_name, basic_salary, traffic_allowance, phone_allowance, food_allowance, pension_basic, pension_ratio, medicare_benefits_basic, medicare_benefits_ratio, business_insurance_basic, business_insurance_ratio, industrial_insurance_basic, industrial_insurance_ratio, birth_insurance_basic, birth_insurance_ratio, housing_fund_basic, housing_fund_ratio, final_salary, create_time,taxes
+        from final_job.account_set
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="AccountSetMap">
+        select
+          id, account_name, basic_salary, traffic_allowance, phone_allowance, food_allowance, pension_basic, pension_ratio, medicare_benefits_basic, medicare_benefits_ratio, business_insurance_basic, business_insurance_ratio, industrial_insurance_basic, industrial_insurance_ratio, birth_insurance_basic, birth_insurance_ratio, housing_fund_basic, housing_fund_ratio, final_salary, create_time,taxes
+        from final_job.account_set
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryAllByLimitCount" resultType="long">
+        select count(*)
+        from final_job.account_set
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="AccountSetMap">
+        select
+          id, account_name, basic_salary, traffic_allowance, phone_allowance, food_allowance, pension_basic, pension_ratio, medicare_benefits_basic, medicare_benefits_ratio, business_insurance_basic, business_insurance_ratio, industrial_insurance_basic, industrial_insurance_ratio, birth_insurance_basic, birth_insurance_ratio, housing_fund_basic, housing_fund_ratio, final_salary, create_time,taxes
+        from final_job.account_set
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="accountName != null and accountName != ''">
+                and account_name = #{accountName}
+            </if>
+            <if test="basicSalary != null">
+                and basic_salary = #{basicSalary}
+            </if>
+            <if test="trafficAllowance != null">
+                and traffic_allowance = #{trafficAllowance}
+            </if>
+            <if test="phoneAllowance != null">
+                and phone_allowance = #{phoneAllowance}
+            </if>
+            <if test="foodAllowance != null">
+                and food_allowance = #{foodAllowance}
+            </if>
+            <if test="pensionBasic != null">
+                and pension_basic = #{pensionBasic}
+            </if>
+            <if test="pensionRatio != null">
+                and pension_ratio = #{pensionRatio}
+            </if>
+            <if test="medicareBenefitsBasic != null">
+                and medicare_benefits_basic = #{medicareBenefitsBasic}
+            </if>
+            <if test="medicareBenefitsRatio != null">
+                and medicare_benefits_ratio = #{medicareBenefitsRatio}
+            </if>
+            <if test="businessInsuranceBasic != null">
+                and business_insurance_basic = #{businessInsuranceBasic}
+            </if>
+            <if test="businessInsuranceRatio != null">
+                and business_insurance_ratio = #{businessInsuranceRatio}
+            </if>
+            <if test="industrialInsuranceBasic != null">
+                and industrial_insurance_basic = #{industrialInsuranceBasic}
+            </if>
+            <if test="industrialInsuranceRatio != null">
+                and industrial_insurance_ratio = #{industrialInsuranceRatio}
+            </if>
+            <if test="birthInsuranceBasic != null">
+                and birth_insurance_basic = #{birthInsuranceBasic}
+            </if>
+            <if test="birthInsuranceRatio != null">
+                and birth_insurance_ratio = #{birthInsuranceRatio}
+            </if>
+            <if test="housingFundBasic != null">
+                and housing_fund_basic = #{housingFundBasic}
+            </if>
+            <if test="housingFundRatio != null">
+                and housing_fund_ratio = #{housingFundRatio}
+            </if>
+            <if test="finalSalary != null">
+                and final_salary = #{finalSalary}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into final_job.account_set(account_name, basic_salary, traffic_allowance, phone_allowance, food_allowance, pension_basic, pension_ratio, medicare_benefits_basic, medicare_benefits_ratio, business_insurance_basic, business_insurance_ratio, industrial_insurance_basic, industrial_insurance_ratio, birth_insurance_basic, birth_insurance_ratio, housing_fund_basic, housing_fund_ratio, final_salary, create_time,taxes)
+        values (#{accountName}, #{basicSalary}, #{trafficAllowance}, #{phoneAllowance}, #{foodAllowance}, #{pensionBasic}, #{pensionRatio}, #{medicareBenefitsBasic}, #{medicareBenefitsRatio}, #{businessInsuranceBasic}, #{businessInsuranceRatio}, #{industrialInsuranceBasic}, #{industrialInsuranceRatio}, #{birthInsuranceBasic}, #{birthInsuranceRatio}, #{housingFundBasic}, #{housingFundRatio}, #{finalSalary}, #{createTime},#{taxes})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update final_job.account_set
+        <set>
+            <if test="accountName != null and accountName != ''">
+                account_name = #{accountName},
+            </if>
+            <if test="basicSalary != null">
+                basic_salary = #{basicSalary},
+            </if>
+            <if test="trafficAllowance != null">
+                traffic_allowance = #{trafficAllowance},
+            </if>
+            <if test="phoneAllowance != null">
+                phone_allowance = #{phoneAllowance},
+            </if>
+            <if test="foodAllowance != null">
+                food_allowance = #{foodAllowance},
+            </if>
+            <if test="pensionBasic != null">
+                pension_basic = #{pensionBasic},
+            </if>
+            <if test="pensionRatio != null">
+                pension_ratio = #{pensionRatio},
+            </if>
+            <if test="medicareBenefitsBasic != null">
+                medicare_benefits_basic = #{medicareBenefitsBasic},
+            </if>
+            <if test="medicareBenefitsRatio != null">
+                medicare_benefits_ratio = #{medicareBenefitsRatio},
+            </if>
+            <if test="businessInsuranceBasic != null">
+                business_insurance_basic = #{businessInsuranceBasic},
+            </if>
+            <if test="businessInsuranceRatio != null">
+                business_insurance_ratio = #{businessInsuranceRatio},
+            </if>
+            <if test="industrialInsuranceBasic != null">
+                industrial_insurance_basic = #{industrialInsuranceBasic},
+            </if>
+            <if test="industrialInsuranceRatio != null">
+                industrial_insurance_ratio = #{industrialInsuranceRatio},
+            </if>
+            <if test="birthInsuranceBasic != null">
+                birth_insurance_basic = #{birthInsuranceBasic},
+            </if>
+            <if test="birthInsuranceRatio != null">
+                birth_insurance_ratio = #{birthInsuranceRatio},
+            </if>
+            <if test="housingFundBasic != null">
+                housing_fund_basic = #{housingFundBasic},
+            </if>
+            <if test="housingFundRatio != null">
+                housing_fund_ratio = #{housingFundRatio},
+            </if>
+            <if test="finalSalary != null">
+                final_salary = #{finalSalary},
+            </if>
+            <if test="finalSalary != null">
+                final_salary = #{finalSalary},
+            </if>
+            <if test="taxes != null">
+                taxes = #{taxes},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from final_job.account_set where id = #{id}
+    </delete>
+
+</mapper>

@@ -57,8 +57,9 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void nationDaoQueryTest() {
-        System.out.println(nationDao.queryById(1));
+
     }
+
 
     @Autowired
     private UserDao userDao;
