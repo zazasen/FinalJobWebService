@@ -51,6 +51,13 @@
         </dependency>
         <!-- 存储 end -->
 
+        <!-- 定时 start -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+        <!-- 定时 end -->
+
         <!--导出 start-->
         <dependency>
             <groupId>org.apache.poi</groupId>

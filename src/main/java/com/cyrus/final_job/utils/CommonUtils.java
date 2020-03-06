@@ -105,4 +105,10 @@ public class CommonUtils {
         }
         return shouldBeWorkDays;
     }
+
+    public static Boolean FreeDayJudge(LocalDate localDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String format = formatter.format(localDate);
+        return WorkUtils.isWorkendDay(format);
+    }
 }

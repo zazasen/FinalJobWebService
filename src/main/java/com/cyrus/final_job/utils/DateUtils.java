@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -70,5 +71,17 @@ public class DateUtils {
         Date currYearFirst = calendar.getTime();
         Timestamp timestamp = new Timestamp(currYearFirst.getTime());
         return timestamp;
+    }
+
+    public static LocalDate getCurrentMonthFirstDay() {
+        LocalDate now = LocalDate.now();
+        LocalDate first = now.with(TemporalAdjusters.firstDayOfMonth());
+        return first;
+    }
+
+    public static LocalDate getCurrentMonthLasterDay() {
+        LocalDate now = LocalDate.now();
+        LocalDate laster = now.with(TemporalAdjusters.lastDayOfMonth());
+        return laster;
     }
 }

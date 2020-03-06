@@ -14,6 +14,7 @@ import com.cyrus.final_job.entity.condition.CheckInCondition;
 import com.cyrus.final_job.entity.condition.RemedySignCondition;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.CheckInRecordVo;
+import com.cyrus.final_job.entity.vo.CheckInStatisticsVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.CheckInService;
@@ -346,12 +347,14 @@ public class CheckInServiceImpl implements CheckInService {
             days = CommonUtils.shouldBeWorkDays().toString();
             redisUtil.set(key, days);
         }
-        Map<String, String> map = new HashMap<>();
-        map.put("shouldBeWorkDays", days);
-        CheckIn checkIn = new CheckIn();
-        checkIn.setUserId(UserUtils.getCurrentUserId());
-        checkIn.setCreateTime(LocalDate.now().toString());
-        List<CheckIn> list = checkInDao.queryAll(checkIn);
+        List<CheckInStatisticsVo> vos = new ArrayList<>();
+
+        CheckInCondition condition = new CheckInCondition();
+        condition.setUserId(UserUtils.getCurrentUserId());
+        condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
+        condition.setTailTime(LocalDate.now().toString());
+        List<CheckIn> list = checkInDao.queryAllByConditionNoPage(condition);
+
         int workDays = 0;
         int leaveDays = 0;
         for (CheckIn check : list) {
@@ -362,8 +365,23 @@ public class CheckInServiceImpl implements CheckInService {
                 leaveDays++;
             }
         }
-        map.put("workDays", String.valueOf(workDays));
-        map.put("leaveDays", String.valueOf(leaveDays));
-        return Results.createOk(map);
+        // 已打卡天数
+        CheckInStatisticsVo vo = new CheckInStatisticsVo();
+        vo.setName("已打卡");
+        vo.setValue(workDays);
+        vos.add(vo);
+
+        //请假天数
+        CheckInStatisticsVo vo1 = new CheckInStatisticsVo();
+        vo1.setName("请假");
+        vo1.setValue(leaveDays);
+        vos.add(vo1);
+
+        //未打卡天数
+        CheckInStatisticsVo vo2 = new CheckInStatisticsVo();
+        vo2.setName("未打卡");
+        vo2.setValue(Integer.valueOf(days) - workDays);
+        vos.add(vo2);
+        return Results.createOk(vos);
     }
 }

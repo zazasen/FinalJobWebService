@@ -36,6 +36,8 @@ public interface CheckInDao {
 
     Long queryAllByConditionCount(CheckInCondition condition);
 
+    List<CheckIn> queryAllByConditionNoPage(CheckInCondition condition);
+
     /**
      * 通过实体作为筛选条件查询
      *
