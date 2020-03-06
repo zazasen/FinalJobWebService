@@ -103,4 +103,11 @@ public interface CheckInService {
      * @return
      */
     Result remedySign(JSONObject params);
+
+    /**
+     * 获取当月应该工作的天数
+     *
+     * @return
+     */
+    Result getShouldBeWorkDays();
 }

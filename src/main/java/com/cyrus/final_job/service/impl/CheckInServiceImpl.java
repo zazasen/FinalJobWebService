@@ -17,9 +17,7 @@ import com.cyrus.final_job.entity.vo.CheckInRecordVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.CheckInService;
-import com.cyrus.final_job.utils.DateUtils;
-import com.cyrus.final_job.utils.Results;
-import com.cyrus.final_job.utils.UserUtils;
+import com.cyrus.final_job.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +46,9 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Autowired
     private ApprovalRecordDao approvalRecordDao;
+
+    @Autowired
+    private RedisUtil redisUtil;
 
     /**
      * 通过ID查询单条数据
@@ -334,5 +335,35 @@ public class CheckInServiceImpl implements CheckInService {
         approvalRecord.setApprovalId(checkIn.getId());
         approvalRecordDao.insert(approvalRecord);
         return Results.createOk("已发起申请");
+    }
+
+    @Override
+    public Result getShouldBeWorkDays() {
+        int month = LocalDate.now().getMonth().getValue();
+        String key = RedisKeys.shouldBeWorkDaysKey(month);
+        String days = redisUtil.get(key);
+        if (days == null) {
+            days = CommonUtils.shouldBeWorkDays().toString();
+            redisUtil.set(key, days);
+        }
+        Map<String, String> map = new HashMap<>();
+        map.put("shouldBeWorkDays", days);
+        CheckIn checkIn = new CheckIn();
+        checkIn.setUserId(UserUtils.getCurrentUserId());
+        checkIn.setCreateTime(LocalDate.now().toString());
+        List<CheckIn> list = checkInDao.queryAll(checkIn);
+        int workDays = 0;
+        int leaveDays = 0;
+        for (CheckIn check : list) {
+            if (SignTypeEnum.HALF.getCode().equals(check.getSignType()) || SignTypeEnum.FULL.getCode().equals(check.getSignType())) {
+                workDays++;
+            }
+            if (SignTypeEnum.FREE.getCode().equals(check.getSignType())) {
+                leaveDays++;
+            }
+        }
+        map.put("workDays", String.valueOf(workDays));
+        map.put("leaveDays", String.valueOf(leaveDays));
+        return Results.createOk(map);
     }
 }

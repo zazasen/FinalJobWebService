@@ -1,10 +1,14 @@
 package com.cyrus.final_job.utils;
 
+import com.iceyyy.workday.WorkUtils;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,5 +81,28 @@ public class CommonUtils {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         return matcher.find();
+    }
+
+    public static Integer shouldBeWorkDays() {
+        LocalDate now = LocalDate.now();
+        // 本月第一天
+        LocalDate first = now.with(TemporalAdjusters.firstDayOfMonth());
+        // 本月最后一天
+        LocalDate last = now.with(TemporalAdjusters.lastDayOfMonth());
+        // 本月天数
+        int value = last.getDayOfMonth();
+        // 本月应该出勤天数
+        int shouldBeWorkDays = 0;
+        // 遍历每一天
+        for (int i = 0; i < value; i++) {
+            LocalDate localDate = first.plusDays(i);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+            String format = formatter.format(localDate);
+            boolean isHoliday = WorkUtils.isWorkendDay(format);
+            if (!isHoliday) {
+                shouldBeWorkDays++;
+            }
+        }
+        return shouldBeWorkDays;
     }
 }
