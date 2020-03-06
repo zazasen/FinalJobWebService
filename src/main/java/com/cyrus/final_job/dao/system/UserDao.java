@@ -1,6 +1,7 @@
 package com.cyrus.final_job.dao.system;
 
 import com.cyrus.final_job.entity.condition.UserAccountQueryCondition;
+import com.cyrus.final_job.entity.condition.UserAccountSetQueryCondition;
 import com.cyrus.final_job.entity.condition.UserCondition;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.UserAccountVo;
@@ -29,7 +30,7 @@ public interface UserDao {
      * 查询指定行数据
      *
      * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param limit  查询条数
      * @return 对象列表
      */
     List<User> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
@@ -78,6 +79,23 @@ public interface UserDao {
 
     Long getMaxWorkId();
 
+    /**
+     * 员工账号
+     *
+     * @param condition
+     * @return
+     */
     List<UserAccountVo> queryUserAccountByCondition(UserAccountQueryCondition condition);
+
     Long queryUserAccountCountByCondition(UserAccountQueryCondition condition);
+
+    /**
+     * 员工薪资账套列表
+     *
+     * @param condition
+     * @return
+     */
+    List<User> getUserByUserAccountSetCondition(UserAccountSetQueryCondition condition);
+
+    Long getUserByUserAccountSetConditionCount(UserAccountSetQueryCondition condition);
 }

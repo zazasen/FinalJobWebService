@@ -192,6 +192,40 @@
         limit #{offset}, #{pageSize}
     </select>
 
+    <select id="getUserByUserAccountSetCondition" resultMap="UserMap">
+        select id,real_name,work_id,phone,department_id,position_id
+        from final_job.user
+        where enabled = true
+        <if test="workId != null">
+            and work_id = #{workId}
+        </if>
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%' + realName + '%'"/>
+            and real_name like #{realName}
+        </if>
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="getUserByUserAccountSetConditionCount" resultType="long">
+        select count(*)
+        from final_job.user
+        where enabled = true
+        <if test="workId != null">
+            and work_id = #{workId}
+        </if>
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%' + realName + '%'"/>
+            and real_name like #{realName}
+        </if>
+    </select>
+
     <select id="queryUserAccountCountByCondition" resultType="long">
         select count(*)
         from final_job.user

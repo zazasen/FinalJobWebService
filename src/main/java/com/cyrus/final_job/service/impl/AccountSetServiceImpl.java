@@ -1,11 +1,13 @@
 package com.cyrus.final_job.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.AccountSetDao;
 import com.cyrus.final_job.entity.AccountSet;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.condition.AccountSetCondition;
+import com.cyrus.final_job.entity.vo.AccountSetVo;
 import com.cyrus.final_job.service.AccountSetService;
 import com.cyrus.final_job.utils.Results;
 import org.springframework.stereotype.Service;
@@ -118,5 +120,12 @@ public class AccountSetServiceImpl implements AccountSetService {
         if (id == null) return Results.error("id 不能为空");
         accountSetDao.deleteById(id);
         return Results.createOk("删除成功");
+    }
+
+    @Override
+    public Result getAccountSet() {
+        List<AccountSet> accountSets = accountSetDao.queryAll(new AccountSet());
+        List<AccountSetVo> accountSetVos = JSONArray.parseArray(JSONArray.toJSONString(accountSets), AccountSetVo.class);
+        return Results.createOk(accountSetVos);
     }
 }

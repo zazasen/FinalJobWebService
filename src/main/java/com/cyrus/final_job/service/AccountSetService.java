@@ -87,4 +87,11 @@ public interface AccountSetService {
      * @return
      */
     Result delAccountSet(JSONObject params);
+
+    /**
+     * 获取薪资账套下拉列表
+     *
+     * @return
+     */
+    Result getAccountSet();
 }
