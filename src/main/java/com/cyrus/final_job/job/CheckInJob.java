@@ -49,6 +49,7 @@ public class CheckInJob {
             CheckIn condition = new CheckIn();
             condition.setUserId(item.getId());
             condition.setEnabled(true);
+            condition.setCreateTime(yesterday.toLocalDate().toString());
             List<CheckIn> checkIns = checkInDao.queryAll(condition);
             if (!CollectionUtils.isEmpty(checkIns)) {
                 continue;

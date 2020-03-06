@@ -16,8 +16,8 @@ public class QuartzConfig {
         bean.setTargetMethod("buildCheckIn");
         return bean;
     }
-//
-//    // 触发器
+
+    // 触发器
 //    @Bean
 //    SimpleTriggerFactoryBean simpleTriggerFactoryBean() {
 //        SimpleTriggerFactoryBean bean = new SimpleTriggerFactoryBean();

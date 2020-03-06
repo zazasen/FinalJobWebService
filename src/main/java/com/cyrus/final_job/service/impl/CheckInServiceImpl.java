@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -185,11 +186,15 @@ public class CheckInServiceImpl implements CheckInService {
                 vo.setStatus(SignTypeEnum.getEnumByCode(check.getSignType()).getDesc());
                 list.add(vo);
             } else {
-                // 该天未签到
-                SignCalendarVo vo = new SignCalendarVo();
-                vo.setDate(s);
-                vo.setStatus("未签到");
-                list.add(vo);
+                LocalDate parse = LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                // 如果不是节假日
+                if (!CommonUtils.FreeDayJudge(parse)) {
+                    // 该天未签到
+                    SignCalendarVo vo = new SignCalendarVo();
+                    vo.setDate(s);
+                    vo.setStatus("未签到");
+                    list.add(vo);
+                }
             }
             if (month < 10) {
                 s = year + "-0" + month + "-";
