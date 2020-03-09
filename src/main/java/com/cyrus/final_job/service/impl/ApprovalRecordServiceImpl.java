@@ -18,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -330,11 +332,15 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
         newRecord.setId(null);
         newRecord.setEnabled(EnableBooleanEnum.ENABLED.getCode());
         newRecord.setCreateTime(DateUtils.getNowTime());
+        newRecord.setLeaveTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
         quitJobDao.insert(newRecord);
 
         // 禁用账号
         User user = userDao.queryById(produceUserId);
         user.setEnabled(EnableBooleanEnum.DISABLE.getCode());
+        // 离职日期
+        user.setDepartureTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
+        user.setWorkState(WorkStateEnum.OUT.getCode());
         userDao.update(user);
 
         approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());

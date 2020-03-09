@@ -28,9 +28,20 @@ public class HomeController {
     }
 
 
+    /**
+     * 获取异常考勤,迟到早退情况
+     *
+     * @return
+     */
+    @PostMapping("/getExceptionCheckIn")
+    public Result getExceptionCheckIn() {
+        return checkInService.getExceptionCheckIn();
+    }
+
     @PostMapping("/getLeaveInfo")
-    public Result getLeaveInfo(){
+    public Result getLeaveInfo() {
         return leaveService.getLeaveInfo();
     }
+
 
 }

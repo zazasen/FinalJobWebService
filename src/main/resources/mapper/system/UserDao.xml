@@ -313,7 +313,8 @@
                 and user_face = #{userFace}
             </if>
             <if test="realName != null and realName != ''">
-                and real_name = #{realName}
+                <bind name="realName" value="'%' + realName + '%'"/>
+                and real_name like #{realName}
             </if>
             <if test="gender != null">
                 and gender = #{gender}

@@ -17,10 +17,12 @@ import com.cyrus.final_job.entity.vo.CheckInRecordVo;
 import com.cyrus.final_job.entity.vo.CheckInStatisticsVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
+import com.cyrus.final_job.job.CheckInExceptionJob;
 import com.cyrus.final_job.service.CheckInService;
 import com.cyrus.final_job.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +53,9 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Autowired
     private RedisUtil redisUtil;
+
+    @Autowired
+    private CheckInExceptionJob checkInExceptionJob;
 
     /**
      * 通过ID查询单条数据
@@ -345,15 +350,10 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Override
     public Result getShouldBeWorkDays() {
-        int month = LocalDate.now().getMonth().getValue();
-        String key = RedisKeys.shouldBeWorkDaysKey(month);
-        String days = redisUtil.get(key);
-        if (days == null) {
-            days = CommonUtils.shouldBeWorkDays().toString();
-            redisUtil.set(key, days);
-        }
-        List<CheckInStatisticsVo> vos = new ArrayList<>();
+        // 每月要出勤的天数
+        Integer days = CommonUtils.shouldBeWorkDays();
 
+        List<CheckInStatisticsVo> vos = new ArrayList<>();
         CheckInCondition condition = new CheckInCondition();
         condition.setUserId(UserUtils.getCurrentUserId());
         condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
@@ -391,7 +391,7 @@ public class CheckInServiceImpl implements CheckInService {
         //未打卡天数
         CheckInStatisticsVo vo2 = new CheckInStatisticsVo();
         vo2.setName("未打卡");
-        vo2.setValue(Integer.valueOf(days) - workDays - leaveDays);
+        vo2.setValue(days - workDays - leaveDays);
         vos.add(vo2);
 
         // 假期打卡
@@ -399,6 +399,32 @@ public class CheckInServiceImpl implements CheckInService {
         vo3.setName("休息日打卡");
         vo3.setValue(weekendDays);
         vos.add(vo3);
+        return Results.createOk(vos);
+    }
+
+    @Override
+    public Result getExceptionCheckIn() {
+        int month = LocalDate.now().getMonth().getValue();
+        String key = RedisKeys.monthStatistics(month);
+        Map<Object, Object> map = redisUtil.hGetAll(key);
+        if (CollectionUtils.isEmpty(map)) {
+            checkInExceptionJob.build();
+            map = redisUtil.hGetAll(key);
+        }
+        List<CheckInStatisticsVo> vos = new ArrayList<>();
+        for (Map.Entry<Object, Object> item : map.entrySet()) {
+            CheckInStatisticsVo vo = new CheckInStatisticsVo();
+            vo.setName(item.getKey().toString());
+            vo.setValue(item.getValue());
+            vos.add(vo);
+        }
+
+        // 每月要出勤的天数
+        Integer days = CommonUtils.shouldBeWorkDays();
+        CheckInStatisticsVo vo4 = new CheckInStatisticsVo();
+        vo4.setName("总工时");
+        vo4.setValue(days * 8);
+        vos.add(vo4);
         return Results.createOk(vos);
     }
 }

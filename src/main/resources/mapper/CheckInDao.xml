@@ -42,7 +42,7 @@
         <if test="userId != null">
             and user_id = #{userId}
         </if>
-        <if test="startTime != null and tailTime != null">
+        <if test="beginTime != null and tailTime != null">
             and create_time between #{beginTime} and #{tailTime}
         </if>
         order by create_time desc
@@ -58,7 +58,7 @@
         <if test="userId != null">
             and user_id = #{userId}
         </if>
-        <if test="startTime != null and tailTime != null">
+        <if test="beginTime != null and tailTime != null">
             and create_time between #{beginTime} and #{tailTime}
         </if>
     </select>
@@ -70,8 +70,8 @@
         <if test="userId != null">
             and user_id = #{userId}
         </if>
-        <if test="startTime != null and endTime != null">
-            and create_time between #{beginTime} and #{beginTime}
+        <if test="beginTime != null and tailTime != null">
+            and create_time between #{beginTime} and #{tailTime}
         </if>
     </select>
 

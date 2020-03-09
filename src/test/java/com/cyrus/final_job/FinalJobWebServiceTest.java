@@ -14,6 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 @SpringBootTest
 public class FinalJobWebServiceTest {
 
@@ -67,12 +71,18 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void setValue() {
-
+        Map<String,String> map = new HashMap<>();
+        map.put("hhh","1");
+        redisUtil.hPutAll("hashTest",map);
+        redisUtil.expire("hashTest",10, TimeUnit.SECONDS);
+        Map<Object, Object> hashTest = redisUtil.hGetAll("hashTest");
+        System.out.println(hashTest.get("hhh"));
     }
 
     @Test
     void getValue() {
-        System.out.println(redisUtil.get("name"));
+        Map<Object, Object> hashTest = redisUtil.hGetAll("hashTest");
+        System.out.println(hashTest);
     }
 
 

@@ -540,6 +540,7 @@ public class UserServiceImpl implements UserService {
         // 工号
         Long maxWorkId = userDao.getMaxWorkId();
         user.setWorkId(maxWorkId + 1);
+        user.setWorkState(WorkStateEnum.IN.getCode());
         userDao.insert(user);
         // 员工入职时初始化其假期
         buildHoliday(user);

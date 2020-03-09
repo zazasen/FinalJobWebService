@@ -110,4 +110,11 @@ public interface CheckInService {
      * @return
      */
     Result getShouldBeWorkDays();
+
+    /**
+     * 获取异常考勤
+     *
+     * @return
+     */
+    Result getExceptionCheckIn();
 }

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class CheckInStatisticsVo {
     private String name;
-    private Integer value;
+    private Object value;
 }
