@@ -1,8 +1,13 @@
 package com.cyrus.final_job.entity;
 
+import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.utils.DateUtils;
+import com.cyrus.final_job.utils.Results;
+import com.cyrus.final_job.utils.UserUtils;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * 离职表(QuitJob)实体类
@@ -29,10 +34,25 @@ public class QuitJob {
     /**
      * 当前记录状态:0 不可用 1 可用
      */
-    private Integer enabled;
+    private Boolean enabled;
     /**
-     * 离职时间
+     * 创建时间
      */
     private Timestamp createTime;
 
+    /**
+     * 离职时间
+     */
+    private Timestamp leaveTime;
+
+
+    public Result checkAndBuildParams() {
+        if (leaveTime == null) return Results.error("离职时间不能为空");
+        if (reason == null) return Results.error("离职原因不能为空");
+        if (leaveTime.toLocalDateTime().isBefore(LocalDateTime.now())) return Results.error("请选择正确的离职时间");
+        this.userId = UserUtils.getCurrentUserId();
+        this.enabled = false;
+        this.createTime = DateUtils.getNowTime();
+        return null;
+    }
 }

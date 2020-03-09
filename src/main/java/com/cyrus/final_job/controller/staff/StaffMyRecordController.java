@@ -6,6 +6,7 @@ import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.service.ApprovalRecordService;
 import com.cyrus.final_job.service.LeaveService;
 import com.cyrus.final_job.service.OvertimeService;
+import com.cyrus.final_job.service.QuitJobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,9 @@ public class StaffMyRecordController {
 
     @Autowired
     private OvertimeService overtimeService;
+
+    @Autowired
+    private QuitJobService quitJobService;
 
     @PostMapping("/getAllMyApproval")
     public ResultPage getAllMyApproval(@RequestBody JSONObject params) {
@@ -66,5 +70,16 @@ public class StaffMyRecordController {
     @PostMapping("/overtimeApply")
     public Result overtimeApply(@RequestBody JSONObject params) {
         return overtimeService.overtimeApply(params);
+    }
+
+    /**
+     * 离职申请
+     *
+     * @param params
+     * @return
+     */
+    @PostMapping("/quitJobApply")
+    public Result quitJobApply(@RequestBody JSONObject params) {
+        return quitJobService.quitJobApply(params);
     }
 }

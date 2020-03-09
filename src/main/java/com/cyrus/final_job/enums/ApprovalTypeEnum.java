@@ -7,7 +7,8 @@ public enum ApprovalTypeEnum {
     START_REMEDY_SIGN(0, "签到补卡"),
     END_REMEDY_SIGN(1, "签退补卡"),
     LEAVE(2, "请假"),
-    OVERTIME(3, "加班");
+    OVERTIME(3, "加班"),
+    QUIT_JOB(4, "离职");
 
     private Integer code;
     private String desc;

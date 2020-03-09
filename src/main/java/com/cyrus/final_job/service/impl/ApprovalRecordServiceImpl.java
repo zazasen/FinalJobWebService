@@ -57,6 +57,9 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
     @Autowired
     private OvertimeDao overtimeDao;
 
+    @Autowired
+    private QuitJobDao quitJobDao;
+
     /**
      * 通过ID查询单条数据
      *
@@ -203,6 +206,17 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
                     overtimeMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
                 }
                 return Results.createOk(overtimeMap);
+            case QUIT_JOB:
+                QuitJob quitJob = quitJobDao.queryById(approvalRecord.getApprovalId());
+                Map<String, String> quitJobMap = new LinkedHashMap<>();
+                quitJobMap.put("离职日期", quitJob.getLeaveTime().toLocalDateTime().toLocalDate().toString());
+                quitJobMap.put("离职原因", quitJob.getReason());
+                if (RecordStatusEnum.READY_PASS.getCode().equals(approvalRecord.getRecordStatus())) {
+                    quitJobMap.put("目前审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                } else {
+                    quitJobMap.put("最后审批人", userDao.queryById(approvalRecord.getApprovalUserId()).getRealName());
+                }
+                return Results.createOk(quitJobMap);
             default:
                 break;
         }
@@ -236,10 +250,95 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
             case OVERTIME:
                 overtime(approvalRecord);
                 return Results.createOk("审批成功");
+            case QUIT_JOB:
+                quitJob(approvalRecord);
+                return Results.createOk("审批成功");
             default:
                 break;
         }
         return Results.error("审批失败");
+    }
+
+    private void quitJob(ApprovalRecord approvalRecord) {
+        // 申请人申请的记录
+        QuitJob oldRecord = quitJobDao.queryById(approvalRecord.getApprovalId());
+        Integer produceUserId = approvalRecord.getProduceUserId();
+        User user = userDao.queryById(produceUserId);
+        Integer departmentId = user.getDepartmentId();
+        // 申请人所在部门的审批流
+        ApprovalFlow flow = approvalFlowDao.queryByDepId(departmentId);
+        // 没有审批流，直接部门主管通过即可
+        if (flow == null) {
+            // 构造审批通过的新纪录
+            quitJobPass(oldRecord, produceUserId, approvalRecord);
+        } else {
+            int userId = UserUtils.getCurrentUserId();
+            Integer first = flow.getFirstApprovalMan();
+            Integer second = flow.getSecondApprovalMan();
+            Integer third = flow.getThirdApprovalMan();
+            // 有第一审批人、无第二第三审批人 说明当前用户是第一审批人，直接通过即可
+            if (first != null && second == null && third == null) {
+                quitJobPass(oldRecord, produceUserId, approvalRecord);
+            }
+            // 有第一第二审批人，且无第三审批 这种情况不存在
+
+            // 有第一第三审批人，无第二审批人
+            if (first != null && third != null && second == null) {
+                // 如果当前是第一审批人，构造第三审批人数据
+                if (userId == first) {
+                    // 如果第三审批人账号不可用，直接审批通过
+                    if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(third).isEnabled())) {
+                        quitJobPass(oldRecord, produceUserId, approvalRecord);
+                    } else {
+                        leaveApplyNext(approvalRecord, third);
+                    }
+                } else {
+                    // 不然就是第三审批人，直接通过
+                    quitJobPass(oldRecord, produceUserId, approvalRecord);
+                }
+            }
+            // 有第一第二第三审批人
+            if (first != null && second != null && third != null) {
+                if (userId == first) {
+                    // 如果第二审批人账号不可用，指派给第三审批人
+                    if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(second).isEnabled())) {
+                        // 如果第三审批人账号不可用，直接审批通过
+                        if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(third).isEnabled())) {
+                            quitJobPass(oldRecord, produceUserId, approvalRecord);
+                        } else {
+                            leaveApplyNext(approvalRecord, third);
+                        }
+                    } else {
+                        leaveApplyNext(approvalRecord, second);
+                    }
+                } else if (userId == second) {
+                    // 如果第三审批人账号不可用，直接审批通过
+                    if (EnableBooleanEnum.DISABLE.getCode().equals(userDao.queryById(third).isEnabled())) {
+                        quitJobPass(oldRecord, produceUserId, approvalRecord);
+                    } else {
+                        leaveApplyNext(approvalRecord, third);
+                    }
+                } else {
+                    quitJobPass(oldRecord, produceUserId, approvalRecord);
+                }
+            }
+        }
+    }
+
+    private void quitJobPass(QuitJob oldRecord, Integer produceUserId, ApprovalRecord approvalRecord) {
+        QuitJob newRecord = JSONObject.parseObject(JSONObject.toJSONString(oldRecord), QuitJob.class);
+        newRecord.setId(null);
+        newRecord.setEnabled(EnableBooleanEnum.ENABLED.getCode());
+        newRecord.setCreateTime(DateUtils.getNowTime());
+        quitJobDao.insert(newRecord);
+
+        // 禁用账号
+        User user = userDao.queryById(produceUserId);
+        user.setEnabled(EnableBooleanEnum.DISABLE.getCode());
+        userDao.update(user);
+
+        approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
+        approvalRecordDao.update(approvalRecord);
     }
 
     private void overtime(ApprovalRecord approvalRecord) {

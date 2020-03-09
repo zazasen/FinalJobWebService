@@ -7,13 +7,14 @@
         <result property="userId" column="user_id" jdbcType="INTEGER"/>
         <result property="reason" column="reason" jdbcType="VARCHAR"/>
         <result property="enabled" column="enabled" jdbcType="INTEGER"/>
+        <result property="leaveTime" column="leave_time" jdbcType="TIMESTAMP"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="QuitJobMap">
         select
-          id, user_id, reason, enabled, create_time
+          id, user_id, reason, enabled, leave_time, create_time
         from final_job.quit_job
         where id = #{id}
     </select>
@@ -21,7 +22,7 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="QuitJobMap">
         select
-          id, user_id, reason, enabled, create_time
+          id, user_id, reason, enabled, leave_time, create_time
         from final_job.quit_job
         limit #{offset}, #{limit}
     </select>
@@ -29,7 +30,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="QuitJobMap">
         select
-          id, user_id, reason, enabled, create_time
+          id, user_id, reason, enabled, leave_time, create_time
         from final_job.quit_job
         <where>
             <if test="id != null">
@@ -44,6 +45,9 @@
             <if test="enabled != null">
                 and enabled = #{enabled}
             </if>
+            <if test="leaveTime != null">
+                and leave_time = #{leaveTime}
+            </if>
             <if test="createTime != null">
                 and create_time = #{createTime}
             </if>
@@ -52,8 +56,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.quit_job(user_id, reason, enabled, create_time)
-        values (#{userId}, #{reason}, #{enabled}, #{createTime})
+        insert into final_job.quit_job(user_id, reason, enabled, leave_time, create_time)
+        values (#{userId}, #{reason}, #{enabled}, #{leaveTime}, #{createTime})
     </insert>
 
     <!--通过主键修改数据-->
@@ -68,6 +72,9 @@
             </if>
             <if test="enabled != null">
                 enabled = #{enabled},
+            </if>
+            <if test="leaveTime != null">
+                leave_time = #{leaveTime},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime},
