@@ -349,15 +349,17 @@ public class ApprovalRecordServiceImpl implements ApprovalRecordService {
         newRecord.setEnabled(EnableBooleanEnum.ENABLED.getCode());
         newRecord.setCreateTime(DateUtils.getNowTime());
         leaveDao.insert(newRecord);
-        // 减少总假期
-        Holiday holiday = new Holiday();
-        holiday.setUserId(produceUserId);
-        holiday.setHolidayType(oldRecord.getHolidayType());
-        holiday.setCreateTime(String.valueOf(LocalDate.now().getYear()));
-        holiday = holidayDao.queryByUserIdAndTypeInCurrentYear(holiday);
-        holiday.setRemaining(holiday.getRemaining() - DateUtils
-                .getGapDays(oldRecord.getBeginTime().toLocalDateTime().toLocalDate(), oldRecord.getEndTime().toLocalDateTime().toLocalDate()));
-        holidayDao.update(holiday);
+        // 减少总假期,如果是事假就不用减了
+        if (!Objects.equals(HolidayTypeEnum.OTHER, HolidayTypeEnum.getEnumByCode(oldRecord.getHolidayType()))) {
+            Holiday holiday = new Holiday();
+            holiday.setUserId(produceUserId);
+            holiday.setHolidayType(oldRecord.getHolidayType());
+            holiday.setCreateTime(String.valueOf(LocalDate.now().getYear()));
+            holiday = holidayDao.queryByUserIdAndTypeInCurrentYear(holiday);
+            holiday.setRemaining(holiday.getRemaining() - DateUtils
+                    .getGapDays(oldRecord.getBeginTime().toLocalDateTime().toLocalDate(), oldRecord.getEndTime().toLocalDateTime().toLocalDate()));
+            holidayDao.update(holiday);
+        }
         approvalRecord.setRecordStatus(RecordStatusEnum.PASSED.getCode());
         approvalRecordDao.update(approvalRecord);
     }

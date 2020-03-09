@@ -56,6 +56,15 @@
         </if>
     </select>
 
+    <select id="queryLeaveInfo" resultMap="LeaveMap">
+        select
+          id, user_id, holiday_type, begin_time, end_time, reason, enabled, create_time
+        from final_job.leave
+        where enabled = true
+        and user_id = #{userId}
+        and create_time between #{start} and #{end}
+    </select>
+
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="LeaveMap">
         select

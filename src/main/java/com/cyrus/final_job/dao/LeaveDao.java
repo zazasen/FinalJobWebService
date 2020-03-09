@@ -4,6 +4,7 @@ import com.cyrus.final_job.entity.Leave;
 import com.cyrus.final_job.entity.condition.LeaveCondition;
 import org.apache.ibatis.annotations.Param;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -73,4 +74,8 @@ public interface LeaveDao {
     List<Leave> queryAllByCondition(LeaveCondition leaveCondition);
 
     Long queryAllByConditionCount(LeaveCondition leaveCondition);
+
+    List<Leave> queryLeaveInfo(@Param("userId") int userId,
+                               @Param("start") Timestamp start,
+                               @Param("end") Timestamp end);
 }

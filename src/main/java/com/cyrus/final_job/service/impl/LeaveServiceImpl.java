@@ -9,6 +9,7 @@ import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.condition.LeaveCondition;
 import com.cyrus.final_job.entity.system.User;
+import com.cyrus.final_job.entity.vo.LeaveInfoVo;
 import com.cyrus.final_job.entity.vo.LeaveVo;
 import com.cyrus.final_job.enums.ApprovalTypeEnum;
 import com.cyrus.final_job.enums.EnableBooleanEnum;
@@ -22,8 +23,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 员工请假表(Leave)表服务实现类
@@ -115,15 +120,18 @@ public class LeaveServiceImpl implements LeaveService {
         Result result = leave.checkAndBuildParams();
         if (result != null) return result;
 
-        Holiday holiday = new Holiday();
-        holiday.setHolidayType(leave.getHolidayType());
-        holiday.setUserId(UserUtils.getCurrentUserId());
-        holiday.setCreateTime(String.valueOf(LocalDate.now().getYear()));
-        holiday = holidayDao.queryByUserIdAndTypeInCurrentYear(holiday);
-        Integer gapDays = DateUtils.getGapDays(leave.getBeginTime().toLocalDateTime().toLocalDate(),
-                leave.getEndTime().toLocalDateTime().toLocalDate());
-        if (gapDays > holiday.getRemaining()) {
-            return Results.error("假期余额不足");
+        // 如果是事假就不用判斷假期余额了
+        if (!Objects.equals(HolidayTypeEnum.OTHER, HolidayTypeEnum.getEnumByCode(leave.getHolidayType()))) {
+            Holiday holiday = new Holiday();
+            holiday.setHolidayType(leave.getHolidayType());
+            holiday.setUserId(UserUtils.getCurrentUserId());
+            holiday.setCreateTime(String.valueOf(LocalDate.now().getYear()));
+            holiday = holidayDao.queryByUserIdAndTypeInCurrentYear(holiday);
+            Integer gapDays = DateUtils.getGapDays(leave.getBeginTime().toLocalDateTime().toLocalDate(),
+                    leave.getEndTime().toLocalDateTime().toLocalDate());
+            if (gapDays > holiday.getRemaining()) {
+                return Results.error("假期余额不足");
+            }
         }
 
         if (leave.getBeginTime().toLocalDateTime().toLocalDate().isBefore(LocalDate.now())) {
@@ -176,5 +184,23 @@ public class LeaveServiceImpl implements LeaveService {
             leaveVo.setHolidayTypeStr(HolidayTypeEnum.getEnumByCode(leaveVo.getHolidayType()).getDesc());
         }
         return Results.createOk(total, leaveVos);
+    }
+
+    @Override
+    public Result getLeaveInfo() {
+        int userId = UserUtils.getCurrentUserId();
+        Timestamp start = new Timestamp(DateUtils.getCurrentMonthFirstDay().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli());
+        Timestamp end = new Timestamp(DateUtils.getCurrentMonthLasterDay().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli());
+        List<Leave> leaveInfo = leaveDao.queryLeaveInfo(userId, start, end);
+        List<LeaveInfoVo> leaveInfoVos = new ArrayList<>();
+        for (Leave leave : leaveInfo) {
+            LeaveInfoVo leaveInfoVo = new LeaveInfoVo();
+            leaveInfoVo.setLeaveType(HolidayTypeEnum.getEnumByCode(leave.getHolidayType()).getDesc());
+            String startTime = leave.getBeginTime().toLocalDateTime().toLocalDate().toString();
+            String endTime = leave.getEndTime().toLocalDateTime().toLocalDate().toString();
+            leaveInfoVo.setTime(startTime + " 到 " + endTime);
+            leaveInfoVos.add(leaveInfoVo);
+        }
+        return Results.createOk(leaveInfoVos);
     }
 }

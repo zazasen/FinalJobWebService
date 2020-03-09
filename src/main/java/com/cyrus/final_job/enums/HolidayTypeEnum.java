@@ -9,7 +9,9 @@ public enum HolidayTypeEnum {
     ANNUAL_LEAVE(2, "年假"),
     BREASTFEEDING_LEAVE(3, "哺乳假"),
     MARRIAGE_HOLIDAY(4, "婚假"),
-    FUNERAL_LEAVE(5, "丧假");
+    FUNERAL_LEAVE(5, "丧假"),
+    // 事假不带薪休假
+    OTHER(6, "事假");
     private Integer code;
     private String desc;
 

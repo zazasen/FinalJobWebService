@@ -362,7 +362,13 @@ public class CheckInServiceImpl implements CheckInService {
 
         int workDays = 0;
         int leaveDays = 0;
+        int weekendDays = 0;
         for (CheckIn check : list) {
+            LocalDate parse = LocalDate.parse(check.getCreateTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            if (CommonUtils.FreeDayJudge(parse)) {
+                weekendDays++;
+                continue;
+            }
             if (SignTypeEnum.HALF.getCode().equals(check.getSignType()) || SignTypeEnum.FULL.getCode().equals(check.getSignType())) {
                 workDays++;
             }
@@ -385,8 +391,14 @@ public class CheckInServiceImpl implements CheckInService {
         //未打卡天数
         CheckInStatisticsVo vo2 = new CheckInStatisticsVo();
         vo2.setName("未打卡");
-        vo2.setValue(Integer.valueOf(days) - workDays);
+        vo2.setValue(Integer.valueOf(days) - workDays - leaveDays);
         vos.add(vo2);
+
+        // 假期打卡
+        CheckInStatisticsVo vo3 = new CheckInStatisticsVo();
+        vo3.setName("休息日打卡");
+        vo3.setValue(weekendDays);
+        vos.add(vo3);
         return Results.createOk(vos);
     }
 }

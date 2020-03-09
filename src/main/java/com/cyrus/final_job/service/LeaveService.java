@@ -70,4 +70,6 @@ public interface LeaveService {
      * @return
      */
     ResultPage getMyAppliedHolidays(JSONObject params);
+
+    Result getLeaveInfo();
 }
