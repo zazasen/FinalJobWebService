@@ -17,14 +17,13 @@ import com.cyrus.final_job.entity.vo.CheckInRecordVo;
 import com.cyrus.final_job.entity.vo.CheckInStatisticsVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
-import com.cyrus.final_job.job.CheckInExceptionJob;
 import com.cyrus.final_job.service.CheckInService;
 import com.cyrus.final_job.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,12 +49,6 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Autowired
     private ApprovalRecordDao approvalRecordDao;
-
-    @Autowired
-    private RedisUtil redisUtil;
-
-    @Autowired
-    private CheckInExceptionJob checkInExceptionJob;
 
     /**
      * 通过ID查询单条数据
@@ -404,21 +397,7 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Override
     public Result getExceptionCheckIn() {
-        int month = LocalDate.now().getMonth().getValue();
-        String key = RedisKeys.monthStatistics(month);
-        Map<Object, Object> map = redisUtil.hGetAll(key);
-        if (CollectionUtils.isEmpty(map)) {
-            checkInExceptionJob.build();
-            map = redisUtil.hGetAll(key);
-        }
-        List<CheckInStatisticsVo> vos = new ArrayList<>();
-        for (Map.Entry<Object, Object> item : map.entrySet()) {
-            CheckInStatisticsVo vo = new CheckInStatisticsVo();
-            vo.setName(item.getKey().toString());
-            vo.setValue(item.getValue());
-            vos.add(vo);
-        }
-
+        List<CheckInStatisticsVo> vos = buildException();
         // 每月要出勤的天数
         Integer days = CommonUtils.shouldBeWorkDays();
         CheckInStatisticsVo vo4 = new CheckInStatisticsVo();
@@ -426,5 +405,45 @@ public class CheckInServiceImpl implements CheckInService {
         vo4.setValue(days * 8);
         vos.add(vo4);
         return Results.createOk(vos);
+    }
+
+    private List<CheckInStatisticsVo> buildException() {
+        Integer userId = UserUtils.getCurrentUserId();
+        CheckInCondition condition = new CheckInCondition();
+        condition.setUserId(userId);
+        condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
+        condition.setTailTime(DateUtils.getCurrentMonthLasterDay().toString());
+        List<CheckIn> checkIns = checkInDao.queryAllByConditionNoPage(condition);
+        int later = 0;
+        int early = 0;
+        double workedTime = 0;
+        for (CheckIn checkIn : checkIns) {
+            // 如果当天上班打卡时间早于9点，算迟到
+            if (checkIn.getStartTime() != null && checkIn.getStartTime().toLocalDateTime().isAfter(
+                    LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth().getValue(),
+                            LocalDate.now().getDayOfMonth(), 9, 00))) {
+                later++;
+            }
+
+            // 如果当天下班打卡时间早于下午6点算早退
+            if (checkIn.getEndTime() != null && checkIn.getEndTime().toLocalDateTime().isBefore(
+                    LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth().getValue(),
+                            LocalDate.now().getDayOfMonth(), 18, 00))) {
+                early++;
+            }
+            if (checkIn.getWorkHours() != null) {
+                workedTime = workedTime + checkIn.getWorkHours();
+            }
+        }
+        List<CheckInStatisticsVo> vos = new ArrayList<>();
+        CheckInStatisticsVo vo1 = new CheckInStatisticsVo();
+        vo1.setName("早退");
+        vo1.setValue(early);
+        CheckInStatisticsVo vo2 = new CheckInStatisticsVo();
+        vo2.setName("迟到");
+        vo2.setValue(later);
+        vos.add(vo1);
+        vos.add(vo2);
+        return vos;
     }
 }

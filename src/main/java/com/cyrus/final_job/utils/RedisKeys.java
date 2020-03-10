@@ -36,7 +36,7 @@ public class RedisKeys {
      * @param month
      * @return
      */
-    public static String monthStatistics(Integer month){
-        return "monthStatistics" + month + ":";
+    public static String monthStatistics(Integer month,Integer userId){
+        return userId + "-monthStatistics" + month + ":";
     }
 }

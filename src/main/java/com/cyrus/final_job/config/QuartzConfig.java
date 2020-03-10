@@ -23,19 +23,6 @@ public class QuartzConfig {
     }
 
     /**
-     * CheckInExceptionJob
-     *
-     * @return
-     */
-    @Bean
-    MethodInvokingJobDetailFactoryBean checkInExceptionJobFactoryBean() {
-        MethodInvokingJobDetailFactoryBean bean = new MethodInvokingJobDetailFactoryBean();
-        bean.setTargetBeanName("checkInExceptionJob");
-        bean.setTargetMethod("build");
-        return bean;
-    }
-
-    /**
      * checkInJob cron 表达式
      *
      * @return
@@ -46,31 +33,16 @@ public class QuartzConfig {
         bean.setJobDetail(checkInJobDetailFactoryBean().getObject());
         bean.setCronExpression("0 0 1 * * ? *"); //每天凌晨一点执行
 //        bean.setCronExpression("* * * * * ?"); //每秒
-//        bean.setCronExpression("0 29 21 * * ? *");
+//        bean.setCronExpression("0 40 9 * * ? *");
         return bean;
     }
 
-    /**
-     * CheckInExceptionJob cron 表达式
-     *
-     * @return
-     */
-    @Bean
-    CronTriggerFactoryBean checkInExceptionJobCron() {
-        CronTriggerFactoryBean bean = new CronTriggerFactoryBean();
-        bean.setJobDetail(checkInExceptionJobFactoryBean().getObject());
-        bean.setCronExpression("0 0 2 * * ? *"); //每天凌晨二点执行
-//        bean.setCronExpression("* * * * * ?"); //每秒
-//        bean.setCronExpression("0 29 21 * * ? *");
-        return bean;
-    }
 
     // 添加触发器
     @Bean
     SchedulerFactoryBean schedulerFactoryBean() {
         SchedulerFactoryBean bean = new SchedulerFactoryBean();
-        bean.setTriggers(checkInJobCron().getObject(),
-                checkInExceptionJobCron().getObject());
+        bean.setTriggers(checkInJobCron().getObject());
         return bean;
     }
 }

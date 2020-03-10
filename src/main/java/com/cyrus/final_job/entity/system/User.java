@@ -265,10 +265,6 @@ public class User implements Serializable, UserDetails {
         return this.enabled;
     }
 
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
     public Integer getId() {
         return id;
     }
