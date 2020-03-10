@@ -79,6 +79,7 @@ public class CheckIn implements Serializable {
         checkIn.setStartType(SignInTypeEnum.NORMAL.getCode());
         checkIn.setCreateTime(LocalDate.now().toString());
         checkIn.setSignType(SignTypeEnum.HALF.getCode());
+        checkIn.setWorkHours(4.0);
         return checkIn;
     }
 

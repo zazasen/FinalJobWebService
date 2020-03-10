@@ -81,6 +81,14 @@
         </where>
     </select>
 
+    <select id="queryByUserIdAndCreateTime" resultMap="RewardAndPunishMap">
+        select
+          id, user_id, money, reason, create_time
+        from final_job.reward_and_punish
+        where user_id = #{userId}
+        and create_time between #{startTime} and #{endTime}
+    </select>
+
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
         insert into final_job.reward_and_punish(user_id, money, reason, create_time)

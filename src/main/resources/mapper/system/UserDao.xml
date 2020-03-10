@@ -226,6 +226,7 @@
         </if>
     </select>
 
+
     <select id="queryUserAccountCountByCondition" resultType="long">
         select count(*)
         from final_job.user
@@ -395,6 +396,14 @@
                 and enabled = #{enabled}
             </if>
         </where>
+    </select>
+
+    <select id="queryLeave" resultMap="UserMap">
+        select
+          id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
+        from final_job.user
+        where enabled = false
+        and departure_time between #{startTime} and #{endTime}
     </select>
 
     <!--新增所有列-->

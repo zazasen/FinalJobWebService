@@ -51,8 +51,7 @@
 
     <select id="queryAllByConditionNoPage" resultMap="CheckInMap">
         select
-        id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time,
-        work_hours
+        id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time, work_hours
         from final_job.check_in
         where enabled = true
         <if test="userId != null">

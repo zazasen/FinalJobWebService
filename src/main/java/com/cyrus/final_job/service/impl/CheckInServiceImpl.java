@@ -365,6 +365,7 @@ public class CheckInServiceImpl implements CheckInService {
             if (SignTypeEnum.HALF.getCode().equals(check.getSignType()) || SignTypeEnum.FULL.getCode().equals(check.getSignType())) {
                 workDays++;
             }
+
             if (SignTypeEnum.FREE.getCode().equals(check.getSignType())) {
                 leaveDays++;
             }
@@ -397,17 +398,6 @@ public class CheckInServiceImpl implements CheckInService {
 
     @Override
     public Result getExceptionCheckIn() {
-        List<CheckInStatisticsVo> vos = buildException();
-        // 每月要出勤的天数
-        Integer days = CommonUtils.shouldBeWorkDays();
-        CheckInStatisticsVo vo4 = new CheckInStatisticsVo();
-        vo4.setName("总工时");
-        vo4.setValue(days * 8);
-        vos.add(vo4);
-        return Results.createOk(vos);
-    }
-
-    private List<CheckInStatisticsVo> buildException() {
         Integer userId = UserUtils.getCurrentUserId();
         CheckInCondition condition = new CheckInCondition();
         condition.setUserId(userId);
@@ -442,8 +432,12 @@ public class CheckInServiceImpl implements CheckInService {
         CheckInStatisticsVo vo2 = new CheckInStatisticsVo();
         vo2.setName("迟到");
         vo2.setValue(later);
+        CheckInStatisticsVo vo3 = new CheckInStatisticsVo();
+        vo3.setName("已工作工时");
+        vo3.setValue(workedTime);
         vos.add(vo1);
         vos.add(vo2);
-        return vos;
+        vos.add(vo3);
+        return Results.createOk(vos);
     }
 }

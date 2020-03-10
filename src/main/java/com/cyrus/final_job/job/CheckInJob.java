@@ -63,10 +63,12 @@ public class CheckInJob {
             // 获取该员工所有假期
             List<Leave> leaves = leaveDao.queryAll(leave);
             for (Leave leaf : leaves) {
-                LocalDateTime begin = leaf.getBeginTime().toLocalDateTime();
-                LocalDateTime end = leaf.getEndTime().toLocalDateTime();
+                LocalDate begin = leaf.getBeginTime().toLocalDateTime().toLocalDate();
+                LocalDate end = leaf.getEndTime().toLocalDateTime().toLocalDate();
                 // 昨天请假了
-                if (yesterday.isBefore(end) && yesterday.isAfter(begin)) {
+                LocalDate localDate = yesterday.toLocalDate();
+                if ((localDate.isBefore(end) || localDate.isEqual(end)) &&
+                        (localDate.isAfter(begin) || localDate.isEqual(begin))) {
                     free = true;
                     CheckIn checkIn = buildCheckIn(item, free);
                     checkInDao.insert(checkIn);

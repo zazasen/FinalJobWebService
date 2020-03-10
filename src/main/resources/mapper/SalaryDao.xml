@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyrus.final_job.dao.SalaryDao">
+
+    <resultMap type="com.cyrus.final_job.entity.Salary" id="SalaryMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="basicSalary" column="basic_salary" jdbcType="NUMERIC"/>
+        <result property="trafficAllowance" column="traffic_allowance" jdbcType="NUMERIC"/>
+        <result property="phoneAllowance" column="phone_allowance" jdbcType="NUMERIC"/>
+        <result property="foodAllowance" column="food_allowance" jdbcType="NUMERIC"/>
+        <result property="taxes" column="taxes" jdbcType="NUMERIC"/>
+        <result property="fiveAndOne" column="five_and_one" jdbcType="NUMERIC"/>
+        <result property="checkInMoney" column="check_in_money" jdbcType="NUMERIC"/>
+        <result property="checkInReason" column="check_in_reason" jdbcType="VARCHAR"/>
+        <result property="rewardAndPunishMoney" column="reward_and_punish_money" jdbcType="NUMERIC"/>
+        <result property="otherMoney" column="other_money" jdbcType="NUMERIC"/>
+        <result property="otherMoneyReason" column="other_money_reason" jdbcType="VARCHAR"/>
+        <result property="finalSalary" column="final_salary" jdbcType="NUMERIC"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="SalaryVoMap" type="com.cyrus.final_job.entity.vo.SalaryVo" extends="SalaryMap">
+        <result property="realName" column="real_name" jdbcType="VARCHAR"/>
+        <result property="workId" column="work_id" jdbcType="VARCHAR"/>
+        <result property="departmentId" column="department_id" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="SalaryMap">
+        select
+          id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one, check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary, create_time
+        from final_job.salary
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="SalaryMap">
+        select
+          id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one, check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary, create_time
+        from final_job.salary
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SalaryMap">
+        select
+        id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one,
+        check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary,
+        create_time
+        from final_job.salary
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="basicSalary != null">
+                and basic_salary = #{basicSalary}
+            </if>
+            <if test="trafficAllowance != null">
+                and traffic_allowance = #{trafficAllowance}
+            </if>
+            <if test="phoneAllowance != null">
+                and phone_allowance = #{phoneAllowance}
+            </if>
+            <if test="foodAllowance != null">
+                and food_allowance = #{foodAllowance}
+            </if>
+            <if test="taxes != null">
+                and taxes = #{taxes}
+            </if>
+            <if test="fiveAndOne != null">
+                and five_and_one = #{fiveAndOne}
+            </if>
+            <if test="checkInMoney != null">
+                and check_in_money = #{checkInMoney}
+            </if>
+            <if test="checkInReason != null and checkInReason != ''">
+                and check_in_reason = #{checkInReason}
+            </if>
+            <if test="rewardAndPunishMoney != null">
+                and reward_and_punish_money = #{rewardAndPunishMoney}
+            </if>
+            <if test="otherMoney != null">
+                and other_money = #{otherMoney}
+            </if>
+            <if test="otherMoneyReason != null and otherMoneyReason != ''">
+                and other_money_reason = #{otherMoneyReason}
+            </if>
+            <if test="finalSalary != null">
+                and final_salary = #{finalSalary}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="querySalaryByUserIdAndTime" resultMap="SalaryMap">
+        select
+        id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one, check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary, create_time
+        from final_job.salary
+        where user_id = #{userId}
+        and create_time = #{createTime}
+    </select>
+
+    <select id="queryWithUserByCondition" resultMap="SalaryVoMap">
+        select
+        salary.id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one,
+        check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary,
+        salary.create_time,real_name,work_id,department_id
+        from salary,user
+        where salary.user_id = user.id
+        <if test="realName!=null and realName != ''">
+            <bind name="realName" value="'%'+realName+'%'"/>
+            and user.real_name like #{realName}
+        </if>
+        <if test="workId != null">
+            and user.work_id = #{workId}
+        </if>
+        <if test="departmentId != null">
+            and user.department_id = #{departmentId}
+        </if>
+        <if test="workState != null">
+            and user.work_state = #{workState}
+        </if>
+        <if test="month != null">
+            and salary.create_time = #{month}
+        </if>
+        limit #{offset},#{pageSize}
+    </select>
+
+    <select id="queryWithUserByConditionCount" resultType="long">
+        select count(*)
+        from salary,user
+        where salary.user_id = user.id
+        <if test="realName!=null and realName != ''">
+            <bind name="realName" value="'%'+realName+'%'"/>
+            and user.real_name like #{realName}
+        </if>
+        <if test="workId != null">
+            and user.work_id = #{workId}
+        </if>
+        <if test="departmentId != null">
+            and user.department_id = #{departmentId}
+        </if>
+        <if test="workState != null">
+            and user.work_state = #{workState}
+        </if>
+        <if test="month != null">
+            and salary.create_time = #{month}
+        </if>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into final_job.salary(user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one, check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary, create_time)
+        values (#{userId}, #{basicSalary}, #{trafficAllowance}, #{phoneAllowance}, #{foodAllowance}, #{taxes}, #{fiveAndOne}, #{checkInMoney}, #{checkInReason}, #{rewardAndPunishMoney}, #{otherMoney}, #{otherMoneyReason}, #{finalSalary}, #{createTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update final_job.salary
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="basicSalary != null">
+                basic_salary = #{basicSalary},
+            </if>
+            <if test="trafficAllowance != null">
+                traffic_allowance = #{trafficAllowance},
+            </if>
+            <if test="phoneAllowance != null">
+                phone_allowance = #{phoneAllowance},
+            </if>
+            <if test="foodAllowance != null">
+                food_allowance = #{foodAllowance},
+            </if>
+            <if test="taxes != null">
+                taxes = #{taxes},
+            </if>
+            <if test="fiveAndOne != null">
+                five_and_one = #{fiveAndOne},
+            </if>
+            <if test="checkInMoney != null">
+                check_in_money = #{checkInMoney},
+            </if>
+            <if test="checkInReason != null and checkInReason != ''">
+                check_in_reason = #{checkInReason},
+            </if>
+            <if test="rewardAndPunishMoney != null">
+                reward_and_punish_money = #{rewardAndPunishMoney},
+            </if>
+            <if test="otherMoney != null">
+                other_money = #{otherMoney},
+            </if>
+            <if test="otherMoneyReason != null and otherMoneyReason != ''">
+                other_money_reason = #{otherMoneyReason},
+            </if>
+            <if test="finalSalary != null">
+                final_salary = #{finalSalary},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from final_job.salary where id = #{id}
+    </delete>
+
+
+</mapper>

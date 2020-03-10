@@ -28,7 +28,6 @@
     </select>
 
     <select id="queryByLimit" resultMap="PositionMap">
-        <bind name="positionName" value="'%' + positionName + '%'"/>
         select
         id, position_name, position_level, create_time, enabled, remark
         from final_job.position
@@ -37,6 +36,7 @@
                 and id = #{id}
             </if>
             <if test="positionName != null and positionName != ''">
+                <bind name="positionName" value="'%' + positionName + '%'"/>
                 and position_name like #{positionName}
             </if>
             <if test="positionLevel != null">

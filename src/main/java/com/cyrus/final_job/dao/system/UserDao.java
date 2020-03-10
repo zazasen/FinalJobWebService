@@ -8,6 +8,7 @@ import com.cyrus.final_job.entity.vo.UserAccountVo;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -98,4 +99,6 @@ public interface UserDao {
     List<User> getUserByUserAccountSetCondition(UserAccountSetQueryCondition condition);
 
     Long getUserByUserAccountSetConditionCount(UserAccountSetQueryCondition condition);
+
+    List<User> queryLeave(@Param("startTime") LocalDate startTime,@Param("endTime") LocalDate endTime);
 }

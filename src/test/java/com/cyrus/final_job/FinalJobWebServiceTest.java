@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -88,7 +89,7 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void calMoney() {
-
+        System.out.println(new Timestamp(1582992000000L).toLocalDateTime().toLocalDate());
     }
 
 }

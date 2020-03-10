@@ -3,6 +3,7 @@ package com.cyrus.final_job.dao;
 import com.cyrus.final_job.entity.RewardAndPunish;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -67,4 +68,7 @@ public interface RewardAndPunishDao {
      */
     int deleteById(Integer id);
 
+    List<RewardAndPunish> queryByUserIdAndCreateTime(@Param("userId") Integer userId,
+                                                     @Param("startTime") LocalDate startTime,
+                                                     @Param("endTime") LocalDate endTime);
 }
