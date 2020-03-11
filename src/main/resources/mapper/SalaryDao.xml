@@ -106,6 +106,27 @@
         and create_time = #{createTime}
     </select>
 
+    <select id="queryOneByCondition" resultMap="SalaryMap">
+        select
+        id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one, check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary, create_time
+        from final_job.salary
+        where user_id = #{userId}
+        <if test="month != null">
+            and create_time = #{month}
+        </if>
+        order by create_time desc
+        limit #{offset},#{pageSize}
+    </select>
+
+    <select id="queryOneByConditionCount" resultType="long">
+        select count(*)
+        from final_job.salary
+        where user_id = #{userId}
+        <if test="month != null">
+            and create_time = #{month}
+        </if>
+    </select>
+
     <select id="queryWithUserByCondition" resultMap="SalaryVoMap">
         select
         salary.id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one,
@@ -129,6 +150,7 @@
         <if test="month != null">
             and salary.create_time = #{month}
         </if>
+        order by create_time desc
         limit #{offset},#{pageSize}
     </select>
 

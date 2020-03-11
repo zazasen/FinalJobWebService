@@ -1,5 +1,6 @@
 package com.cyrus.final_job.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.*;
 import com.cyrus.final_job.dao.system.UserDao;
@@ -17,6 +18,7 @@ import com.cyrus.final_job.service.SalaryService;
 import com.cyrus.final_job.utils.CommonUtils;
 import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
+import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -330,6 +332,22 @@ public class SalaryServiceImpl implements SalaryService {
         return Results.createOk(total, salaryVos);
     }
 
+    @Override
+    public ResultPage getMySalary(JSONObject params) {
+        SalaryCondition condition = params.toJavaObject(SalaryCondition.class);
+        condition.buildLimit();
+        condition.setUserId(UserUtils.getCurrentUserId());
+        List<Salary> salary = salaryDao.queryOneByCondition(condition);
+        List<SalaryVo> salaryVos = JSONArray.parseArray(JSONArray.toJSONString(salary), SalaryVo.class);
+        for (SalaryVo salaryVo : salaryVos) {
+            List<RewardAndPunish> list = rewardAndPunishDao.queryByUserIdAndCreateTime(salaryVo.getUserId(),
+                    DateUtils.getCurrentMonthFirstDay(),
+                    DateUtils.getCurrentMonthLasterDay());
+            salaryVo.setRewardAndPunishes(list);
+        }
+        Long total = salaryDao.queryOneByConditionCount(condition);
+        return Results.createOk(total, salaryVos);
+    }
 
     @Override
     public Result editSalary(JSONObject params) {

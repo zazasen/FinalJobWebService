@@ -12,4 +12,6 @@ public class SalaryCondition extends BasePageQuery {
     private String departmentId;
     private Timestamp month;
     private Integer workState;
+
+    private Integer userId;
 }

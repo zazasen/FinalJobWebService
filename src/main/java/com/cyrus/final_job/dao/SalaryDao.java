@@ -77,4 +77,14 @@ public interface SalaryDao {
     int deleteById(Integer id);
 
     Salary querySalaryByUserIdAndTime(@Param("userId") Integer userId, @Param("createTime") LocalDate createTime);
+
+    /**
+     * 获取个人薪资
+     *
+     * @param condition
+     * @return
+     */
+    List<Salary> queryOneByCondition(SalaryCondition condition);
+
+    Long queryOneByConditionCount(SalaryCondition condition);
 }

@@ -74,8 +74,17 @@ public interface SalaryService {
 
     /**
      * 补差价
+     *
      * @param params
      * @return
      */
     Result editSalary(JSONObject params);
+
+    /**
+     * 获取个人薪资
+     *
+     * @param params
+     * @return
+     */
+    ResultPage getMySalary(JSONObject params);
 }
