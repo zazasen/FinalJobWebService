@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyrus.final_job.dao.ContractDao">
+
+    <resultMap type="com.cyrus.final_job.entity.Contract" id="ContractMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="beginTime" column="begin_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="confirm" column="confirm" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ContractMap">
+        select
+          id, user_id, begin_time, end_time, content, confirm
+        from final_job.contract
+        where id = #{id}
+    </select>
+
+    <select id="queryByUserId" resultMap="ContractMap">
+        select
+          id, user_id, begin_time, end_time, content, confirm
+        from final_job.contract
+        where user_id = #{UserId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="ContractMap">
+        select
+          id, user_id, begin_time, end_time, content, confirm
+        from final_job.contract
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="ContractMap">
+        select
+          id, user_id, begin_time, end_time, content, confirm
+        from final_job.contract
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="beginTime != null">
+                and begin_time = #{beginTime}
+            </if>
+            <if test="endTime != null">
+                and end_time = #{endTime}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+            <if test="confirm != null">
+                and confirm = #{confirm}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into final_job.contract(user_id, begin_time, end_time, content, confirm)
+        values (#{userId}, #{beginTime}, #{endTime}, #{content}, #{confirm})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update final_job.contract
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="beginTime != null">
+                begin_time = #{beginTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+            <if test="confirm != null">
+                confirm = #{confirm},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from final_job.contract where id = #{id}
+    </delete>
+
+</mapper>

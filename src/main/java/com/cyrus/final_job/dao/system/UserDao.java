@@ -1,5 +1,6 @@
 package com.cyrus.final_job.dao.system;
 
+import com.cyrus.final_job.entity.condition.ContractCondition;
 import com.cyrus.final_job.entity.condition.UserAccountQueryCondition;
 import com.cyrus.final_job.entity.condition.UserAccountSetQueryCondition;
 import com.cyrus.final_job.entity.condition.UserCondition;
@@ -100,5 +101,9 @@ public interface UserDao {
 
     Long getUserByUserAccountSetConditionCount(UserAccountSetQueryCondition condition);
 
-    List<User> queryLeave(@Param("startTime") LocalDate startTime,@Param("endTime") LocalDate endTime);
+    List<User> queryLeave(@Param("startTime") LocalDate startTime, @Param("endTime") LocalDate endTime);
+
+    List<User> queryAllByContractCondition(ContractCondition condition);
+
+    Long queryAllByContractConditionCount(ContractCondition condition);
 }

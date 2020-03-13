@@ -453,7 +453,7 @@ public class UserServiceImpl implements UserService {
             if (Objects.isNull(item.getContractTerm())) {
                 item.setContractTermStr("");
             } else {
-                item.setContractTermStr(item.getContractTerm() + "天");
+                item.setContractTermStr(item.getContractTerm() + "年");
             }
         }
     }
