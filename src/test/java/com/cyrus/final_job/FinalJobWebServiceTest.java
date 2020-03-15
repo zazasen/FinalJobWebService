@@ -14,9 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -99,10 +100,10 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void contend(){
-        Context context = new Context();
-        context.setVariable("name", "cyrus");
-        String process = templateEngine.process("Contract.html", context);
-        System.out.println(process);
+        Timestamp timestamp = new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli());
+
+        LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
+        System.out.println(localDate.toString());
     }
 
 }

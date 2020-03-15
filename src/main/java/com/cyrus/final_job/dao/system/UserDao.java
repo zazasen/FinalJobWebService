@@ -106,4 +106,6 @@ public interface UserDao {
     List<User> queryAllByContractCondition(ContractCondition condition);
 
     Long queryAllByContractConditionCount(ContractCondition condition);
+
+    List<User> getAllUsersExceptOne(@Param("id") int id);
 }

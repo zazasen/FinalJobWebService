@@ -18,6 +18,7 @@ import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.system.UserRole;
 import com.cyrus.final_job.entity.vo.UserAccountVo;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
+import com.cyrus.final_job.entity.vo.UserVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.system.UserService;
 import com.cyrus.final_job.utils.CommonUtils;
@@ -684,5 +685,20 @@ public class UserServiceImpl implements UserService {
         }
         userDao.update(user);
         return Results.createOk("账号更新成功");
+    }
+
+    @Override
+    public Result getAllUsersExceptOne() {
+        List<User> users = userDao.getAllUsersExceptOne(UserUtils.getCurrentUserId());
+        List<UserVo> userVos = new ArrayList<>();
+        for (User user : users) {
+            UserVo vo = new UserVo();
+            vo.setId(user.getId());
+            vo.setRealName(user.getRealName());
+            vo.setUserFace(user.getUserFace());
+            vo.setUsername(user.getUsername());
+            userVos.add(vo);
+        }
+        return Results.createOk(userVos);
     }
 }

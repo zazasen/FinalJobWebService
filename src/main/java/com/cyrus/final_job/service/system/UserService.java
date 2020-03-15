@@ -90,4 +90,6 @@ public interface UserService extends UserDetailsService {
     Result updateUserAccount(UserAccountCondition condition);
 
     ResultPage getUsers(JSONObject params);
+
+    Result getAllUsersExceptOne();
 }
