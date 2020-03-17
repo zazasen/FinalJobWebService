@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cyrus.final_job.dao.StaffNeedsDao">
+
+    <resultMap type="com.cyrus.final_job.entity.StaffNeeds" id="StaffNeedsMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="userId" column="user_id" jdbcType="INTEGER"/>
+        <result property="departmentId" column="department_id" jdbcType="INTEGER"/>
+        <result property="applyDate" column="apply_date" jdbcType="TIMESTAMP"/>
+        <result property="address" column="address" jdbcType="VARCHAR"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
+        <result property="entryDate" column="entry_date" jdbcType="TIMESTAMP"/>
+        <result property="needNumber" column="need_number" jdbcType="INTEGER"/>
+        <result property="reason" column="reason" jdbcType="INTEGER"/>
+        <result property="responsibility" column="responsibility" jdbcType="VARCHAR"/>
+        <result property="degree" column="degree" jdbcType="INTEGER"/>
+        <result property="highestAge" column="highest_age" jdbcType="INTEGER"/>
+        <result property="minimumAge" column="minimum_age" jdbcType="INTEGER"/>
+        <result property="wedlock" column="wedlock" jdbcType="INTEGER"/>
+        <result property="gender" column="gender" jdbcType="INTEGER"/>
+        <result property="speciality" column="speciality" jdbcType="VARCHAR"/>
+        <result property="foreignLanguages" column="foreign_languages" jdbcType="VARCHAR"/>
+        <result property="skill" column="skill" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="StaffNeedsMap">
+        select
+          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill
+        from final_job.staff_needs
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="StaffNeedsMap">
+        select
+          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill
+        from final_job.staff_needs
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="StaffNeedsMap">
+        select
+          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill
+        from final_job.staff_needs
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="departmentId != null">
+                and department_id = #{departmentId}
+            </if>
+            <if test="applyDate != null">
+                and apply_date = #{applyDate}
+            </if>
+            <if test="address != null and address != ''">
+                and address = #{address}
+            </if>
+            <if test="positionId != null">
+                and position_id = #{positionId}
+            </if>
+            <if test="entryDate != null">
+                and entry_date = #{entryDate}
+            </if>
+            <if test="needNumber != null">
+                and need_number = #{needNumber}
+            </if>
+            <if test="reason != null">
+                and reason = #{reason}
+            </if>
+            <if test="responsibility != null and responsibility != ''">
+                and responsibility = #{responsibility}
+            </if>
+            <if test="degree != null">
+                and degree = #{degree}
+            </if>
+            <if test="highestAge != null">
+                and highest_age = #{highestAge}
+            </if>
+            <if test="minimumAge != null">
+                and minimum_age = #{minimumAge}
+            </if>
+            <if test="wedlock != null">
+                and wedlock = #{wedlock}
+            </if>
+            <if test="gender != null">
+                and gender = #{gender}
+            </if>
+            <if test="speciality != null and speciality != ''">
+                and speciality = #{speciality}
+            </if>
+            <if test="foreignLanguages != null and foreignLanguages != ''">
+                and foreign_languages = #{foreignLanguages}
+            </if>
+            <if test="skill != null and skill != ''">
+                and skill = #{skill}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into final_job.staff_needs(user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill)
+        values (#{userId}, #{departmentId}, #{applyDate}, #{address}, #{positionId}, #{entryDate}, #{needNumber}, #{reason}, #{responsibility}, #{degree}, #{highestAge}, #{minimumAge}, #{wedlock}, #{gender}, #{speciality}, #{foreignLanguages}, #{skill})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update final_job.staff_needs
+        <set>
+            <if test="userId != null">
+                user_id = #{userId},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId},
+            </if>
+            <if test="applyDate != null">
+                apply_date = #{applyDate},
+            </if>
+            <if test="address != null and address != ''">
+                address = #{address},
+            </if>
+            <if test="positionId != null">
+                position_id = #{positionId},
+            </if>
+            <if test="entryDate != null">
+                entry_date = #{entryDate},
+            </if>
+            <if test="needNumber != null">
+                need_number = #{needNumber},
+            </if>
+            <if test="reason != null">
+                reason = #{reason},
+            </if>
+            <if test="responsibility != null and responsibility != ''">
+                responsibility = #{responsibility},
+            </if>
+            <if test="degree != null">
+                degree = #{degree},
+            </if>
+            <if test="highestAge != null">
+                highest_age = #{highestAge},
+            </if>
+            <if test="minimumAge != null">
+                minimum_age = #{minimumAge},
+            </if>
+            <if test="wedlock != null">
+                wedlock = #{wedlock},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="speciality != null and speciality != ''">
+                speciality = #{speciality},
+            </if>
+            <if test="foreignLanguages != null and foreignLanguages != ''">
+                foreign_languages = #{foreignLanguages},
+            </if>
+            <if test="skill != null and skill != ''">
+                skill = #{skill},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from final_job.staff_needs where id = #{id}
+    </delete>
+
+</mapper>
