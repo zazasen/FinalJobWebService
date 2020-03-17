@@ -1,6 +1,7 @@
 package com.cyrus.final_job.entity;
 
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.enums.StaffNeedsPublishEnum;
 import com.cyrus.final_job.utils.Results;
 import lombok.Data;
 
@@ -89,6 +90,13 @@ public class StaffNeeds {
      */
     private String skill;
 
+
+    /**
+     * 0 未发布 1 已发布 2 招聘完成
+     */
+    private Integer publish;
+
+
     public Result checkParams() {
 
         if (Objects.isNull(this.departmentId)) {
@@ -115,6 +123,7 @@ public class StaffNeeds {
         if (Objects.isNull(this.degree)) {
             return Results.error("请选择最低学历");
         }
+        this.publish = StaffNeedsPublishEnum.UNKNOWN.getCode();
         return null;
     }
 }
