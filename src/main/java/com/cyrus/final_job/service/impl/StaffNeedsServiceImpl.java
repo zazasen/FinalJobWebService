@@ -169,4 +169,24 @@ public class StaffNeedsServiceImpl implements StaffNeedsService {
         staffNeedsDao.update(condition);
         return Results.createOk("操作成功");
     }
+
+    @Override
+    public ResultPage getPublishedStaffNeeds(JSONObject params) {
+        StaffNeedsQueryCondition condition = params.toJavaObject(StaffNeedsQueryCondition.class);
+        if (null == condition.getPageIndex() || condition.getPageIndex() <= 0) {
+            condition.setPageIndex(1);
+        }
+        if (condition.getPageSize() == null || condition.getPageSize() <= 0) {
+            condition.setPageSize(3);
+        }
+        condition.setOffset((condition.getPageIndex() - 1) * condition.getPageSize());
+        condition.setPublish(StaffNeedsPublishEnum.PUBLISHED.getCode());
+        List<StaffNeeds> list = staffNeedsDao.queryByQueryCondition(condition);
+        Long total = staffNeedsDao.queryCountByQueryCondition(condition);
+        List<StaffNeedsQueryVo> staffNeedsQueryVos = JSONArray.parseArray(JSONArray.toJSONString(list), StaffNeedsQueryVo.class);
+        for (StaffNeedsQueryVo vo : staffNeedsQueryVos) {
+            buildStaffNeedsQueryVo(vo);
+        }
+        return Results.createOk(total, staffNeedsQueryVos);
+    }
 }

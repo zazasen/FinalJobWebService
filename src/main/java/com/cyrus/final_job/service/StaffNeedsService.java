@@ -82,4 +82,6 @@ public interface StaffNeedsService {
 
 
     Result editStaffNeeds(JSONObject params);
+
+    ResultPage getPublishedStaffNeeds(JSONObject params);
 }

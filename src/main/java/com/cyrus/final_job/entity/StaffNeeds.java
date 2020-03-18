@@ -3,6 +3,7 @@ package com.cyrus.final_job.entity;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.enums.StaffNeedsPublishEnum;
 import com.cyrus.final_job.utils.Results;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -32,6 +33,7 @@ public class StaffNeeds {
     /**
      * 申请时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Timestamp applyDate;
     /**
      * 岗位地址
@@ -44,6 +46,7 @@ public class StaffNeeds {
     /**
      * 到岗日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Timestamp entryDate;
     /**
      * 招聘人数

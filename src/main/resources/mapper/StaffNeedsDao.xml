@@ -52,6 +52,9 @@
             <if test="departmentId != null">
                 and department_id = #{departmentId}
             </if>
+            <if test="publish != null">
+                and publish = #{publish}
+            </if>
         </where>
         order by publish
         limit #{offset}, #{pageSize}
@@ -63,6 +66,9 @@
         <where>
             <if test="departmentId != null">
                 and department_id = #{departmentId}
+            </if>
+            <if test="publish != null">
+                and publish = #{publish}
             </if>
         </where>
     </select>
