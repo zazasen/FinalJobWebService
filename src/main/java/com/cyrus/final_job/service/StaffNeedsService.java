@@ -3,6 +3,7 @@ package com.cyrus.final_job.service;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.StaffNeeds;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
 
 import java.util.List;
 
@@ -62,4 +63,20 @@ public interface StaffNeedsService {
      * @return
      */
     Result submitStaffNeed(JSONObject params);
+
+    /**
+     * 获取招聘看板数据
+     *
+     * @param params
+     * @return
+     */
+    ResultPage getStaffNeedsDate(JSONObject params);
+
+    /**
+     * 获取招聘详情
+     *
+     * @param params
+     * @return
+     */
+    Result getStaffNeedsDetail(JSONObject params);
 }

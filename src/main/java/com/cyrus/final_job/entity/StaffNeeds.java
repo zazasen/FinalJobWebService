@@ -97,6 +97,16 @@ public class StaffNeeds {
     private Integer publish;
 
 
+    /**
+     * 工作经历
+     */
+    private String experience;
+    /**
+     * 试用期
+     */
+    private Integer probationPeriod;
+
+
     public Result checkParams() {
 
         if (Objects.isNull(this.departmentId)) {
@@ -123,7 +133,7 @@ public class StaffNeeds {
         if (Objects.isNull(this.degree)) {
             return Results.error("请选择最低学历");
         }
-        this.publish = StaffNeedsPublishEnum.UNKNOWN.getCode();
+        this.publish = StaffNeedsPublishEnum.NO_PUBLISH.getCode();
         return null;
     }
 }

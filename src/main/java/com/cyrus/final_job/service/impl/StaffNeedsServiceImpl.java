@@ -1,12 +1,25 @@
 package com.cyrus.final_job.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.cyrus.final_job.dao.DepartmentDao;
+import com.cyrus.final_job.dao.PositionDao;
 import com.cyrus.final_job.dao.StaffNeedsDao;
+import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.entity.StaffNeeds;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.StaffNeedsQueryCondition;
+import com.cyrus.final_job.entity.vo.StaffNeedsQueryVo;
+import com.cyrus.final_job.enums.DegreeEnum;
+import com.cyrus.final_job.enums.GenderEnum;
+import com.cyrus.final_job.enums.RecruitReasonEnum;
+import com.cyrus.final_job.enums.WedlockEnum;
 import com.cyrus.final_job.service.StaffNeedsService;
 import com.cyrus.final_job.utils.Results;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -21,6 +34,15 @@ import java.util.List;
 public class StaffNeedsServiceImpl implements StaffNeedsService {
     @Resource
     private StaffNeedsDao staffNeedsDao;
+
+    @Autowired
+    private UserDao userDao;
+
+    @Autowired
+    private DepartmentDao departmentDao;
+
+    @Autowired
+    private PositionDao positionDao;
 
     /**
      * 通过ID查询单条数据
@@ -87,5 +109,58 @@ public class StaffNeedsServiceImpl implements StaffNeedsService {
         if (result != null) return result;
         staffNeedsDao.insert(staffNeeds);
         return Results.createOk("提交招聘需求成功");
+    }
+
+    @Override
+    public ResultPage getStaffNeedsDate(JSONObject params) {
+        StaffNeedsQueryCondition condition = params.toJavaObject(StaffNeedsQueryCondition.class);
+        condition.buildLimit();
+        List<StaffNeeds> list = staffNeedsDao.queryByQueryCondition(condition);
+        List<StaffNeedsQueryVo> staffNeedsQueryVos = JSONArray.parseArray(JSONArray.toJSONString(list), StaffNeedsQueryVo.class);
+        for (StaffNeedsQueryVo vo : staffNeedsQueryVos) {
+            buildStaffNeedsQueryVo(vo);
+        }
+        Long total = staffNeedsDao.queryCountByQueryCondition(condition);
+        return Results.createOk(total, staffNeedsQueryVos);
+    }
+
+    public void buildStaffNeedsQueryVo(StaffNeedsQueryVo vo) {
+        vo.setRealName(userDao.queryById(vo.getUserId()).getRealName());
+        vo.setDepartmentName(departmentDao.queryById(vo.getDepartmentId()).getName());
+        vo.setPositionName(positionDao.queryById(vo.getPositionId()).getPositionName());
+        vo.setReasonStr(RecruitReasonEnum.getEnumByCode(vo.getReason()).getDesc());
+        if (vo.getGender() == null) {
+            vo.setGenderStr("不限");
+        } else {
+            vo.setGenderStr(GenderEnum.getEnumByCode(vo.getGender()).getDesc());
+        }
+        vo.setDegreeStr(DegreeEnum.getEnumByCode(vo.getDegree()).getDesc() + "以上");
+        if (vo.getWedlock() == null) {
+            vo.setWedlockStr("不限");
+        } else {
+            vo.setWedlockStr(WedlockEnum.getEnumByCode(vo.getWedlock()).getDesc());
+        }
+        if (StringUtils.isEmpty(vo.getSpeciality())) {
+            vo.setSpeciality("不限");
+        }
+        if (StringUtils.isEmpty(vo.getForeignLanguages())) {
+            vo.setForeignLanguages("不限");
+        }
+        if (StringUtils.isEmpty(vo.getSkill())) {
+            vo.setSkill("不限");
+        }
+        if (StringUtils.isEmpty(vo.getExperience())) {
+            vo.setExperience("不限");
+        }
+    }
+
+    @Override
+    public Result getStaffNeedsDetail(JSONObject params) {
+        Integer id = params.getInteger("id");
+        if (id == null) return Results.error("id 不能为空");
+        StaffNeeds staffNeeds = staffNeedsDao.queryById(id);
+        StaffNeedsQueryVo vo = JSONObject.parseObject(JSONObject.toJSONString(staffNeeds), StaffNeedsQueryVo.class);
+        buildStaffNeedsQueryVo(vo);
+        return Results.createOk(vo);
     }
 }

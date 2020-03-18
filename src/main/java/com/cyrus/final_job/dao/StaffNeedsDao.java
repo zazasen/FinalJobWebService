@@ -1,6 +1,7 @@
 package com.cyrus.final_job.dao;
 
 import com.cyrus.final_job.entity.StaffNeeds;
+import com.cyrus.final_job.entity.condition.StaffNeedsQueryCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -30,6 +31,9 @@ public interface StaffNeedsDao {
      */
     List<StaffNeeds> queryAllByLimit(@Param("offset") int offset, @Param("limit") int limit);
 
+    List<StaffNeeds> queryByQueryCondition(StaffNeedsQueryCondition condition);
+
+    Long queryCountByQueryCondition(StaffNeedsQueryCondition condition);
 
     /**
      * 通过实体作为筛选条件查询
@@ -62,5 +66,4 @@ public interface StaffNeedsDao {
      * @return 影响行数
      */
     int deleteById(Integer id);
-
 }
