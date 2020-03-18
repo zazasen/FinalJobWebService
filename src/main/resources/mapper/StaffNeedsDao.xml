@@ -24,12 +24,14 @@
         <result property="publish" column="publish" jdbcType="INTEGER"/>
         <result property="experience" column="experience" jdbcType="VARCHAR"/>
         <result property="probationPeriod" column="probation_period" jdbcType="INTEGER"/>
+        <result property="salaryTop" column="salary_top" jdbcType="NUMERIC"/>
+        <result property="salaryLow" column="salary_low" jdbcType="NUMERIC"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="StaffNeedsMap">
         select
-          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period
+          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period, salary_top, salary_low
         from final_job.staff_needs
         where id = #{id}
     </select>
@@ -37,20 +39,21 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="StaffNeedsMap">
         select
-          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period
+          id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period, salary_top, salary_low
         from final_job.staff_needs
         limit #{offset}, #{limit}
     </select>
 
     <select id="queryByQueryCondition" resultMap="StaffNeedsMap">
         select
-        id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period
+        id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period, salary_top, salary_low
         from final_job.staff_needs
         <where>
             <if test="departmentId != null">
                 and department_id = #{departmentId}
             </if>
         </where>
+        order by publish
         limit #{offset}, #{pageSize}
     </select>
 
@@ -67,7 +70,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="StaffNeedsMap">
         select
-        id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period
+        id, user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period, salary_top, salary_low
         from final_job.staff_needs
         <where>
             <if test="id != null">
@@ -133,13 +136,19 @@
             <if test="probationPeriod != null">
                 and probation_period = #{probationPeriod}
             </if>
+            <if test="salaryTop != null">
+                and salary_top = #{salaryTop}
+            </if>
+            <if test="salaryLow != null">
+                and salary_low = #{salaryLow}
+            </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.staff_needs(user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period)
-        values (#{userId}, #{departmentId}, #{applyDate}, #{address}, #{positionId}, #{entryDate}, #{needNumber}, #{reason}, #{responsibility}, #{degree}, #{highestAge}, #{minimumAge}, #{wedlock}, #{gender}, #{speciality}, #{foreignLanguages}, #{skill}, #{publish}, #{experience}, #{probationPeriod})
+        insert into final_job.staff_needs(user_id, department_id, apply_date, address, position_id, entry_date, need_number, reason, responsibility, degree, highest_age, minimum_age, wedlock, gender, speciality, foreign_languages, skill, publish, experience, probation_period, salary_top, salary_low)
+        values (#{userId}, #{departmentId}, #{applyDate}, #{address}, #{positionId}, #{entryDate}, #{needNumber}, #{reason}, #{responsibility}, #{degree}, #{highestAge}, #{minimumAge}, #{wedlock}, #{gender}, #{speciality}, #{foreignLanguages}, #{skill}, #{publish}, #{experience}, #{probationPeriod}, #{salaryTop}, #{salaryLow})
     </insert>
 
     <!--通过主键修改数据-->
@@ -205,6 +214,12 @@
             </if>
             <if test="probationPeriod != null">
                 probation_period = #{probationPeriod},
+            </if>
+            <if test="salaryTop != null">
+                salary_top = #{salaryTop},
+            </if>
+            <if test="salaryLow != null">
+                salary_low = #{salaryLow},
             </if>
         </set>
         where id = #{id}

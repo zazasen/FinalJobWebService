@@ -11,10 +11,7 @@ import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.condition.StaffNeedsQueryCondition;
 import com.cyrus.final_job.entity.vo.StaffNeedsQueryVo;
-import com.cyrus.final_job.enums.DegreeEnum;
-import com.cyrus.final_job.enums.GenderEnum;
-import com.cyrus.final_job.enums.RecruitReasonEnum;
-import com.cyrus.final_job.enums.WedlockEnum;
+import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.StaffNeedsService;
 import com.cyrus.final_job.utils.Results;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,6 +149,7 @@ public class StaffNeedsServiceImpl implements StaffNeedsService {
         if (StringUtils.isEmpty(vo.getExperience())) {
             vo.setExperience("不限");
         }
+        vo.setPublishStr(StaffNeedsPublishEnum.getEnumByCode(vo.getPublish()).getDesc());
     }
 
     @Override
@@ -162,5 +160,13 @@ public class StaffNeedsServiceImpl implements StaffNeedsService {
         StaffNeedsQueryVo vo = JSONObject.parseObject(JSONObject.toJSONString(staffNeeds), StaffNeedsQueryVo.class);
         buildStaffNeedsQueryVo(vo);
         return Results.createOk(vo);
+    }
+
+    @Override
+    public Result editStaffNeeds(JSONObject params) {
+        StaffNeeds condition = params.toJavaObject(StaffNeeds.class);
+        if (condition.getId() == null) return Results.error("参数出错");
+        staffNeedsDao.update(condition);
+        return Results.createOk("操作成功");
     }
 }

@@ -13,4 +13,6 @@ public class StaffNeedsQueryVo extends StaffNeeds {
     private String degreeStr;
 
     private String wedlockStr;
+
+    private String publishStr;
 }

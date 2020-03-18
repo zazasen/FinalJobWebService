@@ -79,4 +79,7 @@ public interface StaffNeedsService {
      * @return
      */
     Result getStaffNeedsDetail(JSONObject params);
+
+
+    Result editStaffNeeds(JSONObject params);
 }

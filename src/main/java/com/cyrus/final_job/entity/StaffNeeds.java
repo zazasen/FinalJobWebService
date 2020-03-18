@@ -106,6 +106,15 @@ public class StaffNeeds {
      */
     private Integer probationPeriod;
 
+    /**
+     * 薪资上限
+     */
+    private Double salaryTop;
+    /**
+     * 薪资下限
+     */
+    private Double salaryLow;
+
 
     public Result checkParams() {
 

@@ -30,8 +30,13 @@ public class RecruitBoardController {
         return departmentService.getAllDepartment();
     }
 
-    @PostMapping("getStaffNeedsDetail")
+    @PostMapping("/getStaffNeedsDetail")
     public Result getStaffNeedsDetail(@RequestBody JSONObject params) {
         return staffNeedsService.getStaffNeedsDetail(params);
+    }
+
+    @PostMapping("/editStaffNeeds")
+    public Result editStaffNeeds(@RequestBody JSONObject params) {
+        return staffNeedsService.editStaffNeeds(params);
     }
 }
