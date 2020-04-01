@@ -33,7 +33,7 @@ public class QuartzConfig {
         bean.setJobDetail(checkInJobDetailFactoryBean().getObject());
 //        bean.setCronExpression("0 0 1 * * ? *"); //每天凌晨一点执行
 //        bean.setCronExpression("* * * * * ?"); //每秒
-        bean.setCronExpression("0 52 9 * * ? *");
+        bean.setCronExpression("0 00 11 * * ? *");
         return bean;
     }
 

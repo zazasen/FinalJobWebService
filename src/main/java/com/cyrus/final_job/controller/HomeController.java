@@ -3,8 +3,10 @@ package com.cyrus.final_job.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.InputResumeCondition;
 import com.cyrus.final_job.service.CheckInService;
 import com.cyrus.final_job.service.LeaveService;
+import com.cyrus.final_job.service.ResumeService;
 import com.cyrus.final_job.service.StaffNeedsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +30,9 @@ public class HomeController {
 
     @Autowired
     private StaffNeedsService staffNeedsService;
+
+    @Autowired
+    private ResumeService resumeService;
 
     @PostMapping("/getShouldBeWorkDays")
     public Result getShouldBeWorkDays() {
@@ -58,5 +63,11 @@ public class HomeController {
     @PostMapping("/getStaffNeedsDetail")
     public Result getStaffNeedsDetail(@RequestBody JSONObject params) {
         return staffNeedsService.getStaffNeedsDetail(params);
+    }
+
+    @PostMapping("/inputResume")
+    public Result inputResume(InputResumeCondition condition) {
+        return resumeService.inputResume(condition);
+
     }
 }

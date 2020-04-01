@@ -10,14 +10,13 @@ import com.cyrus.final_job.service.system.MenuService;
 import com.cyrus.final_job.utils.RedisUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.thymeleaf.TemplateEngine;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -98,12 +97,13 @@ public class FinalJobWebServiceTest {
     @Autowired
     TemplateEngine templateEngine;
 
+    @Value("${fastdfs.nginx.host}")
+    private String nginxHost;
+
+
     @Test
     public void contend(){
-        Timestamp timestamp = new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli());
-
-        LocalDate localDate = timestamp.toLocalDateTime().toLocalDate();
-        System.out.println(localDate.toString());
+        System.out.println(nginxHost);
     }
 
 }
