@@ -2,6 +2,7 @@ package com.cyrus.final_job.entity.condition;
 
 import com.cyrus.final_job.entity.Resume;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.enums.ResumeStatusEnum;
 import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
 import lombok.Data;
@@ -36,6 +37,7 @@ public class InputResumeCondition {
         resume.setIdCard(idCard);
         resume.setEmail(email);
         resume.setStaffNeedsId(staffNeedsId);
+        resume.setStatus(ResumeStatusEnum.SCREENING.getCode());
         resume.setCreateTime(DateUtils.getNowTime());
         return resume;
     }

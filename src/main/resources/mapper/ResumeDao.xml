@@ -5,18 +5,21 @@
     <resultMap type="com.cyrus.final_job.entity.Resume" id="ResumeMap">
         <result property="id" column="id" jdbcType="INTEGER"/>
         <result property="staffNeedsId" column="staff_needs_id" jdbcType="INTEGER"/>
+        <result property="departmentId" column="department_id" jdbcType="INTEGER"/>
+        <result property="positionId" column="position_id" jdbcType="INTEGER"/>
         <result property="name" column="name" jdbcType="VARCHAR"/>
         <result property="phone" column="phone" jdbcType="VARCHAR"/>
         <result property="email" column="email" jdbcType="VARCHAR"/>
         <result property="idCard" column="id_card" jdbcType="VARCHAR"/>
         <result property="url" column="url" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="ResumeMap">
         select
-          id, staff_needs_id, name, phone, email, id_card, url, create_time
+          id, staff_needs_id, department_id, position_id, name, phone, email, id_card, url, create_time, status
         from final_job.resume
         where id = #{id}
     </select>
@@ -24,15 +27,52 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="ResumeMap">
         select
-          id, staff_needs_id, name, phone, email, id_card, url, create_time
+          id, staff_needs_id, department_id, position_id, name, phone, email, id_card, url, create_time, status
         from final_job.resume
         limit #{offset}, #{limit}
     </select>
 
+
+    <select id="queryPageByCondition" resultMap="ResumeMap">
+        select
+        id, staff_needs_id, department_id, position_id, name, phone, email, id_card, url, create_time, status
+        from final_job.resume
+        <where>
+            <if test="departmentId != null">
+                and department_id = #{departmentId}
+            </if>
+            <if test="positionId != null">
+                and position_id = #{positionId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+        order by status
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryPageByConditionCount" resultType="long">
+        select count(*)
+        from final_job.resume
+        <where>
+            <if test="departmentId != null">
+                and department_id = #{departmentId}
+            </if>
+            <if test="positionId != null">
+                and position_id = #{positionId}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="ResumeMap">
         select
-          id, staff_needs_id, name, phone, email, id_card, url, create_time
+        id, staff_needs_id, department_id, position_id, name, phone, email, id_card, url, create_time, status
         from final_job.resume
         <where>
             <if test="id != null">
@@ -40,6 +80,12 @@
             </if>
             <if test="staffNeedsId != null">
                 and staff_needs_id = #{staffNeedsId}
+            </if>
+            <if test="departmentId != null">
+                and department_id = #{departmentId}
+            </if>
+            <if test="positionId != null">
+                and position_id = #{positionId}
             </if>
             <if test="name != null and name != ''">
                 and name = #{name}
@@ -59,13 +105,16 @@
             <if test="createTime != null">
                 and create_time = #{createTime}
             </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into final_job.resume(staff_needs_id, name, phone, email, id_card, url, create_time)
-        values (#{staffNeedsId}, #{name}, #{phone}, #{email}, #{idCard}, #{url}, #{createTime})
+        insert into final_job.resume(staff_needs_id, department_id, position_id, name, phone, email, id_card, url, create_time, status)
+        values (#{staffNeedsId}, #{departmentId}, #{positionId}, #{name}, #{phone}, #{email}, #{idCard}, #{url}, #{createTime}, #{status})
     </insert>
 
     <!--通过主键修改数据-->
@@ -74,6 +123,12 @@
         <set>
             <if test="staffNeedsId != null">
                 staff_needs_id = #{staffNeedsId},
+            </if>
+            <if test="departmentId != null">
+                department_id = #{departmentId},
+            </if>
+            <if test="positionId != null">
+                position_id = #{positionId},
             </if>
             <if test="name != null and name != ''">
                 name = #{name},
@@ -92,6 +147,9 @@
             </if>
             <if test="createTime != null">
                 create_time = #{createTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
             </if>
         </set>
         where id = #{id}

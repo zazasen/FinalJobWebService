@@ -1,7 +1,9 @@
 package com.cyrus.final_job.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.Resume;
 import com.cyrus.final_job.entity.base.Result;
+import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.condition.InputResumeCondition;
 
 import java.util.List;
@@ -62,4 +64,14 @@ public interface ResumeService {
      * @return
      */
     Result inputResume(InputResumeCondition condition);
+
+    /**
+     * 简历分页列表
+     *
+     * @param params
+     * @return
+     */
+    ResultPage getResumes(JSONObject params);
+
+    Result updateResumeStatus(JSONObject params);
 }

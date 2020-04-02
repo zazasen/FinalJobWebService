@@ -21,6 +21,16 @@ public class Resume {
      * 招聘需求表id
      */
     private Integer staffNeedsId;
+
+    /**
+     * 申请部门id
+     */
+    private Integer departmentId;
+
+    /**
+     * 申请职位
+     */
+    private Integer positionId;
     /**
      * 姓名
      */
@@ -45,4 +55,9 @@ public class Resume {
      * 创建时间
      */
     private Timestamp createTime;
+
+    /**
+     * 简历状态：0 筛选中，1 已通过 2 人才库 3 未通过
+     */
+    private Integer status;
 }
