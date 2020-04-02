@@ -10,9 +10,9 @@ public enum ResumeStatusEnum {
 
     UNKNOWN(-1, "未知"),
     SCREENING(0, "筛选中"),
-    FIRST_INTERVIEW(1, "一面中"),
-    SECOND_INTERVIEW(2, "二面中"),
-    HR_INTERVIEW(3, "HR面中"),
+    FIRST_INTERVIEW(1, "待一面"),
+    SECOND_INTERVIEW(2, "待二面"),
+    HR_INTERVIEW(3, "待HR面"),
     PASSED(4, "已通过"),
     TALENT_POOL(5, "人才库"),
     NOT_PASS(6, "未通过");
