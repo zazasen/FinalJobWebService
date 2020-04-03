@@ -6,6 +6,7 @@ import com.cyrus.final_job.dao.*;
 import com.cyrus.final_job.dao.system.RoleDao;
 import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.dao.system.UserRoleDao;
+import com.cyrus.final_job.entity.Contract;
 import com.cyrus.final_job.entity.Holiday;
 import com.cyrus.final_job.entity.Position;
 import com.cyrus.final_job.entity.base.Result;
@@ -76,6 +77,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RedisUtils redisUtils;
+
+    @Autowired
+    private ContractDao contractDao;
 
     /**
      * 通过ID查询单条数据
@@ -542,6 +546,13 @@ public class UserServiceImpl implements UserService {
         user.setWorkId(maxWorkId + 1);
         user.setWorkState(WorkStateEnum.IN.getCode());
         userDao.insert(user);
+
+        // 合同人員添加
+        Contract contract = new Contract();
+        contract.setUserId(user.getId());
+        contract.setConfirm(ConfirmStateEnum.NO_SIGN.getCode());
+        contractDao.insert(contract);
+
         // 员工入职时初始化其假期
         buildHoliday(user);
         return Results.createOk("添加成功");
