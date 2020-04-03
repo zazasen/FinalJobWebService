@@ -10,5 +10,6 @@ public class ContractCondition extends BasePageQuery {
     private Integer workId;
     private Integer departmentId;
     private Integer workState;
+    private Integer confirm;
 
 }

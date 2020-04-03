@@ -34,6 +34,53 @@
         limit #{offset}, #{limit}
     </select>
 
+    <select id="queryAllByCondition" resultMap="ContractMap">
+        select
+        contract.id, user_id, begin_time, end_time, content, confirm
+        from contract,user
+        where contract.user_id = user.id
+        <if test="workId != null">
+            and work_id = #{workId}
+        </if>
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+        <if test="workState != null">
+            and work_state = #{workState}
+        </if>
+        <if test="confirm != null">
+            and confirm = #{confirm}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%' + realName + '%'"/>
+            and real_name like #{realName}
+        </if>
+        order by contract.confirm,create_time desc
+        limit #{offset},#{pageSize}
+    </select>
+
+    <select id="queryAllByConditionCount" resultType="long">
+        select count(*)
+        from contract,user
+        where contract.user_id = user.id
+        <if test="workId != null">
+            and work_id = #{workId}
+        </if>
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+        <if test="workState != null">
+            and work_state = #{workState}
+        </if>
+        <if test="confirm != null">
+            and confirm = #{confirm}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%' + realName + '%'"/>
+            and real_name like #{realName}
+        </if>
+    </select>
+
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="ContractMap">
         select

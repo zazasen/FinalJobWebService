@@ -1,5 +1,6 @@
 package com.cyrus.final_job.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.AccountSetDao;
 import com.cyrus.final_job.dao.ContractDao;
@@ -22,6 +23,7 @@ import com.cyrus.final_job.utils.Results;
 import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -30,9 +32,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 员工合同表(Contract)表服务实现类
@@ -122,7 +122,7 @@ public class ContractServiceImpl implements ContractService {
     public String getContract(Integer userId) {
         Contract contract = contractDao.queryByUserId(userId);
         String process = null;
-        if (contract == null) {
+        if (StringUtils.isEmpty(contract.getContent())) {
             process = getContractMethod(userId, false);
         } else if (ConfirmStateEnum.READY_SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
             process = getContractMethod(userId, false);
@@ -134,7 +134,7 @@ public class ContractServiceImpl implements ContractService {
 
     /**
      * @param userId
-     * @param confirm 是否是员工确认合同
+     * @param confirm 员工是否确认合同
      * @return
      */
     private String getContractMethod(Integer userId, Boolean confirm) {
@@ -169,61 +169,40 @@ public class ContractServiceImpl implements ContractService {
     public ResultPage getAllContract(JSONObject params) {
         ContractCondition condition = params.toJavaObject(ContractCondition.class);
         condition.buildLimit();
-        List<User> userList = userDao.queryAllByContractCondition(condition);
-        List<ContractVo> contractVoList = new ArrayList<>();
-        for (User user : userList) {
-            ContractVo contractVo = new ContractVo();
-            contractVo.setRealName(user.getRealName());
-            contractVo.setUserId(user.getId());
-            contractVo.setWorkID(user.getWorkId());
-            contractVo.setPhone(user.getPhone());
-            contractVo.setEmail(user.getEmail());
+
+        List<Contract> contracts = contractDao.queryAllByCondition(condition);
+        List<ContractVo> vos = JSONArray.parseArray(JSONArray.toJSONString(contracts), ContractVo.class);
+        for (ContractVo vo : vos) {
+            User user = userDao.queryById(vo.getUserId());
+            vo.setRealName(user.getRealName());
+            vo.setUserId(user.getId());
+            vo.setWorkID(user.getWorkId());
+            vo.setPhone(user.getPhone());
+            vo.setEmail(user.getEmail());
             Department department = departmentDao.queryById(user.getDepartmentId());
-            contractVo.setDepartmentName(department.getName());
-            contractVo.setBeginContractTime(user.getBeginContractTime());
-            contractVo.setEndContractTime(user.getEndContractTime());
-            Contract contract = contractDao.queryByUserId(user.getId());
-            if (contract == null) {
-                contractVo.setSignState(ConfirmStateEnum.NO_SIGN.getDesc());
-                contractVo.setState(ConfirmStateEnum.NO_SIGN.getCode());
-            } else if (ConfirmStateEnum.READY_SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
-                contractVo.setSignState(ConfirmStateEnum.READY_SIGNED.getDesc());
-                contractVo.setState(ConfirmStateEnum.READY_SIGNED.getCode());
-            } else if (ConfirmStateEnum.SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
-                contractVo.setSignState(ConfirmStateEnum.SIGNED.getDesc());
-                contractVo.setState(ConfirmStateEnum.SIGNED.getCode());
-            }
-            contractVoList.add(contractVo);
+            vo.setDepartmentName(department.getName());
+            vo.setBeginContractTime(vo.getBeginTime());
+            vo.setEndContractTime(vo.getEndTime());
+            vo.setConfirmStr(ConfirmStateEnum.getEnumByCode(vo.getConfirm()).getDesc());
         }
-        List<ContractVo> res = contractVoList.stream().sorted(Comparator.comparing(ContractVo::getState)).collect(Collectors.toList());
-        Long total = userDao.queryAllByContractConditionCount(condition);
-        return Results.createOk(total, res);
+        Long total = contractDao.queryAllByConditionCount(condition);
+        return Results.createOk(total, vos);
     }
 
     @Override
     public Result addContract(JSONObject params) {
         Integer userId = params.getInteger("userId");
         Contract contract = contractDao.queryByUserId(userId);
-        if (contract != null && ConfirmStateEnum.SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
+        if (ConfirmStateEnum.SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
             return Results.error("发起失败，该员工已经签约");
-        } else if (contract == null) {
-            String process = getContract(userId);
-            contract = new Contract();
-            contract.setUserId(userId);
-            contract.setContent(process);
-            contract.setConfirm(ConfirmStateEnum.READY_SIGNED.getCode());
-            contract.setBeginTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
-            contract.setEndTime(new Timestamp(LocalDate.now().plusYears(2).atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
-            contractDao.insert(contract);
-            return Results.createOk("发起成功");
-        } else {
-            String process = getContract(userId);
-            contract.setContent(process);
-            contract.setBeginTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
-            contract.setEndTime(new Timestamp(LocalDate.now().plusYears(2).atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
-            contractDao.update(contract);
-            return Results.createOk("发起成功");
         }
+        String process = getContract(userId);
+        contract.setContent(process);
+        contract.setConfirm(ConfirmStateEnum.READY_SIGNED.getCode());
+        contract.setBeginTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
+        contract.setEndTime(new Timestamp(LocalDate.now().plusYears(2).atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
+        contractDao.update(contract);
+        return Results.createOk("发起成功");
     }
 
     @Override
@@ -237,11 +216,7 @@ public class ContractServiceImpl implements ContractService {
             ContractVo vo = new ContractVo();
             vo.setBeginContractTime(contract.getBeginTime());
             vo.setEndContractTime(contract.getEndTime());
-            if (ConfirmStateEnum.READY_SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
-                vo.setSignState(ConfirmStateEnum.READY_SIGNED.getDesc());
-            } else if (ConfirmStateEnum.SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
-                vo.setSignState(ConfirmStateEnum.SIGNED.getDesc());
-            }
+            vo.setConfirmStr(ConfirmStateEnum.getEnumByCode(contract.getConfirm()).getDesc());
             list.add(vo);
             return Results.createOk(list);
         }
@@ -264,6 +239,7 @@ public class ContractServiceImpl implements ContractService {
 
         User user = userDao.queryById(userId);
         user.setWorkState(WorkStateEnum.IN.getCode());
+        // 合同期限
         user.setContractTerm(2);
         user.setBeginContractTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
         user.setEndContractTime(new Timestamp(LocalDate.now().plusYears(2).atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));

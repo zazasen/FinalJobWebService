@@ -52,6 +52,13 @@ public interface UserDao {
     List<User> queryAll(User user);
 
     /**
+     * 无条件查找所有用户
+     *
+     * @return
+     */
+    List<User> selectAll();
+
+    /**
      * 新增数据
      *
      * @param user 实例对象

@@ -88,13 +88,20 @@ public class RoleServiceImpl implements RoleService {
     /**
      * 通过主键删除数据
      *
-     * @param params
+     * @param params roleId
      * @return res
      */
     @Override
     public Result deleteById(JSONObject params) {
         Integer id = params.getInteger("id");
         if (id == null) return Results.error("参数不能为空");
+
+        List<Integer> userIds = userRoleDao.queryUserIdByRoleId(id);
+        for (Integer userId : userIds) {
+            String key = RedisKeys.menusKey(userId);
+            redisUtils.delete(key);
+        }
+
         menuRoleDao.delByRoleId(id);
         userRoleDao.delByRoleId(id);
         roleDao.deleteById(id);
@@ -143,7 +150,7 @@ public class RoleServiceImpl implements RoleService {
         role.setUpdateTime(DateUtils.getNowTime());
         roleDao.update(role);
 
-        List<Integer> userIds = userRoleDao.queryByRoleId(role.getId());
+        List<Integer> userIds = userRoleDao.queryUserIdByRoleId(role.getId());
         for (Integer userId : userIds) {
             String key = RedisKeys.menusKey(userId);
             redisUtils.delete(key);
@@ -169,8 +176,14 @@ public class RoleServiceImpl implements RoleService {
     public Result delMulByIds(JSONObject params) {
         String s = JSONObject.toJSONString(params.getJSONArray("ids"));
         List<Integer> ids = JSONObject.parseArray(s, Integer.class);
+
         menuRoleDao.delMulByRoleIds(ids);
         for (Integer id : ids) {
+            List<Integer> userIds = userRoleDao.queryUserIdByRoleId(id);
+            for (Integer userId : userIds) {
+                String key = RedisKeys.menusKey(userId);
+                redisUtils.delete(key);
+            }
             userRoleDao.delByRoleId(id);
         }
         roleDao.delMulByIds(ids);
