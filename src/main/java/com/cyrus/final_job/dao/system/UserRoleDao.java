@@ -66,4 +66,6 @@ public interface UserRoleDao {
     int deleteByUserId(Integer userId);
 
     int delByRoleId(Integer id);
+
+    List<Integer> queryByRoleId(Integer id);
 }

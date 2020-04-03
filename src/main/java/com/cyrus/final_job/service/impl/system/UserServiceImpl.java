@@ -21,10 +21,7 @@ import com.cyrus.final_job.entity.vo.UserDetailVo;
 import com.cyrus.final_job.entity.vo.UserVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.system.UserService;
-import com.cyrus.final_job.utils.CommonUtils;
-import com.cyrus.final_job.utils.DateUtils;
-import com.cyrus.final_job.utils.Results;
-import com.cyrus.final_job.utils.UserUtils;
+import com.cyrus.final_job.utils.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -75,8 +72,10 @@ public class UserServiceImpl implements UserService {
     private PositionDao positionDao;
 
     @Autowired
-
     private HolidayDao holidayDao;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 通过ID查询单条数据
@@ -667,6 +666,8 @@ public class UserServiceImpl implements UserService {
         Integer[] roleIds = condition.getRoleIds();
         if (roleIds != null && roleIds.length > 0) {
             userRoleDao.deleteByUserId(condition.getId());
+            String key = RedisKeys.menusKey(condition.getId());
+            redisUtils.delete(key);
             for (Integer roleId : roleIds) {
                 UserRole userRole = new UserRole();
                 userRole.setUserId(condition.getId());

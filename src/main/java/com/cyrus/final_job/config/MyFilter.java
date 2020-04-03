@@ -26,6 +26,11 @@ public class MyFilter implements FilterInvocationSecurityMetadataSource {
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
         String requestUrl = ((FilterInvocation) object).getRequestUrl();
         List<Menu> allMenu = menuService.getAllMenuWithRole();
+        if (pathMatcher.match("/home/getPublishedStaffNeeds", requestUrl) ||
+                pathMatcher.match("/home/getStaffNeedsDetail", requestUrl) ||
+                pathMatcher.match("/home/inputResume", requestUrl)) {
+            return SecurityConfig.createList("ROLE_pass");
+        }
         for (Menu menu : allMenu) {
             if (pathMatcher.match(menu.getUrl(), requestUrl)) {
                 List<Role> roles = menu.getRoles();
@@ -33,7 +38,7 @@ public class MyFilter implements FilterInvocationSecurityMetadataSource {
                 for (int i = 0; i < roles.size(); i++) {
                     rolesStr[i] = roles.get(i).getRoleName();
                 }
-                if(rolesStr.length == 0) return SecurityConfig.createList("ROLE_NOALLOW");
+                if (rolesStr.length == 0) return SecurityConfig.createList("ROLE_NOALLOW");
                 return SecurityConfig.createList(rolesStr);
             }
         }

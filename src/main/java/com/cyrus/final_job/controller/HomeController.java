@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.condition.InputResumeCondition;
-import com.cyrus.final_job.service.CheckInService;
-import com.cyrus.final_job.service.LeaveService;
 import com.cyrus.final_job.service.ResumeService;
 import com.cyrus.final_job.service.StaffNeedsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 主页 controller
+ * 可以不用登录访问的链接
  */
 
 @RestController
@@ -23,43 +21,28 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     @Autowired
-    private CheckInService checkInService;
-
-    @Autowired
-    private LeaveService leaveService;
-
-    @Autowired
     private StaffNeedsService staffNeedsService;
 
     @Autowired
     private ResumeService resumeService;
 
-    @PostMapping("/getShouldBeWorkDays")
-    public Result getShouldBeWorkDays() {
-        return checkInService.getShouldBeWorkDays();
-    }
-
-
     /**
-     * 获取异常考勤,迟到早退情况
+     * 岗位列表（投递人可以看）
      *
+     * @param params
      * @return
      */
-    @PostMapping("/getExceptionCheckIn")
-    public Result getExceptionCheckIn() {
-        return checkInService.getExceptionCheckIn();
-    }
-
-    @PostMapping("/getLeaveInfo")
-    public Result getLeaveInfo() {
-        return leaveService.getLeaveInfo();
-    }
-
     @PostMapping("/getPublishedStaffNeeds")
     public ResultPage getPublishedStaffNeeds(@RequestBody JSONObject params) {
         return staffNeedsService.getPublishedStaffNeeds(params);
     }
 
+    /**
+     * 岗位详情（投递人可以看）
+     *
+     * @param params
+     * @return
+     */
     @PostMapping("/getStaffNeedsDetail")
     public Result getStaffNeedsDetail(@RequestBody JSONObject params) {
         return staffNeedsService.getStaffNeedsDetail(params);

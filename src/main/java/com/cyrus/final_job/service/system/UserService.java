@@ -87,6 +87,12 @@ public interface UserService extends UserDetailsService {
 
     Result importStaff(MultipartFile file);
 
+    /**
+     * 更新用户账号信息（更改密码，更改用户拥有的角色，更改账号状态）
+     *
+     * @param condition
+     * @return
+     */
     Result updateUserAccount(UserAccountCondition condition);
 
     ResultPage getUsers(JSONObject params);

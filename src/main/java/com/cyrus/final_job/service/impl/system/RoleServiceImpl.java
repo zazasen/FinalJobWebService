@@ -11,9 +11,7 @@ import com.cyrus.final_job.entity.system.Role;
 import com.cyrus.final_job.entity.system.UserRole;
 import com.cyrus.final_job.entity.system.condition.RoleCondition;
 import com.cyrus.final_job.service.system.RoleService;
-import com.cyrus.final_job.utils.DateUtils;
-import com.cyrus.final_job.utils.Results;
-import com.cyrus.final_job.utils.UserUtils;
+import com.cyrus.final_job.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +34,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private UserRoleDao userRoleDao;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     /**
      * 通过ID查询单条数据
@@ -141,11 +142,18 @@ public class RoleServiceImpl implements RoleService {
         if (result != null) return result;
         role.setUpdateTime(DateUtils.getNowTime());
         roleDao.update(role);
+
+        List<Integer> userIds = userRoleDao.queryByRoleId(role.getId());
+        for (Integer userId : userIds) {
+            String key = RedisKeys.menusKey(userId);
+            redisUtils.delete(key);
+        }
+
         menuRoleDao.delByRoleId(role.getId());
         String selectKeys = JSONObject.toJSONString(params.getJSONArray("selectKeys"));
         List<Integer> menuIds = JSONObject.parseArray(selectKeys, Integer.class);
         addMenuRole(menuIds, role);
-        return Results.createOk("添加成功");
+        return Results.createOk("修改成功");
     }
 
     private void addMenuRole(List<Integer> menuIds, Role role) {

@@ -75,4 +75,8 @@
         delete from final_job.user_role where role_id = #{userId}
     </delete>
 
+
+    <select id="queryByRoleId" resultType="int">
+        select distinct user_id from final_job.user_role where role_id = #{id}
+    </select>
 </mapper>

@@ -5,9 +5,12 @@ import com.cyrus.final_job.dao.DepartmentDao;
 import com.cyrus.final_job.dao.NationDao;
 import com.cyrus.final_job.dao.PoliticsStatusDao;
 import com.cyrus.final_job.dao.system.MenuDao;
+import com.cyrus.final_job.dao.system.RoleDao;
+import com.cyrus.final_job.entity.system.Role;
 import com.cyrus.final_job.service.DepartmentService;
 import com.cyrus.final_job.service.system.MenuService;
-import com.cyrus.final_job.utils.RedisUtil;
+import com.cyrus.final_job.utils.RedisKeys;
+import com.cyrus.final_job.utils.RedisUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,9 +20,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.thymeleaf.TemplateEngine;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 @SpringBootTest
 public class FinalJobWebServiceTest {
@@ -70,22 +71,22 @@ public class FinalJobWebServiceTest {
     RedisTemplate redisTemplate;
 
     @Autowired
-    RedisUtil redisUtil;
+    private RoleDao roleDao;
+
+    @Autowired
+    private RedisUtils redisUtils;
 
     @Test
     public void setValue() {
-        Map<String,String> map = new HashMap<>();
-        map.put("hhh","1");
-        redisUtil.hPutAll("hashTest",map);
-        redisUtil.expire("hashTest",10, TimeUnit.SECONDS);
-        Map<Object, Object> hashTest = redisUtil.hGetAll("hashTest");
-        System.out.println(hashTest.get("hhh"));
+        List<Role> roles = roleDao.queryAll(new Role());
+        redisUtils.set("roleTest", roles);
     }
 
     @Test
-    void getValue() {
-        Map<Object, Object> hashTest = redisUtil.hGetAll("hashTest");
-        System.out.println(hashTest);
+    public void getValue() {
+        String s = RedisKeys.menusKey(1);
+        String roleTest = redisUtils.get(s);
+        System.out.println(roleTest);
     }
 
 

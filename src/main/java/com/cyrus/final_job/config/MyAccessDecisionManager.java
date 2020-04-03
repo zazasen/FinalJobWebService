@@ -3,6 +3,7 @@ package com.cyrus.final_job.config;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,11 +20,13 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
             // 这里假设该资源登录之后即可访问，不需要权限，当然需要根据实际情况判断
             if ("ROLE_login".equals(configAttribute.getAttribute())) {
                 // 匿名用户，没登陆
-//                if (authentication instanceof AnonymousAuthenticationToken) {
-//                    throw new AccessDeniedException("尚未登录，请登录");
-//                } else {
-//                    return;
-//                }
+                if (authentication instanceof AnonymousAuthenticationToken) {
+                    throw new AccessDeniedException("尚未登录，请登录");
+                } else {
+                    return;
+                }
+            }
+            if ("ROLE_pass".equals(configAttribute.getAttribute())) {
                 return;
             }
 

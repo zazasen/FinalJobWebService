@@ -17,12 +17,6 @@ public class StaffMyAttendanceController {
     @Autowired
     private CheckInService checkInService;
 
-    @GetMapping("/calendarShow")
-    public Result calendarShow() {
-        return checkInService.calendarShow();
-    }
-
-
     /**
      * 补卡（签到补卡、签退补卡）
      *
@@ -42,20 +36,5 @@ public class StaffMyAttendanceController {
     @PostMapping("/getAttendanceRecord")
     public ResultPage getAttendanceRecord(@RequestBody JSONObject params) {
         return checkInService.getAttendanceRecord(params);
-    }
-
-    @PostMapping("/signIn")
-    public Result signIn() {
-        return checkInService.signIn();
-    }
-
-    @PostMapping("/signOut")
-    public Result signOut() {
-        return checkInService.signOut();
-    }
-
-    @GetMapping("/signType")
-    public Result signType() {
-        return checkInService.signType();
     }
 }

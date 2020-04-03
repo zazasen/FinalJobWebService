@@ -4,6 +4,7 @@ package com.cyrus.final_job.controller.hr;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.service.DepartmentService;
 import com.cyrus.final_job.service.NationService;
 import com.cyrus.final_job.service.PoliticsStatusService;
 import com.cyrus.final_job.service.PositionService;
@@ -32,6 +33,9 @@ public class StaffManagerController {
 
     @Autowired
     private PoliticsStatusService politicsStatusService;
+
+    @Autowired
+    private DepartmentService departmentService;
 
     @PostMapping("/getStaff")
     public ResultPage getStaff(@RequestBody JSONObject params) {
@@ -81,6 +85,11 @@ public class StaffManagerController {
     @PostMapping("/importStaff")
     public Result importStaff(MultipartFile file){
         return userService.importStaff(file);
+    }
+
+    @GetMapping("/getAllDepartment")
+    public Result getAllDepartment() {
+        return departmentService.getAllDepartment();
     }
 
 }
