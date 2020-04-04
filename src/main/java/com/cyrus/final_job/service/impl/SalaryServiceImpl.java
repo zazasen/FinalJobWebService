@@ -344,6 +344,7 @@ public class SalaryServiceImpl implements SalaryService {
                     DateUtils.getCurrentMonthFirstDay(),
                     DateUtils.getCurrentMonthLasterDay());
             salaryVo.setRewardAndPunishes(list);
+            salaryVo.setCreateTimeStr(salaryVo.getCreateTime().toLocalDateTime().toLocalDate().toString());
         }
         Long total = salaryDao.queryOneByConditionCount(condition);
         return Results.createOk(total, salaryVos);

@@ -15,4 +15,6 @@ public class SalaryVo extends Salary {
     private List<RewardAndPunish> rewardAndPunishes;
 
     private String departmentName;
+
+    private String createTimeStr;
 }

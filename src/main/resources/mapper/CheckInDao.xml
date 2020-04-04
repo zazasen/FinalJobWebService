@@ -35,17 +35,24 @@
 
     <select id="queryAllByCondition" resultMap="CheckInMap">
         select
-        id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, create_time,
+        check_in.id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type, check_in.create_time,
         work_hours
-        from final_job.check_in
-        where enabled = true
+        from check_in,user
+        where check_in.user_id = user.id and check_in.enabled = true
         <if test="userId != null">
             and user_id = #{userId}
         </if>
         <if test="beginTime != null and tailTime != null">
-            and create_time between #{beginTime} and #{tailTime}
+            and check_in.create_time between #{beginTime} and #{tailTime}
         </if>
-        order by create_time desc
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%'+realName+'%'"/>
+            and real_name like #{realName}
+        </if>
+        order by check_in.create_time desc
         limit #{offset}, #{pageSize}
     </select>
 
@@ -64,13 +71,20 @@
 
     <select id="queryAllByConditionCount" resultType="long">
         select count(*)
-        from final_job.check_in
-        where enabled = true
+        from check_in,user
+        where check_in.user_id = user.id and check_in.enabled = true
         <if test="userId != null">
             and user_id = #{userId}
         </if>
         <if test="beginTime != null and tailTime != null">
-            and create_time between #{beginTime} and #{tailTime}
+            and check_in.create_time between #{beginTime} and #{tailTime}
+        </if>
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%'+realName+'%'"/>
+            and real_name like #{realName}
         </if>
     </select>
 

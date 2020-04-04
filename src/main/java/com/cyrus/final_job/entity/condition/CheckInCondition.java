@@ -10,6 +10,8 @@ public class CheckInCondition extends BasePageQuery {
     private Timestamp startTime;
     private Timestamp endTime;
     private Integer userId;
+    private String realName;
+    private Integer departmentId;
 
     private String beginTime;
     private String tailTime;
