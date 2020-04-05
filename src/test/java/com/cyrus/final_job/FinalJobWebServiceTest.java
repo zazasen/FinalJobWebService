@@ -78,7 +78,7 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void setValue() {
-        List<Role> roles = roleDao.queryAll(new Role());
+        List<Role> roles = null;
         redisUtils.set("roleTest", roles);
     }
 

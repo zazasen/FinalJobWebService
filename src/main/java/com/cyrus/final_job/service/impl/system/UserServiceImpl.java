@@ -92,18 +92,6 @@ public class UserServiceImpl implements UserService {
         return this.userDao.queryById(id);
     }
 
-    /**
-     * 查询多条数据
-     *
-     * @param offset 查询起始位置
-     * @param limit  查询条数
-     * @return 对象列表
-     */
-    @Override
-    public List<User> queryAllByLimit(int offset, int limit) {
-        return this.userDao.queryAllByLimit(offset, limit);
-    }
-
     @Override
     public ResultPage getStaff(JSONObject params) {
         UserCondition userCondition = params.toJavaObject(UserCondition.class);

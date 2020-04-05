@@ -9,8 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 /**
  * 用户表(User)表服务接口
  *
@@ -26,15 +24,6 @@ public interface UserService extends UserDetailsService {
      * @return 实例对象
      */
     User queryById(Integer id);
-
-    /**
-     * 查询多条数据
-     *
-     * @param offset 查询起始位置
-     * @param limit  查询条数
-     * @return 对象列表
-     */
-    List<User> queryAllByLimit(int offset, int limit);
 
     /**
      * 新增数据

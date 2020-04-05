@@ -14,6 +14,7 @@ import com.cyrus.final_job.utils.Results;
 import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -111,7 +112,9 @@ public class MenuServiceImpl implements MenuService {
         if (StringUtils.isEmpty(menusStr)) {
             List<Menu> menus = menuDao.getMenusByUserId(userId);
             res = menus.stream().sorted(Comparator.comparing(Menu::getId)).collect(Collectors.toList());
-            redisUtils.set(key, res);
+            if(!CollectionUtils.isEmpty(res)){
+                redisUtils.set(key, res);
+            }
         } else {
             res = JSONArray.parseArray(menusStr, Menu.class);
         }

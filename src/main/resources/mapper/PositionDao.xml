@@ -35,10 +35,6 @@
             <if test="id != null">
                 and id = #{id}
             </if>
-            <if test="positionName != null and positionName != ''">
-                <bind name="positionName" value="'%' + positionName + '%'"/>
-                and position_name like #{positionName}
-            </if>
             <if test="positionLevel != null">
                 and position_level = #{positionLevel}
             </if>
@@ -50,6 +46,10 @@
             </if>
             <if test="remark != null">
                 and remark = #{remark}
+            </if>
+            <if test="positionName != null and positionName != ''">
+                <bind name="positionName" value="'%' + positionName + '%'"/>
+                and position_name like #{positionName}
             </if>
         </where>
         limit #{offset}, #{pageSize}

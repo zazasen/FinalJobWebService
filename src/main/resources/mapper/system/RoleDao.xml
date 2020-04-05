@@ -28,16 +28,16 @@
     </select>
 
     <select id="query" resultMap="RoleMap">
-        <bind name="roleName" value="'%' + roleCondition.roleName + '%'"/>
-        <bind name="roleZh" value="'%' + roleCondition.roleZh + '%'"/>
         select
         id, role_name, role_zh, remark, create_time, update_time
         from final_job.role
         <where>
             <if test="roleCondition.roleName != null and roleCondition.roleName != ''">
+                <bind name="roleName" value="'%' + roleCondition.roleName + '%'"/>
                 and role_name like #{roleName}
             </if>
             <if test="roleCondition.roleZh != null and roleCondition.roleZh != ''">
+                <bind name="roleZh" value="'%' + roleCondition.roleZh + '%'"/>
                 and role_zh like #{roleZh}
             </if>
         </where>
@@ -45,14 +45,14 @@
     </select>
 
     <select id="queryCount" resultType="long">
-        <bind name="roleName" value="'%' + roleCondition.roleName + '%'"/>
-        <bind name="roleZh" value="'%' + roleCondition.roleZh + '%'"/>
         select count(*) from final_job.role
         <where>
             <if test="roleCondition.roleName != null and roleCondition.roleName != ''">
+                <bind name="roleName" value="'%' + roleCondition.roleName + '%'"/>
                 and role_name like #{roleName}
             </if>
             <if test="roleCondition.roleZh != null and roleCondition.roleZh != ''">
+                <bind name="roleZh" value="'%' + roleCondition.roleZh + '%'"/>
                 and role_zh like #{roleZh}
             </if>
         </where>
