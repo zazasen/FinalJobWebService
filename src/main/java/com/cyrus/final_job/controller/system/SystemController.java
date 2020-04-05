@@ -1,14 +1,14 @@
 package com.cyrus.final_job.controller.system;
 
+import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.service.CheckInService;
 import com.cyrus.final_job.service.LeaveService;
 import com.cyrus.final_job.service.system.MenuService;
+import com.cyrus.final_job.service.system.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 需要登录但是不需要指定角色的链接
@@ -25,6 +25,25 @@ public class SystemController {
 
     @Autowired
     private LeaveService leaveService;
+
+
+    @Autowired
+    private UserService userService;
+
+    @PostMapping("/getMyInfo")
+    public Result getMyInfo(@RequestBody JSONObject params) {
+        return userService.getMyInfo(params);
+    }
+
+    @PostMapping("/updatePassword")
+    public Result updatePassword(@RequestBody JSONObject params){
+        return userService.updatePassword(params);
+    }
+
+    @PostMapping("/updateUserFace")
+    public Result updateUserFace(MultipartFile file,Integer id){
+        return userService.updateUserFace(file,id);
+    }
 
     @GetMapping("/menu")
     public Result getAllMenus() {

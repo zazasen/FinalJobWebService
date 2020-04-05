@@ -87,4 +87,29 @@ public interface UserService extends UserDetailsService {
     ResultPage getUsers(JSONObject params);
 
     Result getAllUsersExceptOne();
+
+    /**
+     * 获取个人信息
+     *
+     * @param params
+     * @return
+     */
+    Result getMyInfo(JSONObject params);
+
+    /**
+     * 更新密码
+     *
+     * @param params
+     * @return
+     */
+    Result updatePassword(JSONObject params);
+
+    /**
+     * 更新用户头像
+     *
+     * @param file
+     * @param id
+     * @return
+     */
+    Result updateUserFace(MultipartFile file, Integer id);
 }

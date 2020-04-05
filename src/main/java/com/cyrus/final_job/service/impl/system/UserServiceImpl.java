@@ -25,13 +25,16 @@ import com.cyrus.final_job.service.system.UserService;
 import com.cyrus.final_job.utils.*;
 import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
@@ -80,6 +83,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ContractDao contractDao;
+
+    @Value("${fastdfs.nginx.host}")
+    private String nginxHost;
 
     /**
      * 通过ID查询单条数据
@@ -700,5 +706,64 @@ public class UserServiceImpl implements UserService {
             userVos.add(vo);
         }
         return Results.createOk(userVos);
+    }
+
+
+    @Override
+    public Result getMyInfo(JSONObject params) {
+        Integer userId = params.getInteger("userId");
+        if (Objects.isNull(userId)) {
+            return Results.error("userId 不能为空");
+        }
+        User user = userDao.queryById(userId);
+        UserVo vo = new UserVo();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setUserFace(user.getUserFace());
+        vo.setRealName(user.getRealName());
+        vo.setEnabled(user.isEnabled());
+        vo.setDepartmentName(departmentDao.queryById(user.getDepartmentId()).getName());
+        vo.setPositionName(positionDao.queryById(user.getPositionId()).getPositionName());
+        return Results.createOk(vo);
+    }
+
+    @Override
+    public Result updatePassword(JSONObject params) {
+        Integer userId = params.getInteger("userId");
+        if (Objects.isNull(userId)) {
+            return Results.error("userId 不能为空");
+        }
+        String oldPassword = params.getString("oldPassword");
+        if (StringUtils.isEmpty(oldPassword)) {
+            return Results.error("原密码不能为空");
+        }
+        String newPassword = params.getString("newPassword");
+        if (StringUtils.isEmpty(newPassword)) {
+            return Results.error("新密码不能为空");
+        }
+        String confirmPassword = params.getString("confirmPassword");
+        if (StringUtils.isEmpty(confirmPassword)) {
+            return Results.error("确认密码不能为空");
+        }
+        if (!Objects.equals(newPassword, confirmPassword)) {
+            return Results.error("两次密码不相同");
+        }
+        User user = userDao.queryById(userId);
+        if (!new BCryptPasswordEncoder().matches(oldPassword, user.getPassword())) {
+            return Results.error("原密码输入错误，请重新输入");
+        }
+        user.setPassword(CommonUtils.getPassword(newPassword));
+        userDao.update(user);
+        return Results.createOk("密码更改成功");
+    }
+
+    @Override
+    public Result updateUserFace(MultipartFile file, Integer id) {
+        User user = userDao.queryById(id);
+        String fileId = FastDFSUtils.upload(file);
+        String url = nginxHost + fileId;
+        user.setUserFace(url);
+        userDao.update(user);
+        return Results.createOk("更新成功");
     }
 }

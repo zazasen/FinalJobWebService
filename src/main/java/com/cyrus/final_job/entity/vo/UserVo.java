@@ -23,4 +23,8 @@ public class UserVo {
 
 
     private Boolean enabled;
+
+    private String departmentName;
+
+    private String positionName;
 }

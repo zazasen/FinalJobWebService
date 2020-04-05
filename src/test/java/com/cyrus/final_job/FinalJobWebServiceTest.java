@@ -9,6 +9,7 @@ import com.cyrus.final_job.dao.system.RoleDao;
 import com.cyrus.final_job.entity.system.Role;
 import com.cyrus.final_job.service.DepartmentService;
 import com.cyrus.final_job.service.system.MenuService;
+import com.cyrus.final_job.utils.CommonUtils;
 import com.cyrus.final_job.utils.RedisKeys;
 import com.cyrus.final_job.utils.RedisUtils;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,7 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void contend(){
-        System.out.println(nginxHost);
+        System.out.println(CommonUtils.getPassword("123456"));
     }
 
 }

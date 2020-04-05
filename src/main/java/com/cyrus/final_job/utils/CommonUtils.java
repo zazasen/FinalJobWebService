@@ -14,8 +14,8 @@ import java.util.regex.Pattern;
 
 public class CommonUtils {
 
-    public static String getPassword(String username) {
-        return new BCryptPasswordEncoder().encode(username);
+    public static String getPassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
     }
 
     public static long doubleToLong(Double d) {
