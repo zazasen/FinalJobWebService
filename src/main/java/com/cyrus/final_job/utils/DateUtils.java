@@ -2,15 +2,37 @@ package com.cyrus.final_job.utils;
 
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
+import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Calendar;
 import java.util.Date;
 
 public class DateUtils {
+
+
+    /**
+     * 获取当天上班时间
+     *
+     * @return
+     */
+    public static Timestamp getBeginWorkTime() {
+        LocalDateTime localDateTime = LocalDateTime.of(LocalDateTime.now().getYear(),
+                LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 10, 00);
+        Date date = Date.from(localDateTime.toInstant(ZoneOffset.of("+8")));
+        return new Timestamp(date.getTime());
+    }
+
+    /**
+     * 获取当天下班时间
+     *
+     * @return
+     */
+    public static Timestamp getEndWorkTime() {
+        LocalDateTime localDateTime = LocalDateTime.of(LocalDateTime.now().getYear(),
+                LocalDateTime.now().getMonth(), LocalDateTime.now().getDayOfMonth(), 19, 00);
+        Date date = Date.from(localDateTime.toInstant(ZoneOffset.of("+8")));
+        return new Timestamp(date.getTime());
+    }
 
     public static Timestamp getNowTime() {
         Date date = new Date();

@@ -254,8 +254,6 @@ public class DepartmentServiceImpl implements DepartmentService {
         return list;
     }
 
-
-
     /**
      * 递归部门数获取员工
      *

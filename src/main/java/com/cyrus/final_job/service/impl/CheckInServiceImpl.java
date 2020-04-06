@@ -18,17 +18,17 @@ import com.cyrus.final_job.entity.vo.CheckInStatisticsVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.CheckInService;
-import com.cyrus.final_job.utils.*;
+import com.cyrus.final_job.utils.CommonUtils;
+import com.cyrus.final_job.utils.DateUtils;
+import com.cyrus.final_job.utils.Results;
+import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 签到表(CheckIn)表服务实现类
@@ -439,5 +439,22 @@ public class CheckInServiceImpl implements CheckInService {
         vos.add(vo2);
         vos.add(vo3);
         return Results.createOk(vos);
+    }
+
+    @Override
+    public Result updateCheckIn(JSONObject params) {
+        Integer id = params.getInteger("id");
+        if (Objects.isNull(id)) {
+            return Results.error("id 不能为空");
+        }
+        CheckIn checkIn = checkInDao.queryById(id);
+        checkIn.setStartTime(DateUtils.getBeginWorkTime());
+        checkIn.setStartType(SignInTypeEnum.NORMAL.getCode());
+        checkIn.setEndTime(DateUtils.getEndWorkTime());
+        checkIn.setEndType(SignInTypeEnum.NORMAL.getCode());
+        checkIn.setSignType(SignTypeEnum.FULL.getCode());
+        checkIn.setWorkHours(DateUtils.getGapTime(checkIn.getStartTime().toLocalDateTime(), checkIn.getEndTime().toLocalDateTime()));
+        checkInDao.update(checkIn);
+        return Results.createOk("人工补卡成功");
     }
 }

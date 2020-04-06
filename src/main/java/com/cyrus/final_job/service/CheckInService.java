@@ -117,4 +117,12 @@ public interface CheckInService {
      * @return
      */
     Result getExceptionCheckIn();
+
+    /**
+     * 手动补卡
+     *
+     * @param params
+     * @return
+     */
+    Result updateCheckIn(JSONObject params);
 }
