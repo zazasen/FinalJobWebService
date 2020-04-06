@@ -34,7 +34,17 @@ public class HrContractController {
     }
 
     @PostMapping("/addContract")
-    public Result addContract(@RequestBody  JSONObject params) {
+    public Result addContract(@RequestBody JSONObject params) {
         return contractService.addContract(params);
+    }
+
+    /**
+     * 续签
+     * @param params
+     * @return
+     */
+    @PostMapping("/renewalContract")
+    public Result renewalContract(@RequestBody JSONObject params) {
+        return contractService.renewalContract(params);
     }
 }

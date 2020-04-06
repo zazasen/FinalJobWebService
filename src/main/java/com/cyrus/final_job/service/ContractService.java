@@ -92,4 +92,11 @@ public interface ContractService {
      */
     Result confirmAdd();
 
+    /**
+     * 续签
+     *
+     * @param params
+     * @return
+     */
+    Result renewalContract(JSONObject params);
 }

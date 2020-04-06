@@ -206,6 +206,22 @@ public class ContractServiceImpl implements ContractService {
     }
 
     @Override
+    public Result renewalContract(JSONObject params) {
+        Integer userId = params.getInteger("userId");
+        Contract contract = contractDao.queryByUserId(userId);
+        if (!ConfirmStateEnum.SIGNED.equals(ConfirmStateEnum.getEnumByCode(contract.getConfirm()))) {
+            return Results.error("续签失败，该员工还没有尚未发起合同");
+        }
+        String process = getContractMethod(userId, false);
+        contract.setContent(process);
+        contract.setConfirm(ConfirmStateEnum.READY_SIGNED.getCode());
+        contract.setBeginTime(new Timestamp(LocalDate.now().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
+        contract.setEndTime(new Timestamp(LocalDate.now().plusYears(2).atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
+        contractDao.update(contract);
+        return Results.createOk("发起续签成功");
+    }
+
+    @Override
     public Result getMyContract() {
         int userId = UserUtils.getCurrentUserId();
         Contract contract = contractDao.queryByUserId(userId);
@@ -213,7 +229,7 @@ public class ContractServiceImpl implements ContractService {
             return Results.createOk(null);
         } else {
             List<ContractVo> list = new ArrayList<>();
-            ContractVo vo = new ContractVo();
+            ContractVo vo = JSONObject.parseObject(JSONObject.toJSONString(contract), ContractVo.class);
             vo.setBeginContractTime(contract.getBeginTime());
             vo.setEndContractTime(contract.getEndTime());
             vo.setConfirmStr(ConfirmStateEnum.getEnumByCode(contract.getConfirm()).getDesc());

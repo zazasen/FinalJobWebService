@@ -37,4 +37,9 @@ public class Contract {
     * 员工是否已经确认了该合同
     */
     private Integer confirm;
+
+    /**
+     * 合同是否有效 0 无效 1 有效
+     */
+    private Integer enabled;
 }
