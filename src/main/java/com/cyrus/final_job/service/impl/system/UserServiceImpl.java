@@ -24,6 +24,7 @@ import com.cyrus.final_job.enums.*;
 import com.cyrus.final_job.service.system.UserService;
 import com.cyrus.final_job.utils.*;
 import org.apache.poi.hssf.usermodel.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -86,6 +87,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${fastdfs.nginx.host}")
     private String nginxHost;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 通过ID查询单条数据
@@ -549,6 +553,7 @@ public class UserServiceImpl implements UserService {
 
         // 员工入职时初始化其假期
         buildHoliday(user);
+        rabbitTemplate.convertAndSend("cyrus.mail.welcome",user);
         return Results.createOk("添加成功");
     }
 
