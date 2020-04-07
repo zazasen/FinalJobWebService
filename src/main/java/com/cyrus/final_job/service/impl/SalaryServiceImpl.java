@@ -223,7 +223,7 @@ public class SalaryServiceImpl implements SalaryService {
             salary.setBasicSalary(accountSet.getBasicSalary());
 
             // 每月要出勤的天数
-            Integer days = CommonUtils.shouldBeWorkDays();
+            Integer days = CommonUtils.shouldBeWorkDays(LocalDate.now());
             // 出勤天数够了
             if ((workDays + leaveDays) >= days) {
                 BigDecimal workTime = new BigDecimal(workedTime);

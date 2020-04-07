@@ -83,8 +83,7 @@ public class CommonUtils {
         return matcher.find();
     }
 
-    public static Integer shouldBeWorkDays() {
-        LocalDate now = LocalDate.now();
+    public static Integer shouldBeWorkDays(LocalDate now) {
         // 本月第一天
         LocalDate first = now.with(TemporalAdjusters.firstDayOfMonth());
         // 本月最后一天

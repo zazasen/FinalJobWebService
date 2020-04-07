@@ -27,6 +27,14 @@
         where user_id = #{UserId}
     </select>
 
+    <select id="getMyContract" resultMap="ContractMap">
+        select
+          id, user_id, begin_time, end_time, content, confirm, enabled
+        from final_job.contract
+        where user_id = #{UserId}
+        and confirm != 0
+    </select>
+
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="ContractMap">
         select

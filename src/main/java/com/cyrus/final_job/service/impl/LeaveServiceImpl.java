@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -187,10 +186,18 @@ public class LeaveServiceImpl implements LeaveService {
     }
 
     @Override
-    public Result getLeaveInfo() {
+    public Result getLeaveInfo(JSONObject params) {
+        Timestamp month = params.getObject("month", Timestamp.class);
         int userId = UserUtils.getCurrentUserId();
-        Timestamp start = new Timestamp(DateUtils.getCurrentMonthFirstDay().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli());
-        Timestamp end = new Timestamp(DateUtils.getCurrentMonthLasterDay().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli());
+        Timestamp start = null;
+        Timestamp end = null;
+        if (Objects.isNull(month)) {
+            start = DateUtils.LocalDate2Timestamp(DateUtils.getCurrentMonthFirstDay());
+            end = DateUtils.LocalDate2Timestamp(DateUtils.getCurrentMonthLasterDay());
+        } else {
+            start = DateUtils.LocalDate2Timestamp(DateUtils.getMonthFirstDay(month.toLocalDateTime().toLocalDate()));
+            end = DateUtils.LocalDate2Timestamp(DateUtils.getMonthLasteDay(month.toLocalDateTime().toLocalDate()));
+        }
         List<Leave> leaveInfo = leaveDao.queryLeaveInfo(userId, start, end);
         List<LeaveInfoVo> leaveInfoVos = new ArrayList<>();
         for (Leave leave : leaveInfo) {

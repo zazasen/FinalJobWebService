@@ -224,7 +224,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     public Result getMyContract() {
         int userId = UserUtils.getCurrentUserId();
-        Contract contract = contractDao.queryByUserId(userId);
+        Contract contract = contractDao.getMyContract(userId);
         if (contract == null) {
             return Results.createOk(null);
         } else {

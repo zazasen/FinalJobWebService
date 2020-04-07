@@ -71,5 +71,5 @@ public interface LeaveService {
      */
     ResultPage getMyAppliedHolidays(JSONObject params);
 
-    Result getLeaveInfo();
+    Result getLeaveInfo(JSONObject params);
 }

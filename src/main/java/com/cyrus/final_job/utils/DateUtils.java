@@ -112,9 +112,19 @@ public class DateUtils {
         return first;
     }
 
+    public static LocalDate getMonthFirstDay(LocalDate date){
+        LocalDate first = date.with(TemporalAdjusters.firstDayOfMonth());
+        return first;
+    }
+
+    public static LocalDate getMonthLasteDay(LocalDate date){
+        LocalDate last = date.with(TemporalAdjusters.lastDayOfMonth());
+        return last;
+    }
+
     public static LocalDate getCurrentMonthLasterDay() {
         LocalDate now = LocalDate.now();
-        LocalDate laster = now.with(TemporalAdjusters.lastDayOfMonth());
-        return laster;
+        LocalDate last = now.with(TemporalAdjusters.lastDayOfMonth());
+        return last;
     }
 }

@@ -61,8 +61,8 @@ public class SystemController {
     }
 
     @PostMapping("/getShouldBeWorkDays")
-    public Result getShouldBeWorkDays() {
-        return checkInService.getShouldBeWorkDays();
+    public Result getShouldBeWorkDays(@RequestBody JSONObject params) {
+        return checkInService.getShouldBeWorkDays(params);
     }
 
     /**
@@ -71,13 +71,13 @@ public class SystemController {
      * @return
      */
     @PostMapping("/getExceptionCheckIn")
-    public Result getExceptionCheckIn() {
-        return checkInService.getExceptionCheckIn();
+    public Result getExceptionCheckIn(@RequestBody JSONObject params) {
+        return checkInService.getExceptionCheckIn(params);
     }
 
     @PostMapping("/getLeaveInfo")
-    public Result getLeaveInfo() {
-        return leaveService.getLeaveInfo();
+    public Result getLeaveInfo(@RequestBody JSONObject params) {
+        return leaveService.getLeaveInfo(params);
     }
 
     /**

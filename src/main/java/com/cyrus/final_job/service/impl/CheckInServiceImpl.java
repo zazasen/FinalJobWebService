@@ -345,15 +345,21 @@ public class CheckInServiceImpl implements CheckInService {
     }
 
     @Override
-    public Result getShouldBeWorkDays() {
-        // 每月要出勤的天数
-        Integer days = CommonUtils.shouldBeWorkDays();
-
-        List<CheckInStatisticsVo> vos = new ArrayList<>();
+    public Result getShouldBeWorkDays(JSONObject params) {
+        Timestamp month = params.getObject("month", Timestamp.class);
         CheckInCondition condition = new CheckInCondition();
         condition.setUserId(UserUtils.getCurrentUserId());
-        condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
-        condition.setTailTime(LocalDate.now().toString());
+        if (Objects.isNull(month)) {
+            month = new Timestamp(new Date().getTime());
+            condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
+            condition.setTailTime(LocalDate.now().toString());
+        } else {
+            condition.setBeginTime(DateUtils.getMonthFirstDay(month.toLocalDateTime().toLocalDate()).toString());
+            condition.setTailTime(DateUtils.getMonthLasteDay(month.toLocalDateTime().toLocalDate()).toString());
+        }
+        // 每月要出勤的天数
+        Integer days = CommonUtils.shouldBeWorkDays(month.toLocalDateTime().toLocalDate());
+        List<CheckInStatisticsVo> vos = new ArrayList<>();
         List<CheckIn> list = checkInDao.queryAllByConditionNoPage(condition);
 
         int workDays = 0;
@@ -400,28 +406,40 @@ public class CheckInServiceImpl implements CheckInService {
     }
 
     @Override
-    public Result getExceptionCheckIn() {
+    public Result getExceptionCheckIn(JSONObject params) {
+        Timestamp month = params.getObject("month", Timestamp.class);
         Integer userId = UserUtils.getCurrentUserId();
         CheckInCondition condition = new CheckInCondition();
         condition.setUserId(userId);
-        condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
-        condition.setTailTime(DateUtils.getCurrentMonthLasterDay().toString());
+        if (Objects.isNull(month)) {
+            condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
+            condition.setTailTime(DateUtils.getCurrentMonthLasterDay().toString());
+        } else {
+            condition.setBeginTime(DateUtils.getMonthFirstDay(month.toLocalDateTime().toLocalDate()).toString());
+            condition.setTailTime(DateUtils.getMonthLasteDay(month.toLocalDateTime().toLocalDate()).toString());
+        }
         List<CheckIn> checkIns = checkInDao.queryAllByConditionNoPage(condition);
         int later = 0;
         int early = 0;
         double workedTime = 0;
         for (CheckIn checkIn : checkIns) {
-            // 如果当天上班打卡时间早于9点，算迟到
+            LocalDate parse = LocalDate.parse(checkIn.getCreateTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            if (CommonUtils.FreeDayJudge(parse)) {
+                continue;
+            }
+            // 如果当天上班打卡时间晚于9点，算迟到
             if (checkIn.getStartTime() != null && checkIn.getStartTime().toLocalDateTime().isAfter(
-                    LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth().getValue(),
-                            LocalDate.now().getDayOfMonth(), 9, 00))) {
+                    LocalDateTime.of(checkIn.getStartTime().toLocalDateTime().toLocalDate().getYear(),
+                            checkIn.getStartTime().toLocalDateTime().toLocalDate().getMonth().getValue(),
+                            checkIn.getStartTime().toLocalDateTime().toLocalDate().getDayOfMonth(), 9, 00))) {
                 later++;
             }
 
             // 如果当天下班打卡时间早于下午6点算早退
             if (checkIn.getEndTime() != null && checkIn.getEndTime().toLocalDateTime().isBefore(
-                    LocalDateTime.of(LocalDate.now().getYear(), LocalDate.now().getMonth().getValue(),
-                            LocalDate.now().getDayOfMonth(), 18, 00))) {
+                    LocalDateTime.of(checkIn.getEndTime().toLocalDateTime().toLocalDate().getYear(),
+                            checkIn.getEndTime().toLocalDateTime().toLocalDate().getMonth().getValue(),
+                            checkIn.getEndTime().toLocalDateTime().toLocalDate().getDayOfMonth(), 18, 00))) {
                 early++;
             }
             if (checkIn.getWorkHours() != null) {

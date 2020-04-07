@@ -24,6 +24,8 @@ public interface ContractDao {
 
     Contract queryByUserId(Integer id);
 
+    Contract getMyContract(Integer id);
+
 
     /**
      * 查询指定行数据

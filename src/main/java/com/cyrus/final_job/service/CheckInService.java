@@ -109,14 +109,14 @@ public interface CheckInService {
      *
      * @return
      */
-    Result getShouldBeWorkDays();
+    Result getShouldBeWorkDays(JSONObject params);
 
     /**
      * 获取异常考勤
      *
      * @return
      */
-    Result getExceptionCheckIn();
+    Result getExceptionCheckIn(JSONObject params);
 
     /**
      * 手动补卡
