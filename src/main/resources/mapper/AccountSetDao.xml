@@ -43,9 +43,29 @@
         limit #{offset}, #{pageSize}
     </select>
 
-    <select id="queryAllByLimitCount" resultType="long">
+    <select id="queryByCondition" resultMap="AccountSetMap">
+        select
+          id, account_name, basic_salary, traffic_allowance, phone_allowance, food_allowance, pension_basic, pension_ratio, medicare_benefits_basic, medicare_benefits_ratio, business_insurance_basic, business_insurance_ratio, industrial_insurance_basic, industrial_insurance_ratio, birth_insurance_basic, birth_insurance_ratio, housing_fund_basic, housing_fund_ratio, final_salary, create_time,taxes
+        from final_job.account_set
+        <where>
+            <if test="name != null and name != ''">
+                <bind name="accountName" value="'%'+name+'%'"/>
+                and account_name like #{accountName}
+            </if>
+        </where>
+        order by create_time desc
+        limit #{offset}, #{pageSize}
+    </select>
+
+    <select id="queryByConditionCount" resultType="long">
         select count(*)
         from final_job.account_set
+        <where>
+            <if test="name != null and name != ''">
+                <bind name="accountName" value="'%'+name+'%'"/>
+                and account_name like #{accountName}
+            </if>
+        </where>
     </select>
 
     <!--通过实体作为筛选条件查询-->

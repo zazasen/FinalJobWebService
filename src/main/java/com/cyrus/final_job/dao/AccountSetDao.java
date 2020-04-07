@@ -1,6 +1,7 @@
 package com.cyrus.final_job.dao;
 
 import com.cyrus.final_job.entity.AccountSet;
+import com.cyrus.final_job.entity.condition.AccountSetCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -30,7 +31,10 @@ public interface AccountSetDao {
      */
     List<AccountSet> queryAllByLimit(@Param("offset") int offset, @Param("pageSize") int pageSize);
 
-    Long queryAllByLimitCount();
+    List<AccountSet> queryByCondition(AccountSetCondition condition);
+
+
+    Long queryByConditionCount();
 
     /**
      * 通过实体作为筛选条件查询

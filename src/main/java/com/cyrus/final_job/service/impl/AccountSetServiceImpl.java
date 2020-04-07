@@ -97,8 +97,8 @@ public class AccountSetServiceImpl implements AccountSetService {
     public ResultPage queryAccountSet(JSONObject params) {
         AccountSetCondition condition = params.toJavaObject(AccountSetCondition.class);
         condition.buildLimit();
-        List<AccountSet> accountSets = accountSetDao.queryAllByLimit(condition.getOffset(), condition.getPageSize());
-        Long total = accountSetDao.queryAllByLimitCount();
+        List<AccountSet> accountSets = accountSetDao.queryByCondition(condition);
+        Long total = accountSetDao.queryByConditionCount();
         return Results.createOk(total, accountSets);
     }
 
