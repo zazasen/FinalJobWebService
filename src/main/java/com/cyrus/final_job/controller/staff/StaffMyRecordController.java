@@ -3,10 +3,7 @@ package com.cyrus.final_job.controller.staff;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
-import com.cyrus.final_job.service.ApprovalRecordService;
-import com.cyrus.final_job.service.LeaveService;
-import com.cyrus.final_job.service.OvertimeService;
-import com.cyrus.final_job.service.QuitJobService;
+import com.cyrus.final_job.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,6 +28,9 @@ public class StaffMyRecordController {
 
     @Autowired
     private QuitJobService quitJobService;
+
+    @Autowired
+    private ToFormalService toFormalService;
 
     @PostMapping("/getAllMyApproval")
     public ResultPage getAllMyApproval(@RequestBody JSONObject params) {
@@ -81,5 +81,10 @@ public class StaffMyRecordController {
     @PostMapping("/quitJobApply")
     public Result quitJobApply(@RequestBody JSONObject params) {
         return quitJobService.quitJobApply(params);
+    }
+
+    @PostMapping("/conversionApply")
+    public Result conversionApply(@RequestBody JSONObject params){
+        return toFormalService.conversionApply(params);
     }
 }

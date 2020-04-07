@@ -170,19 +170,18 @@
     <select id="queryUserAccountByCondition" resultMap="UserAccountVoMap">
         select id,username,real_name,enabled,work_id
         from final_job.user
-        <where>
-            <if test="workId != null">
-                and work_id = #{workId}
-            </if>
-            <if test="realName != null and realName != ''">
-                <bind name="realName" value="'%' + realName + '%'"/>
-                and real_name like #{realName}
-            </if>
-            <if test="username != null and username != ''">
-                <bind name="username" value="'%' + username + '%'"/>
-                and username like #{username}
-            </if>
-        </where>
+        where enabled = true
+        <if test="workId != null">
+            and work_id = #{workId}
+        </if>
+        <if test="realName != null and realName != ''">
+            <bind name="realName" value="'%' + realName + '%'"/>
+            and real_name like #{realName}
+        </if>
+        <if test="username != null and username != ''">
+            <bind name="username" value="'%' + username + '%'"/>
+            and username like #{username}
+        </if>
         order by create_time desc
         limit #{offset}, #{pageSize}
     </select>
