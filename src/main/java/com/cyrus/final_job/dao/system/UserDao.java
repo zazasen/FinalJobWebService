@@ -1,9 +1,6 @@
 package com.cyrus.final_job.dao.system;
 
-import com.cyrus.final_job.entity.condition.ContractCondition;
-import com.cyrus.final_job.entity.condition.UserAccountQueryCondition;
-import com.cyrus.final_job.entity.condition.UserAccountSetQueryCondition;
-import com.cyrus.final_job.entity.condition.UserCondition;
+import com.cyrus.final_job.entity.condition.*;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.UserAccountVo;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
@@ -106,4 +103,29 @@ public interface UserDao {
     Long queryAllByContractConditionCount(ContractCondition condition);
 
     List<User> getAllUsersExceptOne(@Param("id") int id);
+
+    /**
+     * 根据月份统计入职人数
+     *
+     * @param condition
+     * @return
+     */
+    long getUsersByCreateTime(HrStatisticsCondition condition);
+
+    /**
+     * 根据月份统计转正人数
+     *
+     * @param condition
+     * @return
+     */
+    long getUsersByConversionTime(HrStatisticsCondition condition);
+
+    /**
+     * 根据月份统计离职人数
+     *
+     * @param condition
+     * @return
+     */
+    long getUsersByDepartureTime(HrStatisticsCondition condition);
+
 }

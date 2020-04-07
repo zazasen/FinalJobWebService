@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -219,8 +220,8 @@ public class User implements Serializable, UserDetails {
         if (result != null) return result;
         this.password = CommonUtils.getPassword(username);
         this.userFace = "https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3684533571,3875739943&fm=26&gp=0.jpg";
-        this.createTime = DateUtils.getNowTime();
-        this.updateTime = DateUtils.getNowTime();
+        this.createTime = DateUtils.LocalDate2Timestamp(LocalDate.now());
+        this.updateTime = DateUtils.LocalDate2Timestamp(LocalDate.now());
         this.enabled = true;
         return null;
     }

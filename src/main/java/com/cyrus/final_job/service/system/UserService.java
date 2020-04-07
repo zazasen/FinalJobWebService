@@ -112,4 +112,12 @@ public interface UserService extends UserDetailsService {
      * @return
      */
     Result updateUserFace(MultipartFile file, Integer id);
+
+    /**
+     * 统计数据
+     *
+     * @param params
+     * @return
+     */
+    Result getStatisticsDate(JSONObject params);
 }

@@ -109,7 +109,10 @@
 
     <select id="queryStaffByCondition" resultMap="UserVoMap">
         select
-          id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
+        id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place,
+        politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state,
+        work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time,
+        begin_contract_time, end_contract_time, enabled
         from final_job.user
         <where>
             <if test="workId != null and workId != ''">
@@ -295,7 +298,10 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="UserMap">
         select
-          id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
+        id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place,
+        politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state,
+        work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time,
+        begin_contract_time, end_contract_time, enabled
         from final_job.user
         <where>
             <if test="id != null">
@@ -436,6 +442,33 @@
         begin_contract_time, end_contract_time, enabled
         from final_job.user
         where enabled = true and id != #{id}
+    </select>
+
+    <select id="getUsersByCreateTime" resultType="long">
+        select count(*)
+        from final_job.user
+        where create_time between #{begin} and #{end}
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+    </select>
+
+    <select id="getUsersByConversionTime" resultType="long">
+        select count(*)
+        from final_job.user
+        where conversion_time between #{begin} and #{end}
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
+    </select>
+
+    <select id="getUsersByDepartureTime" resultType="long">
+        select count(*)
+        from final_job.user
+        where departure_time between #{begin} and #{end}
+        <if test="departmentId != null">
+            and department_id = #{departmentId}
+        </if>
     </select>
 
     <select id="queryAllByContractConditionCount" resultType="long">

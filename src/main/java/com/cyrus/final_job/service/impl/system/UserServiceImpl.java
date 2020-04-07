@@ -11,12 +11,14 @@ import com.cyrus.final_job.entity.Holiday;
 import com.cyrus.final_job.entity.Position;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.HrStatisticsCondition;
 import com.cyrus.final_job.entity.condition.UserAccountCondition;
 import com.cyrus.final_job.entity.condition.UserAccountQueryCondition;
 import com.cyrus.final_job.entity.condition.UserCondition;
 import com.cyrus.final_job.entity.system.Role;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.system.UserRole;
+import com.cyrus.final_job.entity.vo.StatisticsDateVo;
 import com.cyrus.final_job.entity.vo.UserAccountVo;
 import com.cyrus.final_job.entity.vo.UserDetailVo;
 import com.cyrus.final_job.entity.vo.UserVo;
@@ -43,6 +45,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -532,9 +535,9 @@ public class UserServiceImpl implements UserService {
         List<Integer> roleIds = userRoles.stream().map(item -> item.getRoleId()).collect(Collectors.toList());
         // 获取该用户下的所有角色信息
         List<Role> roles = null;
-        if(!CollectionUtils.isEmpty(roleIds)){
+        if (!CollectionUtils.isEmpty(roleIds)) {
             roles = roleDao.getRolesByIds(roleIds);
-        }else {
+        } else {
             roles = new ArrayList<>();
         }
         user.setRoles(roles);
@@ -559,7 +562,7 @@ public class UserServiceImpl implements UserService {
 
         // 员工入职时初始化其假期
         buildHoliday(user);
-        rabbitTemplate.convertAndSend("cyrus.mail.welcome",user);
+        rabbitTemplate.convertAndSend("cyrus.mail.welcome", user);
         return Results.createOk("添加成功");
     }
 
@@ -776,5 +779,41 @@ public class UserServiceImpl implements UserService {
         user.setUserFace(url);
         userDao.update(user);
         return Results.createOk("更新成功");
+    }
+
+
+    @Override
+    public Result getStatisticsDate(JSONObject params) {
+        HrStatisticsCondition condition = params.toJavaObject(HrStatisticsCondition.class);
+        if (Objects.isNull(condition.getDate())) {
+            LocalDate begin = DateUtils.getCurrentMonthFirstDay();
+            condition.setBegin(DateUtils.LocalDate2Timestamp(begin));
+            LocalDate end = DateUtils.getCurrentMonthLasterDay();
+            condition.setEnd(DateUtils.LocalDate2Timestamp(end));
+            condition.setDate(DateUtils.LocalDate2Timestamp(begin));
+        } else {
+            LocalDate localDate = condition.getDate().toLocalDateTime().toLocalDate();
+            LocalDate begin = LocalDate.of(localDate.getYear(), localDate.getMonth(), localDate.getDayOfMonth());
+            condition.setBegin(DateUtils.LocalDate2Timestamp(begin));
+            LocalDate end = LocalDate.of(localDate.getYear(), localDate.getMonth(), localDate.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth());
+            condition.setEnd(DateUtils.LocalDate2Timestamp(end));
+        }
+
+        // 入职人数
+        long inCount = userDao.getUsersByCreateTime(condition);
+        // 转正人数
+        long conversionCount = userDao.getUsersByConversionTime(condition);
+        // 离职人数
+        long departureCount = userDao.getUsersByDepartureTime(condition);
+
+
+        StatisticsDateVo vo = new StatisticsDateVo();
+        vo.setStatisticsUsersDate(condition.getDate());
+        List<String> list = new ArrayList<>();
+        list.add(String.valueOf(inCount));
+        list.add((String.valueOf(conversionCount)));
+        list.add((String.valueOf(departureCount)));
+        vo.setData(list);
+        return Results.createOk(vo);
     }
 }

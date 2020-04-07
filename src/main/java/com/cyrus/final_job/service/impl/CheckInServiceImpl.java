@@ -15,7 +15,7 @@ import com.cyrus.final_job.entity.condition.CheckInStatisticsCondition;
 import com.cyrus.final_job.entity.condition.RemedySignCondition;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.CheckInRecordVo;
-import com.cyrus.final_job.entity.vo.CheckInStatisticsDateVo;
+import com.cyrus.final_job.entity.vo.StatisticsDateVo;
 import com.cyrus.final_job.entity.vo.CheckInStatisticsVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
@@ -504,7 +504,7 @@ public class CheckInServiceImpl implements CheckInService {
                 exception++;
             }
         }
-        CheckInStatisticsDateVo vo = new CheckInStatisticsDateVo();
+        StatisticsDateVo vo = new StatisticsDateVo();
         vo.setDate(condition.getDate());
         List<String> list = new ArrayList<>();
         list.add(String.valueOf(half));

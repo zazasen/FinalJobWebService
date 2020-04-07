@@ -10,6 +10,17 @@ import java.util.Date;
 public class DateUtils {
 
 
+    public static Timestamp LocalDateTime2Timestamp(LocalDateTime localDateTime) {
+        Long milliSecond = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+        return new Timestamp(milliSecond);
+    }
+
+    public static Timestamp LocalDate2Timestamp(LocalDate localDate) {
+        long temp = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return new Timestamp(temp);
+    }
+
+
     /**
      * 获取当天上班时间
      *
