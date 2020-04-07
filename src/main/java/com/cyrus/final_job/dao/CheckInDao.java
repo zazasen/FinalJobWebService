@@ -2,6 +2,7 @@ package com.cyrus.final_job.dao;
 
 import com.cyrus.final_job.entity.CheckIn;
 import com.cyrus.final_job.entity.condition.CheckInCondition;
+import com.cyrus.final_job.entity.condition.CheckInStatisticsCondition;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -75,4 +76,6 @@ public interface CheckInDao {
     CheckIn queryByCreateTime(@Param("createTime") String createTime, @Param("userId") Integer userId);
 
     CheckIn queryApplyRecordByCreateTime(@Param("createTime") String createTime, @Param("userId") Integer userId);
+
+    List<CheckIn> queryStatisticsByCondition(CheckInStatisticsCondition condition);
 }

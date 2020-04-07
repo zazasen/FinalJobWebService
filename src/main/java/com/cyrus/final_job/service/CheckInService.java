@@ -125,4 +125,12 @@ public interface CheckInService {
      * @return
      */
     Result updateCheckIn(JSONObject params);
+
+    /**
+     * 获取日考勤统计
+     *
+     * @param params
+     * @return
+     */
+    Result getStatisticsDate(JSONObject params);
 }

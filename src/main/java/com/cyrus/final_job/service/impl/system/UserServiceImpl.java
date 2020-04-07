@@ -35,6 +35,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -530,7 +531,12 @@ public class UserServiceImpl implements UserService {
         List<UserRole> userRoles = userRoleDao.queryAll(userRole);
         List<Integer> roleIds = userRoles.stream().map(item -> item.getRoleId()).collect(Collectors.toList());
         // 获取该用户下的所有角色信息
-        List<Role> roles = roleDao.getRolesByIds(roleIds);
+        List<Role> roles = null;
+        if(!CollectionUtils.isEmpty(roleIds)){
+            roles = roleDao.getRolesByIds(roleIds);
+        }else {
+            roles = new ArrayList<>();
+        }
         user.setRoles(roles);
         return user;
     }

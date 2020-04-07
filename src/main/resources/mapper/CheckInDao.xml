@@ -109,6 +109,22 @@
         where create_time = #{createTime} and user_id = #{userId} and enabled = false
     </select>
 
+
+    <select id="queryStatisticsByCondition" resultMap="CheckInMap">
+        select
+        check_in.id, user_id, start_place, start_time, start_type, end_place, end_time, end_type, sign_type,
+        check_in.create_time,
+        work_hours
+        from check_in,user
+        where check_in.user_id = user.id and check_in.enabled = true
+        <if test="departmentId != null">
+            and user.department_id = #{departmentId}
+        </if>
+        <if test="createTime != null and createTime != ''">
+            and check_in.create_time = #{createTime}
+        </if>
+    </select>
+
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="CheckInMap">
         select

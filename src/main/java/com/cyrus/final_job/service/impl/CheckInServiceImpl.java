@@ -11,9 +11,11 @@ import com.cyrus.final_job.entity.CheckIn;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
 import com.cyrus.final_job.entity.condition.CheckInCondition;
+import com.cyrus.final_job.entity.condition.CheckInStatisticsCondition;
 import com.cyrus.final_job.entity.condition.RemedySignCondition;
 import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.CheckInRecordVo;
+import com.cyrus.final_job.entity.vo.CheckInStatisticsDateVo;
 import com.cyrus.final_job.entity.vo.CheckInStatisticsVo;
 import com.cyrus.final_job.entity.vo.SignCalendarVo;
 import com.cyrus.final_job.enums.*;
@@ -25,6 +27,7 @@ import com.cyrus.final_job.utils.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -456,5 +459,59 @@ public class CheckInServiceImpl implements CheckInService {
         checkIn.setWorkHours(DateUtils.getGapTime(checkIn.getStartTime().toLocalDateTime(), checkIn.getEndTime().toLocalDateTime()));
         checkInDao.update(checkIn);
         return Results.createOk("人工补卡成功");
+    }
+
+    @Override
+    public Result getStatisticsDate(JSONObject params) {
+        CheckInStatisticsCondition condition = params.toJavaObject(CheckInStatisticsCondition.class);
+        if (Objects.isNull(condition.getDate())) {
+            // 如果没有选取时间，则显示最近一天工作日的考勤情况
+            long workDay = new Date().getTime();
+            while (true) {
+                workDay = workDay - 3600 * 1000 * 24;
+                Timestamp timestamp = new Timestamp(workDay);
+                if (CommonUtils.FreeDayJudge(timestamp.toLocalDateTime().toLocalDate())) {
+                    continue;
+                } else {
+                    condition.setDate(timestamp);
+                    break;
+                }
+            }
+        }
+        if (condition.getDate().toLocalDateTime().toLocalDate().isAfter(LocalDate.now())) {
+            return Results.error("请选择昨天及昨天啊以前的日期，今天及今天以后的统计还未出结果哦");
+        }
+        if (CommonUtils.FreeDayJudge(condition.getDate().toLocalDateTime().toLocalDate())) {
+            return Results.error("请选择节假日以外的时间");
+        }
+        condition.setCreateTime(condition.getDate().toLocalDateTime().toLocalDate().toString());
+        List<CheckIn> checkIns = checkInDao.queryStatisticsByCondition(condition);
+        int half = 0;
+        int one = 0;
+        int free = 0;
+        int exception = 0;
+        for (CheckIn checkIn : checkIns) {
+            if (Objects.equals(SignTypeEnum.HALF, SignTypeEnum.getEnumByCode(checkIn.getSignType()))) {
+                half++;
+            }
+            if (Objects.equals(SignTypeEnum.FULL, SignTypeEnum.getEnumByCode(checkIn.getSignType()))) {
+                one++;
+            }
+            if (Objects.equals(SignTypeEnum.FREE, SignTypeEnum.getEnumByCode(checkIn.getSignType()))) {
+                free++;
+            }
+            if (Objects.equals(SignTypeEnum.NONE, SignTypeEnum.getEnumByCode(checkIn.getSignType()))) {
+                exception++;
+            }
+        }
+        CheckInStatisticsDateVo vo = new CheckInStatisticsDateVo();
+        vo.setDate(condition.getDate());
+        List<String> list = new ArrayList<>();
+        list.add(String.valueOf(half));
+        list.add(String.valueOf(one));
+        list.add(String.valueOf(free));
+        list.add(String.valueOf(exception));
+        vo.setData(list);
+        return Results.createOk(vo);
     }
 }
