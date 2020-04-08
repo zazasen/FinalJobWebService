@@ -203,8 +203,8 @@ public class SalaryServiceImpl implements SalaryService {
 
             // 奖惩
             List<RewardAndPunish> rewardAndPunishList = rewardAndPunishDao.queryByUserIdAndCreateTime(item.getId(),
-                    DateUtils.getCurrentMonthFirstDay(),
-                    DateUtils.getCurrentMonthLasterDay());
+                    DateUtils.getMonthFirstDay(lastMonth),
+                    DateUtils.getMonthLasteDay(lastMonth));
 
             // 奖惩金额
             double rewardAndPunishMoney = 0;
@@ -327,8 +327,8 @@ public class SalaryServiceImpl implements SalaryService {
         for (SalaryVo salaryVo : salaryVos) {
             salaryVo.setDepartmentName(departmentDao.queryById(salaryVo.getDepartmentId()).getName());
             List<RewardAndPunish> list = rewardAndPunishDao.queryByUserIdAndCreateTime(salaryVo.getUserId(),
-                    DateUtils.getCurrentMonthFirstDay(),
-                    DateUtils.getCurrentMonthLasterDay());
+                    DateUtils.getMonthFirstDay(salaryVo.getCreateTime().toLocalDateTime().toLocalDate().minusMonths(1)),
+                    DateUtils.getMonthLasteDay(salaryVo.getCreateTime().toLocalDateTime().toLocalDate().minusMonths(1)));
             salaryVo.setRewardAndPunishes(list);
         }
         Long total = salaryDao.queryWithUserByConditionCount(condition);

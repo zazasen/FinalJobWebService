@@ -39,10 +39,10 @@ public class RewardAndPunish {
     private Timestamp createTime;
 
     public Result checkParams() {
-
         if (Objects.isNull(userId)) return Results.error("userId 不能为空");
         if (Objects.isNull(money)) return Results.error("奖惩金额不能为空");
         if (StringUtils.isEmpty(reason)) return Results.error("奖惩原因不能为空");
+        if (Objects.isNull(createTime)) return Results.error("奖惩时间不能为空");
         return null;
     }
 }

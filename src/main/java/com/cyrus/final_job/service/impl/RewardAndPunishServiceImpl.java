@@ -8,7 +8,6 @@ import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.entity.RewardAndPunish;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.service.RewardAndPunishService;
-import com.cyrus.final_job.utils.DateUtils;
 import com.cyrus.final_job.utils.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -112,7 +111,6 @@ public class RewardAndPunishServiceImpl implements RewardAndPunishService {
         RewardAndPunish rewardAndPunish = params.toJavaObject(RewardAndPunish.class);
         Result result = rewardAndPunish.checkParams();
         if (result != null) return result;
-        rewardAndPunish.setCreateTime(DateUtils.getNowTime());
         rewardAndPunishDao.insert(rewardAndPunish);
         return Results.createOk("添加成功");
     }
