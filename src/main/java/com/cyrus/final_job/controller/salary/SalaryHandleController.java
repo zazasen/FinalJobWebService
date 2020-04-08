@@ -18,9 +18,7 @@ public class SalaryHandleController {
     @Autowired
     private DepartmentService departmentService;
 
-
     @PostMapping("/salaryHandle")
-    // todo
     public Result salaryHandle() {
         return salaryService.salaryHandle();
     }
@@ -45,4 +43,13 @@ public class SalaryHandleController {
         return salaryService.editSalary(params);
     }
 
+    @PostMapping("/delMul")
+    public Result delMul(@RequestBody JSONObject params){
+        return salaryService.delMul(params);
+    }
+
+    @PostMapping("/delOne")
+    public Result delOne(@RequestBody JSONObject params){
+        return salaryService.delOne(params);
+    }
 }

@@ -87,4 +87,20 @@ public interface SalaryService {
      * @return
      */
     ResultPage getMySalary(JSONObject params);
+
+    /**
+     * 删除多个
+     *
+     * @param params
+     * @return
+     */
+    Result delMul(JSONObject params);
+
+    /**
+     * 删除单个
+     *
+     * @param params
+     * @return
+     */
+    Result delOne(JSONObject params);
 }

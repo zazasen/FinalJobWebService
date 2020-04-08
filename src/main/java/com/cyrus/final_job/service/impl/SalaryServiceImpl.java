@@ -124,20 +124,23 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public Result salaryHandle() {
-        Salary queryItem = new Salary();
-        // todo
-        queryItem.setCreateTime(new Timestamp(DateUtils.getCurrentMonthFirstDay().atStartOfDay(ZoneOffset.ofHours(8)).toInstant().toEpochMilli()));
-        List<Salary> judge = salaryDao.queryAll(queryItem);
-        if (!CollectionUtils.isEmpty(judge)) {
-            return Results.error("生成失败，上月薪资已经生成过");
-        }
+        LocalDate lastMonth = LocalDate.now().minusMonths(1);
 
         User user = new User();
         user.setEnabled(true);
         List<User> users = userDao.queryAll(user);
-        List<User> leaveUsers = userDao.queryLeave(DateUtils.getCurrentMonthFirstDay(), DateUtils.getCurrentMonthLasterDay());
+        List<User> leaveUsers = userDao.queryLeave(DateUtils.getMonthFirstDay(lastMonth), DateUtils.getMonthLasteDay(lastMonth));
         users.addAll(leaveUsers);
         for (User item : users) {
+
+            Salary queryItem = new Salary();
+            queryItem.setUserId(item.getId());
+            queryItem.setCreateTime(DateUtils.LocalDate2Timestamp(DateUtils.getCurrentMonthFirstDay()));
+            List<Salary> judge = salaryDao.queryAll(queryItem);
+            if (!CollectionUtils.isEmpty(judge)) {
+                continue;
+            }
+
             UserAccountSet temp = userAccountSetDao.queryByUserId(item.getId());
             if (Objects.isNull(temp)) continue;
             // 员工账套
@@ -145,9 +148,9 @@ public class SalaryServiceImpl implements SalaryService {
 
             CheckInCondition condition = new CheckInCondition();
             condition.setUserId(item.getId());
-            // todo
-            condition.setBeginTime(DateUtils.getCurrentMonthFirstDay().toString());
-            condition.setTailTime(DateUtils.getCurrentMonthLasterDay().toString());
+
+            condition.setBeginTime(DateUtils.getMonthFirstDay(lastMonth).toString());
+            condition.setTailTime(DateUtils.getMonthLasteDay(lastMonth).toString());
             // 考勤记录
             List<CheckIn> list = checkInDao.queryAllByConditionNoPage(condition);
 
@@ -365,5 +368,25 @@ public class SalaryServiceImpl implements SalaryService {
         } else {
             return Results.createOk("补差价失败");
         }
+    }
+
+    @Override
+    public Result delMul(JSONObject params) {
+        JSONArray array = params.getJSONArray("ids");
+        List<Integer> ids = JSONArray.parseArray(array.toJSONString(), Integer.class);
+        for (Integer id : ids) {
+            salaryDao.deleteById(id);
+        }
+        return Results.createOk("删除成功");
+    }
+
+    @Override
+    public Result delOne(JSONObject params) {
+        Integer id = params.getInteger("id");
+        if (Objects.isNull(id)) {
+            return Results.error("id 不能为空");
+        }
+        salaryDao.deleteById(id);
+        return Results.createOk("删除成功");
     }
 }
