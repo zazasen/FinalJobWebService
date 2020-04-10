@@ -35,10 +35,37 @@ public class RedisUtils {
     private SetOperations<String, Object> setOperations;
     @Resource(name = "redisTemplate")
     private ZSetOperations<String, Object> zSetOperations;
-    /**  默认过期时长，单位：秒 */
+    /**
+     * 默认过期时长，单位：秒
+     */
     public final static long DEFAULT_EXPIRE = 60 * 60 * 24;
-    /**  不设置过期时长 */
+    /**
+     * 不设置过期时长
+     */
     public final static long NOT_EXPIRE = -1;
+
+
+    public void lPush(String key, Object value) {
+        listOperations.leftPush(key, toJson(value));
+    }
+
+    public void rPush(String key, Object value) {
+        listOperations.rightPush(key, toJson(value));
+    }
+
+    public String lPop(String key) {
+        return toJson(listOperations.leftPop(key));
+    }
+
+    public String rPop(String key) {
+        return toJson(listOperations.rightPop(key));
+    }
+
+
+
+    public long size(String key) {
+        return listOperations.size(key);
+    }
 
     public void set(String key, Object value, long expire) {
         valueOperations.set(key, toJson(value));

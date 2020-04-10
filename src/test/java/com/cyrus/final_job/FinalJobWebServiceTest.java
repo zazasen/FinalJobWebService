@@ -6,11 +6,9 @@ import com.cyrus.final_job.dao.NationDao;
 import com.cyrus.final_job.dao.PoliticsStatusDao;
 import com.cyrus.final_job.dao.system.MenuDao;
 import com.cyrus.final_job.dao.system.RoleDao;
-import com.cyrus.final_job.entity.system.Role;
 import com.cyrus.final_job.service.DepartmentService;
 import com.cyrus.final_job.service.system.MenuService;
 import com.cyrus.final_job.utils.CommonUtils;
-import com.cyrus.final_job.utils.RedisKeys;
 import com.cyrus.final_job.utils.RedisUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +19,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.thymeleaf.TemplateEngine;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 @SpringBootTest
 public class FinalJobWebServiceTest {
@@ -79,15 +76,12 @@ public class FinalJobWebServiceTest {
 
     @Test
     public void setValue() {
-        List<Role> roles = null;
-        redisUtils.set("roleTest", roles);
+        redisUtils.lPush("listkey","陈增森");
     }
 
     @Test
     public void getValue() {
-        String s = RedisKeys.menusKey(1);
-        String roleTest = redisUtils.get(s);
-        System.out.println(roleTest);
+        System.out.println(redisUtils.size("chat:userId:wanglike"));
     }
 
 
