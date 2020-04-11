@@ -31,9 +31,9 @@ public class QuartzConfig {
     CronTriggerFactoryBean checkInJobCron() {
         CronTriggerFactoryBean bean = new CronTriggerFactoryBean();
         bean.setJobDetail(checkInJobDetailFactoryBean().getObject());
-//        bean.setCronExpression("0 0 1 * * ? *"); //每天凌晨一点执行
+        bean.setCronExpression("0 0 1 * * ? *"); //每天凌晨一点执行
 //        bean.setCronExpression("* * * * * ?"); //每秒
-        bean.setCronExpression("0 00 11 * * ? *");
+//        bean.setCronExpression("0 00 11 * * ? *");
         return bean;
     }
 

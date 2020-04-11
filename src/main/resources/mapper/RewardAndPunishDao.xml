@@ -27,36 +27,6 @@
         limit #{offset}, #{pageSize}
     </select>
 
-<!--    <select id="queryAllByLimitCondition" resultMap="RewardAndPunishMap">-->
-<!--        select-->
-<!--          id, user_id, money, reason, create_time-->
-<!--        from final_job.reward_and_punish-->
-<!--        order by create_time desc-->
-<!--        limit #{offset}, #{pageSize}-->
-<!--    </select>-->
-<!--    -->
-<!--    <select id="queryAllByLimitConditionAccount" resultType="long">-->
-<!--        select count(*)-->
-<!--        from final_job.reward_and_punish-->
-<!--        <where>-->
-<!--            <if test="id != null">-->
-<!--                and id = #{id}-->
-<!--            </if>-->
-<!--            <if test="userId != null">-->
-<!--                and user_id = #{userId}-->
-<!--            </if>-->
-<!--            <if test="money != null">-->
-<!--                and money = #{money}-->
-<!--            </if>-->
-<!--            <if test="reason != null and reason != ''">-->
-<!--                and reason = #{reason}-->
-<!--            </if>-->
-<!--            <if test="createTime != null">-->
-<!--                and create_time = #{createTime}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--    </select>-->
-
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="RewardAndPunishMap">
         select

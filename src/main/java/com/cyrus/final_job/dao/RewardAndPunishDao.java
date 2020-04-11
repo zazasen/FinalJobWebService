@@ -31,10 +31,6 @@ public interface RewardAndPunishDao {
      */
     List<RewardAndPunish> queryAllByLimit(@Param("offset") int offset, @Param("pageSize") int pageSize);
 
-//    List<RewardAndPunish> queryAllByLimitCondition(RewardAndPunishCondition condition);
-//
-//    Long queryAllByLimitConditionAccount(RewardAndPunishCondition condition);
-
 
     /**
      * 通过实体作为筛选条件查询
