@@ -1,7 +1,10 @@
 package com.cyrus.final_job.utils;
 
 import org.csource.common.MyException;
-import org.csource.fastdfs.*;
+import org.csource.fastdfs.ClientGlobal;
+import org.csource.fastdfs.StorageClient1;
+import org.csource.fastdfs.TrackerClient;
+import org.csource.fastdfs.TrackerServer;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

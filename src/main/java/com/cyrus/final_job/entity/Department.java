@@ -54,9 +54,6 @@ public class Department implements Serializable {
         if (parentName == null) {
             return Results.error("上级部门名不能为空");
         }
-        if (userId == null) {
-            return Results.error("部门主管不能为空");
-        }
         this.enabled = 1;
         this.isParent = 0;
         return null;
