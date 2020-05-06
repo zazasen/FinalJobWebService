@@ -23,6 +23,19 @@ public class QuartzConfig {
     }
 
     /**
+     * vacationJob
+     *
+     * @return
+     */
+    @Bean
+    MethodInvokingJobDetailFactoryBean vacationJobDetailFactoryBean() {
+        MethodInvokingJobDetailFactoryBean bean = new MethodInvokingJobDetailFactoryBean();
+        bean.setTargetBeanName("vacationJob");
+        bean.setTargetMethod("buildHoliday");
+        return bean;
+    }
+
+    /**
      * checkInJob cron 表达式
      *
      * @return
@@ -37,12 +50,26 @@ public class QuartzConfig {
         return bean;
     }
 
+    /**
+     * vacationJob cron 表达式
+     *
+     * @return
+     */
+    @Bean
+    CronTriggerFactoryBean vacationJobCron() {
+        CronTriggerFactoryBean bean = new CronTriggerFactoryBean();
+        bean.setJobDetail(vacationJobDetailFactoryBean().getObject());
+        bean.setCronExpression("0 0 1 1 1 ? *"); //每年一月01点运行
+        return bean;
+    }
+
 
     // 添加触发器
     @Bean
     SchedulerFactoryBean schedulerFactoryBean() {
         SchedulerFactoryBean bean = new SchedulerFactoryBean();
-        bean.setTriggers(checkInJobCron().getObject());
+        bean.setTriggers(checkInJobCron().getObject(),
+                vacationJobCron().getObject());
         return bean;
     }
 }
