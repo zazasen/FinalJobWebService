@@ -10,6 +10,28 @@ import java.util.Date;
 public class DateUtils {
 
 
+    public static Date Timestamp2Date(Timestamp timestamp) {
+        return new Date(timestamp.getTime());
+    }
+
+
+    /**
+     * 重复日期判断
+     *
+     * @param beforeStartDate
+     * @param beforeEndDate
+     * @param afterStartDate
+     * @param afterEndDate
+     * @return
+     */
+    public static Boolean TimeRepeatJudge(Timestamp beforeStartDate, Timestamp beforeEndDate, Timestamp afterStartDate, Timestamp afterEndDate) {
+        if (beforeStartDate.getTime() <= afterEndDate.getTime() && afterStartDate.getTime() <= beforeEndDate.getTime()) {
+            return true;
+        }
+        return false;
+    }
+
+
     public static Timestamp LocalDateTime2Timestamp(LocalDateTime localDateTime) {
         Long milliSecond = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
         return new Timestamp(milliSecond);
@@ -112,12 +134,12 @@ public class DateUtils {
         return first;
     }
 
-    public static LocalDate getMonthFirstDay(LocalDate date){
+    public static LocalDate getMonthFirstDay(LocalDate date) {
         LocalDate first = date.with(TemporalAdjusters.firstDayOfMonth());
         return first;
     }
 
-    public static LocalDate getMonthLasteDay(LocalDate date){
+    public static LocalDate getMonthLasteDay(LocalDate date) {
         LocalDate last = date.with(TemporalAdjusters.lastDayOfMonth());
         return last;
     }

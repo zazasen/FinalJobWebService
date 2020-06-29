@@ -39,6 +39,8 @@ public interface UserDao {
      */
     List<User> queryAll(User user);
 
+    List<User> queryByPositionId(@Param("positionId") Integer PositionId);
+
     /**
      * 无条件查找所有用户
      *

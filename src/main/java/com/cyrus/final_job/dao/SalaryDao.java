@@ -2,6 +2,7 @@ package com.cyrus.final_job.dao;
 
 import com.cyrus.final_job.entity.Salary;
 import com.cyrus.final_job.entity.condition.SalaryCondition;
+import com.cyrus.final_job.entity.condition.TimeRangeCondition;
 import com.cyrus.final_job.entity.vo.SalaryVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -87,4 +88,12 @@ public interface SalaryDao {
     List<Salary> queryOneByCondition(SalaryCondition condition);
 
     Long queryOneByConditionCount(SalaryCondition condition);
+
+    /**
+     * 薪资统计查询
+     * @param userIds
+     * @param timeRange
+     * @return
+     */
+    List<Salary> queryByUserIds(@Param("userIds") List<Integer> userIds, @Param("timeRange") TimeRangeCondition timeRange);
 }

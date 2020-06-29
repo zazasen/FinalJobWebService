@@ -552,6 +552,7 @@ public class UserServiceImpl implements UserService {
         Long maxWorkId = userDao.getMaxWorkId();
         user.setWorkId(maxWorkId + 1);
         user.setWorkState(WorkStateEnum.IN.getCode());
+        user.setUsername(user.getUsername()+user.getWorkId());
         userDao.insert(user);
 
         // 合同人員添加

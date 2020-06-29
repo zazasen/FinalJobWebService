@@ -154,6 +154,17 @@
         limit #{offset},#{pageSize}
     </select>
 
+    <select id="queryByUserIds" resultMap="SalaryMap">
+        select
+        id, user_id, basic_salary, traffic_allowance, phone_allowance, food_allowance, taxes, five_and_one, check_in_money, check_in_reason, reward_and_punish_money, other_money, other_money_reason, final_salary, create_time
+        from final_job.salary
+        where create_time between #{timeRange.startTime} and #{timeRange.endTime}
+        and user_id in
+        <foreach collection="userIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="queryWithUserByConditionCount" resultType="long">
         select count(*)
         from salary,user

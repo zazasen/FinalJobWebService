@@ -163,7 +163,6 @@
                 and username like #{username}
             </if>
         </where>
-        order by create_time desc
         limit #{offset}, #{pageSize}
     </select>
 
@@ -182,7 +181,6 @@
             <bind name="username" value="'%' + username + '%'"/>
             and username like #{username}
         </if>
-        order by create_time desc
         limit #{offset}, #{pageSize}
     </select>
 
@@ -292,6 +290,16 @@
     <select id="selectAll" resultMap="UserMap">
         select id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place, politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state, work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time, begin_contract_time, end_contract_time, enabled
         from final_job.user
+    </select>
+
+    <select id="queryByPositionId" resultMap="UserMap">
+        select
+        id, username, password, user_face, real_name, gender, birthday, id_card, wedlock, nation_id, native_place,
+        politics_id, email, phone, address, department_id, position_id, top_degree, specialty, school, work_state,
+        work_id, contract_term, work_age, create_time, update_time, conversion_time, departure_time,
+        begin_contract_time, end_contract_time, enabled
+        from final_job.user
+        where position_id = #{positionId}
     </select>
 
     <!--通过实体作为筛选条件查询-->

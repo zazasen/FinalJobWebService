@@ -3,21 +3,22 @@ package com.cyrus.final_job.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.dao.PositionDao;
+import com.cyrus.final_job.dao.system.UserDao;
 import com.cyrus.final_job.entity.Position;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.system.User;
 import com.cyrus.final_job.entity.vo.PositionLevelVo;
 import com.cyrus.final_job.entity.vo.PositionVo;
 import com.cyrus.final_job.enums.EnabledEnum;
 import com.cyrus.final_job.enums.PositionLevelEnum;
 import com.cyrus.final_job.service.PositionService;
 import com.cyrus.final_job.utils.Results;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,6 +34,8 @@ public class PositionServiceImpl implements PositionService {
     private PositionDao positionDao;
 
 
+    @Autowired
+    private UserDao userDao;
 
     /**
      * 通过ID查询单条数据
@@ -138,6 +141,13 @@ public class PositionServiceImpl implements PositionService {
     public Result delPosition(JSONObject params) {
         Integer id = params.getInteger("id");
         if (Objects.isNull(id)) return Results.error("id 不能为空");
+        Position position = positionDao.queryById(id);
+
+        List<User> users = userDao.queryByPositionId(position.getId());
+        if(!CollectionUtils.isEmpty(users)){
+            return Results.error("该职位底下还有员工，不能删除!");
+        }
+
         positionDao.deleteById(id);
         return Results.createOk("删除成功");
     }

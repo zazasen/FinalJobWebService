@@ -165,8 +165,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     public Result getDepByBp() {
         int userId = UserUtils.getCurrentUserId();
         User user = userDao.queryById(userId);
-        Integer departmentId = user.getDepartmentId();
-        List<Department> tree = getDepByDepartmentId(departmentId);
+        List<Department> tree = getDepByDepartmentId(1);
         getApprovalFlow(tree);
         return Results.createOk(tree);
     }

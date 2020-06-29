@@ -137,6 +137,17 @@ public class LeaveServiceImpl implements LeaveService {
             return Results.error("请假时间不得早于现在");
         }
 
+        Leave user = new Leave();
+        user.setUserId(UserUtils.getCurrentUserId());
+        user.setEnabled(true);
+        List<Leave> leaves = leaveDao.queryAll(user);
+        for (Leave leaf : leaves) {
+            Boolean aBoolean = DateUtils.TimeRepeatJudge(leaf.getBeginTime(), leaf.getEndTime(), leave.getBeginTime(), leave.getEndTime());
+            if (aBoolean) {
+                return Results.error("假期范围不能重复");
+            }
+        }
+
 
         leaveDao.insert(leave);
 

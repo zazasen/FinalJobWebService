@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.cyrus.final_job.entity.Salary;
 import com.cyrus.final_job.entity.base.Result;
 import com.cyrus.final_job.entity.base.ResultPage;
+import com.cyrus.final_job.entity.condition.TimeRangeCondition;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -103,4 +105,12 @@ public interface SalaryService {
      * @return
      */
     Result delOne(JSONObject params);
+
+
+    /**
+     * 导出薪资统计数据
+     * @param timeRange
+     * @return
+     */
+    ResponseEntity<byte[]> exportSalaryStatistics(TimeRangeCondition timeRange);
 }

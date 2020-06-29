@@ -69,7 +69,7 @@ public interface DepartmentService {
     Result getAllDepartment();
 
     /**
-     * bp 获取部门，获取自己兄弟部门，以及父部门
+     * bp 获取部门
      *
      * @return
      */
